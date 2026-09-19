@@ -41,9 +41,12 @@ Files carry Drive `appProperties` so the app can find them again and rebuild the
   home-screen web apps where popups do not. Scope is `drive.file` only (files this app creates). The account email
   is read via Drive's `about.get`; requesting `openid email` alongside `drive.file` made Google's
   sign-in flow drop the Drive scope from the token.
-- Video streams from the Drive `files.get?alt=media` endpoint with the access token in the URL,
-  because the browser's video element cannot send headers. Drive supports Range requests, so
-  seeking works.
+- Video playback: the browser's video element cannot send an Authorization header, and Google
+  rejects the access token as a URL parameter for media downloads. The app therefore points the
+  video element at a same-origin virtual URL (`./media?id=…`) that the service worker turns into
+  an authenticated Drive request, preserving Range headers so seeking works. If the service worker
+  is not in control or that request fails, the app downloads the file with `fetch()` and plays it
+  from a blob, showing progress.
 - Service worker caches the app shell, network-first so updates arrive on the next open.
 - Hosted as static files on GitHub Pages.
 

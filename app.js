@@ -39,6 +39,8 @@ let uploading = false;
 let loopA = null, loopB = null;
 let lastSync = 0;
 let video, toastTimer;
+let blobUrl = null;          // object URL when a video was downloaded whole
+let mediaTriedBlob = false;  // fallback already attempted for the current lesson
 
 // ---------- helpers ----------
 function emptyLib() { return { version: 1, updatedAt: null, sources: [], lessons: [] }; }
@@ -483,13 +485,59 @@ async function openDetail(id) {
   current = l; loopReset(); setRate(1);
   video.classList.remove('mirror'); $('btn-mirror').classList.remove('on');
   show('detail'); renderDetail();
-  try {
-    const at = await ensureToken();
-    const src = `${API}/files/${encodeURIComponent(l.id)}?alt=media&access_token=${encodeURIComponent(at)}`;
-    if (video.getAttribute('src') !== src) { video.setAttribute('src', src); video.load(); }
-    video.poster = thumbs[l.id] || '';
-  } catch (e) { /* ensureToken already routed to sign-in */ }
+  loadMedia(l);
 }
+
+// Playback. A <video> element cannot send an Authorization header, and Google rejects the token as a
+// URL parameter for media. Route 1: a same-origin virtual URL that the service worker turns into an
+// authenticated, range-preserving Drive request (true streaming). Route 2, if the service worker is
+// not controlling the page or the media request fails: download the file with fetch() and play it
+// from a blob, showing progress. Recaps are short, so this stays practical.
+async function loadMedia(l) {
+  setVideoLoading('');
+  if (blobUrl) { URL.revokeObjectURL(blobUrl); blobUrl = null; }
+  video.removeAttribute('src'); video.load();
+  mediaTriedBlob = false;
+  let at;
+  try { at = await ensureToken(); } catch (e) { return; }
+  video.poster = thumbs[l.id] || '';
+  const viaWorker = 'serviceWorker' in navigator && !!navigator.serviceWorker.controller;
+  if (viaWorker) {
+    const u = new URL('./media', location.href);
+    u.searchParams.set('id', l.id); u.searchParams.set('t', at);
+    video.src = u.toString(); video.load();
+  } else {
+    loadViaBlob(l, at);
+  }
+}
+async function loadViaBlob(l, at) {
+  if (mediaTriedBlob) return;
+  mediaTriedBlob = true;
+  const id = l.id;
+  try {
+    setVideoLoading('Loading video…');
+    const res = await fetch(`${API}/files/${encodeURIComponent(id)}?alt=media`, { headers: { Authorization: 'Bearer ' + at } });
+    if (!res.ok) throw new Error('Drive error ' + res.status);
+    const total = +res.headers.get('content-length') || l.size || 0;
+    const reader = res.body.getReader(); const chunks = []; let got = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!current || current.id !== id) { reader.cancel().catch(() => {}); setVideoLoading(''); return; }
+      chunks.push(value); got += value.length;
+      if (total) setVideoLoading(`Loading video… ${Math.min(99, Math.round(got / total * 100))}%`);
+    }
+    if (!current || current.id !== id) return;
+    const blob = new Blob(chunks, { type: res.headers.get('content-type') || l.mimeType || 'video/mp4' });
+    blobUrl = URL.createObjectURL(blob);
+    video.src = blobUrl; video.load();
+    setVideoLoading('');
+  } catch (e) {
+    setVideoLoading('');
+    if (e.message !== 'signed out') toast('Could not load this video. ' + shortErr(e), 5000);
+  }
+}
+function setVideoLoading(msg) { const el = $('vload'); el.textContent = msg; el.hidden = !msg; }
 function renderDetail() {
   const l = current; if (!l) return;
   const figs = l.figures;
@@ -760,7 +808,12 @@ function bindEvents() {
   $('btn-mirror').addEventListener('click', () => { video.classList.toggle('mirror'); $('btn-mirror').classList.toggle('on'); });
   $('btn-loop').addEventListener('click', loopStep);
   video.addEventListener('timeupdate', () => { if (loopB !== null && video.currentTime > loopB) video.currentTime = loopA; });
-  video.addEventListener('error', () => { if (current) toast('Could not play this video. Check your connection, or sign in again from Settings.', 5000); });
+  video.addEventListener('error', () => {
+    if (!current) return;
+    const src = video.getAttribute('src') || '';
+    if (src && !src.startsWith('blob:') && !mediaTriedBlob && tokenValid()) { loadViaBlob(current, token.access_token); return; }
+    toast('Could not play this video. It may use a format this browser cannot decode.', 5000);
+  });
   $('detail-body').addEventListener('click', onDetailClick);
   $('detail-body').addEventListener('keydown', e => { if (e.target.id === 'mark-name' && e.key === 'Enter') { e.preventDefault(); submitMark(); } });
 
