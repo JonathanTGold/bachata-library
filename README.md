@@ -38,8 +38,9 @@ Files carry Drive `appProperties` so the app can find them again and rebuild the
 
 - Plain HTML, CSS, and JavaScript. No build step, no framework, no dependencies.
 - Google sign-in uses the OAuth 2.0 implicit flow via full-page redirect, which works inside iOS
-  home-screen web apps where popups do not. Scope is `drive.file` (only files this app creates),
-  plus `openid email` to remember which account to use.
+  home-screen web apps where popups do not. Scope is `drive.file` only (files this app creates). The account email
+  is read via Drive's `about.get`; requesting `openid email` alongside `drive.file` made Google's
+  sign-in flow drop the Drive scope from the token.
 - Video streams from the Drive `files.get?alt=media` endpoint with the access token in the URL,
   because the browser's video element cannot send headers. Drive supports Range requests, so
   seeking works.

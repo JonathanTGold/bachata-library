@@ -11,13 +11,16 @@ const APP_VERSION = '1.0.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
-const SCOPES = 'https://www.googleapis.com/auth/drive.file openid https://www.googleapis.com/auth/userinfo.email';
+// Only the Drive scope. Asking for openid/email alongside it makes Google run its "Sign in with
+// Google" flow, which silently drops the Drive scope from the issued token. The account email
+// is read from the Drive API instead (about.get), which drive.file allows.
+const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 const ROOT_NAME = 'Bachata Library';
 const INDEX_NAME = 'library.json';
 const THUMBS_NAME = '.thumbnails';
 const FOLDER_MIME = 'application/vnd.google-apps.folder';
 const LS = { token: 'bl_token', lib: 'bl_library', clientId: 'bl_client_id', hint: 'bl_login_hint', root: 'bl_root' };
-const SS = { state: 'bl_oauth_state', silent: 'bl_silent_tried' };
+const SS = { state: 'bl_oauth_state', silent: 'bl_silent_tried', needConsent: 'bl_need_consent' };
 const CHUNK = 8 * 1024 * 1024; // resumable upload chunk size, a multiple of 256 KiB
 
 // ---------- state ----------
@@ -114,7 +117,9 @@ function startAuth({ silent = false } = {}) {
   const params = new URLSearchParams({ client_id: id, redirect_uri: redirectUri(), response_type: 'token', scope: SCOPES, include_granted_scopes: 'true', state });
   const hint = localStorage.getItem(LS.hint);
   if (hint) params.set('login_hint', hint);
-  if (silent) params.set('prompt', 'none'); else if (!hint) params.set('prompt', 'select_account');
+  if (silent) params.set('prompt', 'none');
+  else if (sessionStorage.getItem(SS.needConsent) === '1') { params.set('prompt', 'consent'); sessionStorage.removeItem(SS.needConsent); }
+  else if (!hint) params.set('prompt', 'select_account');
   location.replace(AUTH_URL + '?' + params.toString());
   return true;
 }
@@ -128,6 +133,13 @@ function handleRedirect() {
   const expected = sessionStorage.getItem(SS.state); sessionStorage.removeItem(SS.state);
   if (h.get('error')) { console.warn('OAuth error:', h.get('error')); return 'error'; }
   if (expected && h.get('state') !== expected) { toast('Sign-in check failed. Please try again.'); return 'error'; }
+  // Google lets users untick individual permissions. Without Drive access the app cannot work.
+  const granted = (h.get('scope') || '').split(/[\s+]+/);
+  if (granted.length && !granted.some(s => s.endsWith('/auth/drive.file'))) {
+    sessionStorage.setItem(SS.needConsent, '1');
+    toast('Drive access was not granted. Please sign in again and keep the Google Drive box ticked.', 7000);
+    return 'error';
+  }
   const ttl = parseInt(h.get('expires_in') || '3600', 10);
   token = { access_token: h.get('access_token'), expires_at: Date.now() + Math.max(60, ttl - 60) * 1000 };
   localStorage.setItem(LS.token, JSON.stringify(token));
@@ -165,8 +177,8 @@ function signOut() {
 }
 
 async function fetchUserInfo() {
-  try { const r = await api('https://www.googleapis.com/oauth2/v3/userinfo'); if (r && r.email) localStorage.setItem(LS.hint, r.email); }
-  catch (e) { console.warn('userinfo failed', e); }
+  try { const r = await api('/about', { query: { fields: 'user(emailAddress,displayName)' } }); if (r && r.user && r.user.emailAddress) localStorage.setItem(LS.hint, r.user.emailAddress); }
+  catch (e) { console.warn('about.get failed', e); }
 }
 
 // ---------- Drive API ----------
