@@ -5,5 +5,5 @@
  * Leave empty to enter it in the app's setup screen instead.
  */
 window.BACHATA_CONFIG = {
-  GOOGLE_CLIENT_ID: ""
+  GOOGLE_CLIENT_ID: "195630953112-u4rntpk2f3s988flo3ftodqhg6ara6ue.apps.googleusercontent.com"
 };
