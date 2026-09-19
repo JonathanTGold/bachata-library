@@ -24,6 +24,10 @@ Open `index.html` in a browser, or serve the folder:
 python3 -m http.server 8080
 ```
 
+## Live version
+
+https://jonathantgold.github.io/bachata-library/
+
 ## Install on iPhone
 
-Open the hosted URL in Safari or Chrome, tap Share, then **Add to Home Screen**.
+Open the live URL above in Safari or Chrome, tap Share, then **Add to Home Screen**.
