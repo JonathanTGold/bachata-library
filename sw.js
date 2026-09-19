@@ -1,6 +1,6 @@
 /* Bachata Library service worker: caches the app shell, network-first so updates
  * arrive on the next open. Never touches Google API requests. */
-const VERSION = 'bl-v2';
+const VERSION = 'bl-v3';
 // Same-origin virtual path the app uses for video playback. The service worker turns it into an
 // authenticated Drive request, because a <video> element cannot send an Authorization header and
 // Google no longer accepts the token as a URL parameter.
@@ -32,6 +32,16 @@ self.addEventListener('fetch', e => {
   })());
 });
 
+// Google does not expose Content-Range to cross-origin readers, so it is rebuilt here from the
+// requested range, the body length, and the file size (passed by the app, or looked up once).
+const sizeCache = new Map();
+async function fileSize(id, token) {
+  if (sizeCache.has(id)) return sizeCache.get(id);
+  try {
+    const r = await fetch('https://www.googleapis.com/drive/v3/files/' + encodeURIComponent(id) + '?fields=size', { headers: { Authorization: 'Bearer ' + token } });
+    const j = await r.json(); const n = +j.size || 0; if (n) sizeCache.set(id, n); return n;
+  } catch (e) { return 0; }
+}
 async function proxyMedia(req, url) {
   const id = url.searchParams.get('id'), token = url.searchParams.get('t');
   if (!id || !token) return new Response('', { status: 400 });
@@ -41,8 +51,18 @@ async function proxyMedia(req, url) {
   try {
     const res = await fetch('https://www.googleapis.com/drive/v3/files/' + encodeURIComponent(id) + '?alt=media', { headers });
     const h = new Headers();
-    for (const k of ['content-type', 'content-length', 'content-range', 'accept-ranges', 'etag', 'last-modified']) { const v = res.headers.get(k); if (v) h.set(k, v); }
-    if (!h.has('accept-ranges')) h.set('accept-ranges', 'bytes');
+    const ct = res.headers.get('content-type'); if (ct) h.set('content-type', ct);
+    const cl = res.headers.get('content-length'); if (cl) h.set('content-length', cl);
+    h.set('accept-ranges', 'bytes');
+    if (res.status === 206) {
+      let total = +url.searchParams.get('size') || 0;
+      if (!total) total = await fileSize(id, token);
+      const m = /bytes=(\d*)-(\d*)/.exec(range || '');
+      const start = m && m[1] ? +m[1] : 0;
+      const len = cl ? +cl : 0;
+      const end = len ? start + len - 1 : (m && m[2] ? +m[2] : Math.max(0, total - 1));
+      h.set('content-range', 'bytes ' + start + '-' + end + '/' + (total || '*'));
+    }
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
   } catch (err) {
     return new Response('', { status: 502 });

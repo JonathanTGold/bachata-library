@@ -504,7 +504,7 @@ async function loadMedia(l) {
   const viaWorker = 'serviceWorker' in navigator && !!navigator.serviceWorker.controller;
   if (viaWorker) {
     const u = new URL('./media', location.href);
-    u.searchParams.set('id', l.id); u.searchParams.set('t', at);
+    u.searchParams.set('id', l.id); u.searchParams.set('t', at); if (l.size) u.searchParams.set('size', String(l.size));
     video.src = u.toString(); video.load();
   } else {
     loadViaBlob(l, at);
