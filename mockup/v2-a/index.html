@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>אופציה א׳ · יומן הסטודיו</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--bg2:#f5f5f3;--ink:#161616;--muted:#6f6f6a;--line:#e7e7e3;--accent:#2f36ea;--accent-soft:#eceeff;--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--serif:"Frank Ruhl Libre",Georgia,serif;--sans:"Assistant",-apple-system,system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#dcdcd8;font-family:var(--sans);color:var(--ink);-webkit-text-size-adjust:100%}
+body{position:fixed;inset:0}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+input,select,textarea{font:inherit;font-size:16px}
+.stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.phone{position:relative;width:402px;height:874px;background:var(--bg);border-radius:54px;border:10px solid #111;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+@media (max-width:700px){.phone{width:100%;height:100%;border:0;border-radius:0;box-shadow:none}}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg)}
+.screen.active{display:flex}
+.top{padding:max(18px,calc(var(--sat) + 6px)) 22px 0;flex:none}
+.brand{display:flex;justify-content:space-between;align-items:flex-end}
+h1{font-family:var(--serif);font-weight:700;font-size:38px;line-height:1;margin:0;letter-spacing:-.01em}
+.count{font-size:15px;color:var(--muted);margin-top:6px}
+.gear{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:17px;margin-bottom:4px}
+.tabs{display:flex;gap:22px;margin-top:18px;border-bottom:1px solid var(--line)}
+.tab{padding:8px 0 10px;font-weight:600;font-size:16px;color:var(--muted);position:relative}
+.tab.on{color:var(--ink)}
+.tab.on:after{content:"";position:absolute;inset-inline:0;bottom:-1px;height:2px;background:var(--ink)}
+.search{margin:14px 22px 0;display:flex;gap:10px;align-items:center;background:var(--bg2);border-radius:12px;padding:11px 14px;color:var(--muted)}
+.search input{border:0;outline:0;background:transparent;flex:1;color:var(--ink);min-width:0}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 22px 2px;scrollbar-width:none;flex:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:7px 13px;border-radius:999px;border:1px solid var(--line);font-size:14px;font-weight:600;color:var(--ink)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip.teacher{color:var(--accent);border-color:#c9ccf7}
+.chip.teacher.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.list{flex:1;overflow-y:auto;padding:4px 22px calc(90px + var(--sab));-webkit-overflow-scrolling:touch}
+.month{font-family:var(--serif);font-size:22px;font-weight:500;margin:22px 0 6px;display:flex;align-items:baseline;gap:10px}
+.month small{font-family:var(--sans);font-size:13px;color:var(--muted);font-weight:600}
+.row{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);align-items:center}
+.row:last-child{border-bottom:0}
+.th{width:96px;height:72px;border-radius:10px;flex:none;background:#ddd center/cover no-repeat;position:relative;overflow:hidden}
+.th .dur{position:absolute;bottom:6px;inset-inline-end:6px;background:rgba(0,0,0,.7);color:#fff;font-size:11px;font-weight:700;padding:2px 6px;border-radius:5px;direction:ltr}
+.rt{flex:1;min-width:0}
+.rt .ttl{font-family:var(--serif);font-size:19px;font-weight:700;line-height:1.2}
+.rt .meta{font-size:14px;color:var(--muted);margin-top:4px}
+.rt .style{display:inline-block;font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:6px;margin-top:8px}
+.rt .style.salsa{color:#0a7d5a;background:#e3f6ee}
+.tabbar{position:absolute;inset-inline:0;bottom:0;height:calc(62px + var(--sab));padding-bottom:var(--sab);border-top:1px solid var(--line);background:rgba(255,255,255,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;justify-content:space-around;align-items:center}
+.tb{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted);width:90px}
+.tb.on{color:var(--ink)}
+.tb .ic{width:22px;height:22px;border:2px solid currentColor;border-radius:6px}
+.fab{width:54px;height:54px;border-radius:50%;background:var(--ink);color:#fff;font-size:30px;display:grid;place-items:center;margin-top:-26px;box-shadow:0 10px 24px rgba(0,0,0,.25)}
+/* lesson */
+.back{position:absolute;inset-inline-start:14px;top:max(12px,calc(var(--sat) + 6px));z-index:3;background:rgba(0,0,0,.5);color:#fff;border-radius:999px;padding:7px 12px;font-size:14px;font-weight:600}
+.player{position:relative;background:#000;padding-top:var(--sat);flex:none;direction:ltr}
+.player video{display:block;width:100%;aspect-ratio:16/9;max-height:46vh;object-fit:contain;background:#000;transition:transform .2s}
+.player video.mirror{transform:scaleX(-1)}
+.bigplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.92)}
+.bigplay:after{content:"";position:absolute;left:25px;top:19px;border-left:20px solid #111;border-top:13px solid transparent;border-bottom:13px solid transparent}
+.bigplay.hide{display:none}
+.pctl{position:absolute;left:0;right:0;bottom:0;padding:26px 14px 10px;background:linear-gradient(transparent,rgba(0,0,0,.65));color:#fff}
+.scrub{position:relative;height:22px;display:flex;align-items:center;cursor:pointer}
+.scrub .track{position:absolute;left:0;right:0;height:4px;border-radius:2px;background:rgba(255,255,255,.35)}
+.scrub .fill{position:absolute;left:0;height:4px;border-radius:2px;background:#fff;width:0}
+.scrub .knob{position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;margin-left:-7px;left:0;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.scrub .mk{position:absolute;top:1px;width:2px;height:20px;background:#ffd166;margin-left:-1px}
+.scrub .mk:after{content:attr(data-l);position:absolute;top:-16px;left:-4px;font-size:10px;font-weight:700;color:#ffd166}
+.scrub .ab{position:absolute;height:4px;background:rgba(255,209,102,.55)}
+.prow{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.time{font-size:12px;font-variant-numeric:tabular-nums;opacity:.9}
+.pbtns{display:flex;gap:6px}
+.pb{padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.14);font-size:12px;font-weight:700;color:#fff;font-family:var(--sans)}
+.pb.on{background:#fff;color:#111}
+.body{flex:1;overflow-y:auto;padding:0 22px calc(28px + var(--sab));-webkit-overflow-scrolling:touch}
+.tools{display:flex;gap:8px;padding:14px 0 0;align-items:center}
+.seg{display:flex;background:var(--bg2);border-radius:10px;padding:3px;direction:ltr}
+.seg button{padding:7px 10px;border-radius:8px;font-size:13px;font-weight:700;color:var(--muted)}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.tool{padding:9px 12px;border-radius:10px;border:1px solid var(--line);font-size:13px;font-weight:700}
+.tool.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.abbox{margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.abbox.active{border-color:#e6c458;background:#fff9e6}
+.abbox .t{font-weight:700;font-size:15px}
+.abbox .h{font-size:13px;color:var(--muted);margin-top:2px}
+.abbox button{flex:none;background:var(--ink);color:#fff;border-radius:10px;padding:9px 14px;font-weight:700;font-size:14px}
+.abbox.active button{background:#8a6a00}
+.ttl2{font-family:var(--serif);font-size:26px;font-weight:700;line-height:1.15;margin:22px 0 4px}
+.meta2{color:var(--muted);font-size:15px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.meta2 .edit{margin-inline-start:auto;color:var(--accent);font-weight:700}
+h3{font-family:var(--serif);font-size:19px;font-weight:500;margin:24px 0 8px}
+.fig{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-size:16px}
+.fig .tm{font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700;direction:ltr}
+.fig.add{color:var(--muted);border-bottom:0;padding-top:10px}
+.note{font-size:16px;line-height:1.6;color:#333}
+/* add */
+.form{flex:1;overflow-y:auto;padding:0 22px calc(28px + var(--sab))}
+.pick{margin-top:14px;border:1.5px dashed #cfcfca;border-radius:14px;height:120px;display:grid;place-items:center;text-align:center;color:var(--muted);font-size:15px}
+.pick b{display:block;color:var(--ink);font-size:16px;margin-bottom:2px}
+label.f{display:block;margin-top:16px;font-size:13px;font-weight:700;color:var(--muted)}
+.in{margin-top:6px;background:var(--bg2);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:8px}
+.in input,.in select,.in textarea{border:0;outline:0;background:transparent;flex:1;min-width:0;color:var(--ink);-webkit-appearance:none;appearance:none}
+.in textarea{height:64px;resize:none}
+.segw{margin-top:6px;display:flex;background:var(--bg2);border-radius:12px;padding:4px}
+.segw button{flex:1;padding:9px;border-radius:9px;font-weight:700;color:var(--muted)}
+.segw button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.primary{margin-top:22px;width:100%;background:var(--accent);color:#fff;border-radius:14px;padding:15px;font-size:17px;font-weight:700}
+.close{position:absolute;inset-inline-end:16px;top:max(16px,calc(var(--sat) + 8px));width:36px;height:36px;border-radius:50%;background:var(--bg2);font-size:16px;display:grid;place-items:center}
+.toast{position:absolute;inset-inline:22px;bottom:calc(84px + var(--sab));background:var(--ink);color:#fff;padding:12px 14px;border-radius:12px;font-size:14px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;z-index:9}
+.toast.show{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="stage"><div class="phone">
+
+<!-- LIBRARY -->
+<section class="screen active" id="s-lib">
+  <div class="top">
+    <div class="brand"><div><h1>הספרייה</h1><div class="count" id="count"></div></div><div class="gear">⚙</div></div>
+    <div class="tabs" id="styles"></div>
+  </div>
+  <div class="search">⌕<input placeholder="חיפוש לפי פיגורה, בית ספר או הערה"></div>
+  <div class="chips" id="chips"></div>
+  <div class="list" id="list"></div>
+</section>
+
+<!-- LESSON -->
+<section class="screen" id="s-les">
+  <button class="back" id="back">‹ הספרייה</button>
+  <div class="player" id="player">
+    <video id="video" playsinline preload="metadata" src="https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4"></video>
+    <button class="bigplay" id="bigplay" aria-label="נגן"></button>
+    <div class="pctl">
+      <div class="scrub" id="scrub"><div class="track"></div><div class="ab" id="ab" hidden></div><div class="fill" id="fill"></div><div class="mk" id="mkA" data-l="A" hidden></div><div class="mk" id="mkB" data-l="B" hidden></div><div class="knob" id="knob"></div></div>
+      <div class="prow"><span class="time" id="time">0:00 / 0:00</span>
+        <div class="pbtns"><button class="pb" id="pip">תמונה בתוך תמונה</button><button class="pb" id="fs">מסך מלא</button></div></div>
+    </div>
+  </div>
+  <div class="body">
+    <div class="tools">
+      <div class="seg" id="speed"><button data-r="0.25">0.25×</button><button data-r="0.5">0.5×</button><button data-r="0.75">0.75×</button><button data-r="1" class="on">1×</button></div>
+      <button class="tool" id="mirror">מראה</button>
+    </div>
+    <div class="abbox" id="abbox">
+      <div><div class="t" id="abT">חזרה על קטע</div><div class="h" id="abH">בוחרים התחלה וסוף, והסרטון יחזור על הקטע שוב ושוב. מצוין לתרגול פיגורה אחת.</div></div>
+      <button id="abBtn">סמן התחלה</button>
+    </div>
+    <div class="ttl2" id="lTitle"></div>
+    <div class="meta2" id="lMeta"></div>
+    <h3>פיגורות בסיכום</h3>
+    <div id="figs"></div>
+    <h3>הערות</h3>
+    <div class="note" id="lNote"></div>
+  </div>
+</section>
+
+<!-- ADD -->
+<section class="screen" id="s-add">
+  <div class="top"><h1 style="font-size:30px">שיעור חדש</h1><div class="count">בוחרים סרטון, מתייגים, וזה עולה ל‑Drive.</div></div>
+  <button class="close" id="close">✕</button>
+  <div class="form">
+    <div class="pick"><div><b>בחירת סרטון</b>מהתמונות, מהקבצים או צילום עכשיו</div></div>
+    <label class="f">סגנון</label>
+    <div class="segw"><button class="on">באצ׳טה</button><button>סלסה</button><button>אחר…</button></div>
+    <label class="f">סוג שיעור</label>
+    <div class="segw"><button class="on">שיעור קבוצתי</button><button>שיעור פרטי</button></div>
+    <label class="f">בית ספר</label>
+    <div class="in"><select><option>VDance</option><option>סטודיו ריו</option><option>+ בית ספר חדש…</option></select></div>
+    <label class="f">תאריך</label>
+    <div class="in"><input type="date" value="2026-09-19"></div>
+    <label class="f">פיגורות שנלמדו</label>
+    <div class="in"><input placeholder="סומבררו, האמרלוק, בודי רול"></div>
+    <label class="f">הערות</label>
+    <div class="in"><textarea placeholder="מה לתרגל, תיקונים, שיעורי בית"></textarea></div>
+    <button class="primary">שמירה והעלאה ל‑Drive</button>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+<nav class="tabbar"><button class="tb on"><span class="ic"></span>ספרייה</button><button class="fab" id="fab">+</button><button class="tb"><span class="ic"></span>בתי ספר</button></nav>
+</div></div>
+
+<script>
+const L = [
+ {id:1,date:'2026-09-17',style:'באצ׳טה',source:'VDance',type:'group',dur:119,th:'https://picsum.photos/seed/bachata1/400/300',figs:[['האמרלוק',0],['יציאה מסומבררו',4],['בודי רול',7]],note:'להוריד את היד השמאלית בספירה 5. לשמור על פריים רך בכניסה לסומבררו.'},
+ {id:2,date:'2026-09-16',style:'סלסה',source:'סטודיו ריו',type:'group',dur:138,th:'https://picsum.photos/seed/salsa2/400/300',figs:[['קרוס בודי ליד',0],['אנצ׳ופה',5]],note:'הקרוס בודי מתחיל על 1, לא על 5.'},
+ {id:3,date:'2026-09-10',style:'באצ׳טה',source:'אנה רואיז',type:'private',dur:245,th:'https://picsum.photos/seed/bachata3/400/300',figs:[['קמברה',0],['הכנה לדיפ',4],['מוזיקליות: אקצנטים בגיטרה',9]],note:''},
+ {id:4,date:'2026-08-28',style:'באצ׳טה',source:'VDance',type:'group',dur:115,th:'https://picsum.photos/seed/bachata4/400/300',figs:[['שאדו פוזישן',0],['סומבררו',6]],note:''},
+ {id:5,date:'2026-08-21',style:'סלסה',source:'סטודיו ריו',type:'group',dur:190,th:'https://picsum.photos/seed/salsa5/400/300',figs:[['סוזי קיו',0],['שיינס',3]],note:'תרגול שיינס 10 דקות ביום.'},
+];
+const SOURCES=[{name:'VDance',kind:'school'},{name:'סטודיו ריו',kind:'school'},{name:'אנה רואיז',kind:'private'}];
+let style='הכול', src=null, cur=null;
+const $=id=>document.getElementById(id);
+const fmt=s=>`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+const dLong=d=>new Date(d+'T12:00').toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'});
+const dShort=d=>new Date(d+'T12:00').toLocaleDateString('he-IL',{day:'numeric',month:'short'});
+const month=d=>new Date(d+'T12:00').toLocaleDateString('he-IL',{month:'long',year:'numeric'});
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id)); if(id!=='s-les') video.pause();}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2800)}
+function render(){
+  $('styles').innerHTML=['הכול','באצ׳טה','סלסה'].map(s=>`<button class="tab ${style===s?'on':''}" data-s="${s}">${s}</button>`).join('');
+  $('chips').innerHTML=`<button class="chip ${!src?'on':''}" data-src="">כל בתי הספר</button>`+SOURCES.map(s=>`<button class="chip ${s.kind==='private'?'teacher':''} ${src===s.name?'on':''}" data-src="${s.name}">${s.kind==='private'?'מורה פרטי · ':''}${s.name}</button>`).join('');
+  let items=L.filter(l=>(style==='הכול'||l.style===style)&&(!src||l.source===src));
+  $('count').textContent=`${L.length} סיכומים · ${SOURCES.filter(s=>s.kind==='school').length} בתי ספר · מורה פרטי אחד`;
+  let h='',last='';
+  items.forEach(l=>{const m=month(l.date); if(m!==last){h+=`<div class="month">${m}<small>${items.filter(x=>month(x.date)===m).length} שיעורים</small></div>`;last=m;}
+    h+=`<div class="row" data-id="${l.id}"><div class="th" style="background-image:url(${l.th})"><span class="dur">${fmt(l.dur)}</span></div><div class="rt"><div class="ttl">${l.figs.map(f=>f[0]).slice(0,2).join(' · ')}</div><div class="meta">${l.source} · ${l.type==='private'?'פרטי':'קבוצתי'} · ${dShort(l.date)}</div><span class="style ${l.style==='סלסה'?'salsa':''}">${l.style}</span></div></div>`;});
+  $('list').innerHTML=h||'<div class="count" style="padding:40px 0;text-align:center">אין סיכומים בסינון הזה.</div>';
+}
+$('styles').onclick=e=>{const b=e.target.closest('.tab');if(b){style=b.dataset.s;render();}};
+$('chips').onclick=e=>{const b=e.target.closest('.chip');if(b){src=b.dataset.src||null;render();}};
+$('list').onclick=e=>{const r=e.target.closest('.row');if(r)open(+r.dataset.id)};
+$('back').onclick=()=>show('s-lib'); $('fab').onclick=()=>show('s-add'); $('close').onclick=()=>show('s-lib');
+function open(id){cur=L.find(l=>l.id===id); show('s-les'); abReset();
+  $('lTitle').textContent=cur.figs.map(f=>f[0]).join(' · ');
+  $('lMeta').innerHTML=`<span>${cur.source}</span><span>·</span><span>${cur.type==='private'?'שיעור פרטי':'שיעור קבוצתי'}</span><span>·</span><span>${dLong(cur.date)}</span><span class="style ${cur.style==='סלסה'?'salsa':''}" style="margin:0">${cur.style}</span><button class="edit">עריכה</button>`;
+  $('figs').innerHTML=cur.figs.map(f=>`<div class="fig" data-t="${f[1]}"><span>${f[0]}</span><span class="tm">${fmt(f[1])}</span></div>`).join('')+`<div class="fig add">+ סימון פיגורה בזמן הנוכחי</div>`;
+  $('lNote').textContent=cur.note||'אין הערות עדיין. אפשר להוסיף דרך „עריכה”.'; $('lNote').style.color=cur.note?'':'var(--muted)';
+  video.currentTime=0;}
+$('figs').onclick=e=>{const f=e.target.closest('.fig[data-t]');if(f){video.currentTime=+f.dataset.t;video.play();}};
+/* player */
+const video=$('video'), fill=$('fill'), knob=$('knob');
+$('bigplay').onclick=()=>video.play();
+video.onclick=()=>video.paused?video.play():video.pause();
+video.onplay=()=>$('bigplay').classList.add('hide'); video.onpause=()=>$('bigplay').classList.remove('hide');
+video.ontimeupdate=()=>{const p=video.duration?video.currentTime/video.duration:0;fill.style.width=knob.style.left=(p*100)+'%';$('time').textContent=`${fmt(video.currentTime)} / ${fmt(video.duration||0)}`; if(B!==null&&video.currentTime>=B) video.currentTime=A;};
+video.onloadedmetadata=()=>{$('time').textContent=`0:00 / ${fmt(video.duration)}`};
+const scrub=$('scrub'); const seekAt=x=>{const r=scrub.getBoundingClientRect();video.currentTime=Math.max(0,Math.min(1,(x-r.left)/r.width))*video.duration;};
+scrub.onpointerdown=e=>{seekAt(e.clientX);scrub.setPointerCapture(e.pointerId);scrub.onpointermove=ev=>seekAt(ev.clientX);}; scrub.onpointerup=()=>scrub.onpointermove=null;
+$('speed').onclick=e=>{const b=e.target.closest('button');if(!b)return;video.playbackRate=+b.dataset.r;$('speed').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));};
+$('mirror').onclick=()=>{video.classList.toggle('mirror');$('mirror').classList.toggle('on');};
+$('fs').onclick=()=>{ if(video.webkitEnterFullscreen&&/iPhone/.test(navigator.userAgent)) video.webkitEnterFullscreen(); else if($('player').requestFullscreen) $('player').requestFullscreen(); else if(video.webkitEnterFullscreen) video.webkitEnterFullscreen(); };
+$('pip').onclick=async()=>{ try{ if(video.requestPictureInPicture) await video.requestPictureInPicture(); else if(video.webkitSetPresentationMode) video.webkitSetPresentationMode('picture-in-picture'); else toast('הדפדפן הזה לא תומך בתמונה בתוך תמונה'); }catch(e){toast('צריך להתחיל לנגן קודם')} };
+if(!(document.pictureInPictureEnabled||video.webkitSupportsPresentationMode)) $('pip').style.display='none';
+/* A-B */
+let A=null,B=null;
+function abReset(){A=B=null;$('abbox').classList.remove('active');$('abT').textContent='חזרה על קטע';$('abH').textContent='בוחרים התחלה וסוף, והסרטון יחזור על הקטע שוב ושוב. מצוין לתרגול פיגורה אחת.';$('abBtn').textContent='סמן התחלה';['mkA','mkB','ab'].forEach(i=>$(i).hidden=true);}
+$('abBtn').onclick=()=>{ if(A===null){A=video.currentTime;$('abT').textContent=`התחלה סומנה ב‑${fmt(A)}`;$('abH').textContent='נגנו עד סוף הקטע ולחצו שוב.';$('abBtn').textContent='סמן סוף';$('mkA').hidden=false;$('mkA').style.left=(A/video.duration*100)+'%'; if(video.paused) video.play(); }
+  else if(B===null){B=Math.max(video.currentTime,A+0.5);$('abbox').classList.add('active');$('abT').textContent=`חוזר על ${fmt(A)}–${fmt(B)}`;$('abH').textContent='הקטע ינוגן שוב ושוב עד שתעצרו.';$('abBtn').textContent='עצור חזרה';$('mkB').hidden=false;$('mkB').style.left=(B/video.duration*100)+'%';$('ab').hidden=false;$('ab').style.left=(A/video.duration*100)+'%';$('ab').style.width=((B-A)/video.duration*100)+'%';video.currentTime=A;video.play();}
+  else abReset(); };
+render();
+</script>
+</body>
+</html>
