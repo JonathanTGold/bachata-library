@@ -1,33 +1,85 @@
 # Bachata Library
 
-A lightweight web app (PWA) to organize, browse, and watch Bachata lesson recap videos.
-Videos live in your own Google Drive. The app is only the front end; nothing is stored on a server.
+A lightweight progressive web app (PWA) to organize, browse, and watch Bachata lesson recap videos.
+Everything lives in **your own Google Drive**. The app is only the front end. There is no backend
+and no server that ever sees your videos.
 
-## Status
+**Live app:** https://jonathantgold.github.io/bachata-library/
+**UI mockup (fake data):** https://jonathantgold.github.io/bachata-library/mockup/
 
-**Mockup stage.** `index.html` is a clickable UI mockup with fake data: library, lesson player
-(speed, mirror, A-B loop), add/tag form, and schools list. No Google sign-in or Drive upload yet.
+## What it does
 
-## Planned architecture
+- **Library** grouped by month, filter chips per school and per private teacher, plus an Untagged inbox.
+- **Add lesson**: pick a clip from Photos or Files, date auto-filled from the file, choose Group class
+  (school) or Private (teacher name), type the figures covered, optional notes. Uploads to Drive in
+  resumable chunks with a progress bar.
+- **Lesson player**: streams straight from Drive. Speed 1x / 0.75x / 0.5x / 0.25x, mirror flip,
+  A-B loop, tap a figure to jump to its timestamp, mark a figure at the current time.
+- **Schools** list with counts; private teachers listed alongside.
+- **Settings**: open the Drive folder, rescan and repair the index, sign out.
+- Installable on iPhone via Add to Home Screen. Works on Android and desktop Chrome too.
 
-- Storage: a `Bachata Library` folder in the user's Google Drive, one subfolder per school
-  (or per teacher for private lessons), plus a single `library.json` index.
-- Auth: Google Sign-In with the `drive.file` scope (non-sensitive, no verification needed).
-- Playback: the browser's native video element streaming straight from Drive with Range requests.
-- Hosting: static files on GitHub Pages. No backend.
+## How the data is laid out in Drive
+
+```
+Bachata Library/
+  library.json          # index: schools/teachers, lessons, figures, timestamps, notes
+  .thumbnails/          # small JPEG posters
+  <School name>/        # one folder per school
+    2026-09-14 <School name>.mov
+  <Teacher name>/       # one folder per private teacher
+    2026-09-17 <Teacher name>.mov
+```
+
+Files carry Drive `appProperties` so the app can find them again and rebuild the index if needed
+(Settings > Rescan).
+
+## Architecture
+
+- Plain HTML, CSS, and JavaScript. No build step, no framework, no dependencies.
+- Google sign-in uses the OAuth 2.0 implicit flow via full-page redirect, which works inside iOS
+  home-screen web apps where popups do not. Scope is `drive.file` (only files this app creates),
+  plus `openid email` to remember which account to use.
+- Video streams from the Drive `files.get?alt=media` endpoint with the access token in the URL,
+  because the browser's video element cannot send headers. Drive supports Range requests, so
+  seeking works.
+- Service worker caches the app shell, network-first so updates arrive on the next open.
+- Hosted as static files on GitHub Pages.
+
+## One-time Google setup (about 10 minutes)
+
+The app needs an OAuth client ID. It is public by design; Google only issues tokens for it to the
+origins you register.
+
+1. Go to https://console.cloud.google.com/ and create a project (for example "Bachata Library").
+2. **APIs & Services > Library**: enable **Google Drive API**.
+3. **Google Auth Platform > Branding**: app name, support email, developer contact.
+   **Audience**: External, then **Publish app**. (Testing mode expires sessions every 7 days.)
+   **Data access**: add the scope `https://www.googleapis.com/auth/drive.file`. It is non-sensitive,
+   so no verification review is required.
+4. **Clients > Create client**, type **Web application**:
+   - Authorized JavaScript origins: `https://jonathantgold.github.io`
+     (add `http://localhost:8787` for local development)
+   - Authorized redirect URIs: `https://jonathantgold.github.io/bachata-library/`
+     (add `http://localhost:8787/` for local development)
+5. Copy the client ID into `config.js`, or paste it into the app's setup screen.
 
 ## Run locally
 
-Open `index.html` in a browser, or serve the folder:
-
 ```
-python3 -m http.server 8080
+python3 -m http.server 8787
 ```
 
-## Live version
+Then open http://localhost:8787/ . Sign-in only works if that origin is registered on the OAuth client.
 
-https://jonathantgold.github.io/bachata-library/
+## Repository layout
 
-## Install on iPhone
-
-Open the live URL above in Safari or Chrome, tap Share, then **Add to Home Screen**.
+```
+index.html   app shell
+app.js       all application logic (auth, Drive API, upload, player, screens)
+styles.css   styles
+sw.js        service worker
+config.js    Google client ID
+manifest.webmanifest, icons/
+mockup/      the original clickable UI mockup with fake data
+```

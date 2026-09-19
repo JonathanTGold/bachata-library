@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Bachata Library</title>
+<meta name="description" content="Organize, browse, and watch your Bachata lesson recap videos, stored in your own Google Drive.">
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#f6f4f1">
 <meta name="mobile-web-app-capable" content="yes">
@@ -12,372 +13,127 @@
 <meta name="apple-mobile-web-app-title" content="Bachata">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
-<style>
-:root{
-  --bg:#f6f4f1; --card:#fff; --ink:#1c1a17; --muted:#7a746c; --line:#e7e2db;
-  --accent:#c8432f; --accent-soft:#fbe9e5; --chip:#efebe6;
-  --private:#2f6fb3; --group:#3a9d6a;
-}
-*{box-sizing:border-box}
-html,body{margin:0;height:100%;background:#d9d4cd;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-ui,sans-serif;color:var(--ink)}
-.stage{min-height:100%;display:flex;align-items:center;justify-content:center;gap:48px;padding:24px}
-.phone{width:390px;height:844px;background:var(--bg);border-radius:48px;box-shadow:0 30px 80px rgba(0,0,0,.35);position:relative;overflow:hidden;border:10px solid #111;flex:none}
-@media (max-width:900px){ .stage{padding:0;display:block} .phone{width:100%;height:100vh;border:0;border-radius:0;box-shadow:none} .aside{display:none} }
-.screen{position:absolute;inset:0;display:none;flex-direction:column}
-.screen.active{display:flex}
-.top{padding:max(56px, calc(env(safe-area-inset-top) + 16px)) 20px 12px;background:var(--bg)}
-h1{margin:0;font-size:28px;letter-spacing:-.02em}
-.sub{color:var(--muted);font-size:14px;margin-top:4px}
-.search{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 14px;color:var(--muted);font-size:15px;display:flex;gap:8px;align-items:center}
-.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 20px 4px;scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
-.chip{flex:none;padding:7px 12px;border-radius:999px;background:var(--chip);font-size:13px;font-weight:500;color:#3d3833;cursor:pointer;border:1px solid transparent;user-select:none}
-.chip.on{background:var(--ink);color:#fff}
-.chip.priv{background:#fff;border-color:var(--line)}
-.chip.priv:before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--private);margin-right:6px}
-.chip.warn{background:var(--accent-soft);color:var(--accent)}
-.chip.warn.on{background:var(--accent);color:#fff}
-.scroll{flex:1;overflow-y:auto;padding:8px 20px calc(110px + env(safe-area-inset-bottom))}
-.month{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px}
-.card{display:flex;gap:12px;background:var(--card);border-radius:18px;padding:10px;margin-bottom:10px;border:1px solid var(--line);cursor:pointer}
-.card.untagged{border-style:dashed;border-color:#e0a89f}
-.thumb{width:92px;height:92px;border-radius:12px;flex:none;position:relative;background:linear-gradient(135deg,#3b2a2a,#8a3b2c)}
-.thumb.t2{background:linear-gradient(135deg,#1f2d3a,#3f6f8a)}
-.thumb.t3{background:linear-gradient(135deg,#2c2338,#7a4c8f)}
-.thumb .dur{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.65);color:#fff;font-size:11px;padding:2px 6px;border-radius:6px}
-.thumb .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.9)}
-.thumb .play:after{content:"";position:absolute;left:11px;top:8px;border-left:10px solid var(--ink);border-top:6px solid transparent;border-bottom:6px solid transparent}
-.meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
-.title{font-weight:600;font-size:15px;line-height:1.25}
-.who{font-size:13px;color:var(--muted)}
-.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
-.tag{font-size:11px;padding:3px 8px;border-radius:999px;background:var(--chip);color:#3d3833}
-.type{font-size:11px;padding:3px 8px;border-radius:999px;color:#fff;font-weight:600}
-.type.private{background:var(--private)} .type.group{background:var(--group)}
-.tabbar{position:absolute;left:0;right:0;bottom:0;height:calc(84px + env(safe-area-inset-bottom));background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:flex-start;padding-top:10px}
-.tab{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--muted);cursor:pointer;width:80px;font-weight:500}
-.tab.on{color:var(--accent)}
-.tab .ic{width:24px;height:24px;border-radius:7px;border:2px solid currentColor}
-.tab .ic.house{border-radius:4px 4px 7px 7px;border-top-width:4px}
-.fab{width:56px;height:56px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;line-height:1;margin-top:-30px;box-shadow:0 8px 20px rgba(200,67,47,.4);cursor:pointer}
-.back{position:absolute;left:16px;top:max(52px, calc(env(safe-area-inset-top) + 12px));z-index:2;background:rgba(0,0,0,.45);color:#fff;border-radius:999px;padding:6px 12px;font-size:14px;cursor:pointer}
-.player{background:#000;height:300px;position:relative;display:flex;align-items:center;justify-content:center;flex:none}
-video{width:100%;height:100%;object-fit:contain;transition:transform .2s}
-video.mirror{transform:scaleX(-1)}
-.controls{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);background:#fff;overflow-x:auto;scrollbar-width:none;flex:none}
-.ctl{flex:none;padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink);user-select:none}
-.ctl.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
-.section{padding:14px 20px 0}
-.section h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-.fig{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:6px;cursor:pointer;font-size:14px}
-.fig .t{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--accent);background:var(--accent-soft);padding:2px 6px;border-radius:6px}
-.note{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:14px;line-height:1.45;color:#3d3833}
-.headline{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.headline .title{font-size:18px}
-.link{color:var(--accent);font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
-.form{padding:0 20px}
-.field{margin-top:14px}
-.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
-.input{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.input select,.input input,.input textarea{border:0;outline:0;font:inherit;background:transparent;flex:1;min-width:0;color:var(--ink)}
-.input textarea{resize:none;height:56px;line-height:1.4}
-.auto{font-size:11px;color:var(--group);font-weight:700;background:#e6f4ec;padding:3px 7px;border-radius:6px;white-space:nowrap}
-.seg{display:flex;background:var(--chip);border-radius:12px;padding:4px}
-.seg div{flex:1;text-align:center;padding:8px;border-radius:9px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;user-select:none}
-.seg div.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.pick{height:140px;border-radius:16px;border:2px dashed #cfc7bd;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:var(--muted);font-size:14px;background:#fff;cursor:pointer;text-align:center;padding:0 20px}
-.pick.picked{border-style:solid;border-color:var(--line);background:linear-gradient(135deg,#3b2a2a,#8a3b2c);color:#fff}
-.pick b{font-size:15px}
-.primary{margin:20px 0 0;background:var(--accent);color:#fff;border:0;border-radius:14px;padding:15px;font-size:16px;font-weight:600;width:100%;cursor:pointer}
-.primary:disabled{opacity:.5}
-.progress{margin:12px 0 0;height:6px;background:var(--chip);border-radius:3px;overflow:hidden;display:none}
-.progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
-.hint{color:var(--muted);font-size:13px;padding:10px 0 0;line-height:1.4}
-.trow{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:8px;cursor:pointer}
-.trow .n{font-weight:600;font-size:15px}
-.trow .s{font-size:13px;color:var(--muted);margin-top:2px}
-.count{font-size:13px;color:var(--muted);text-align:right}
-.aside{max-width:360px;color:#2b2723;font-size:14px;line-height:1.55}
-.aside h2{margin:0 0 6px;font-size:20px;letter-spacing:-.01em}
-.aside p{margin:0 0 12px}
-.aside ol{padding-left:18px;margin:0 0 12px}
-.aside li{margin-bottom:8px}
-.aside .k{display:inline-block;background:#fff;border:1px solid #cfc7bd;padding:1px 7px;border-radius:6px;font-size:12px;font-weight:600}
-</style>
+<link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-<div class="stage">
-<div class="phone">
+<div class="app">
+
+  <!-- SIGN IN -->
+  <section class="screen" id="s-auth">
+    <div class="auth">
+      <img class="logo" src="./icons/icon-192.png" alt="">
+      <h1>Bachata Library</h1>
+      <p class="sub">Your lesson recaps, organized by school, streamed from your own Google Drive. Nothing is stored anywhere else.</p>
+      <button class="primary" id="btn-signin">Sign in with Google</button>
+      <p class="hint" id="auth-hint">Asks only for access to files this app creates in your Drive.</p>
+
+      <div class="setup" id="setup" hidden>
+        <h3>One-time setup</h3>
+        <p>This copy of the app has no Google client ID yet. Create one in the Google Cloud console, then paste it below.</p>
+        <ol>
+          <li>Create a project and enable the <b>Google Drive API</b>.</li>
+          <li>Under <b>Google Auth Platform</b> set up branding, choose audience <b>External</b>, add the scope <code>…/auth/drive.file</code>, and publish the app.</li>
+          <li>Create an OAuth client of type <b>Web application</b> with<br>
+            Authorized JavaScript origin: <code id="setup-origin"></code><br>
+            Authorized redirect URI: <code id="setup-redirect"></code></li>
+        </ol>
+        <div class="input"><input id="setup-client" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Paste client ID (ends with .apps.googleusercontent.com)"></div>
+        <button class="primary" id="btn-save-client">Save and sign in</button>
+      </div>
+    </div>
+  </section>
 
   <!-- LIBRARY -->
-  <section class="screen active" id="s-library">
-    <div class="top">
-      <h1>Library</h1>
-      <div class="sub" id="lib-sub"></div>
-      <div class="search">&#9906;&nbsp; Search figures, schools, notes</div>
+  <section class="screen" id="s-library">
+    <div class="top row">
+      <div><h1>Library</h1><div class="sub" id="lib-sub"></div></div>
+      <button class="iconbtn" id="btn-settings" aria-label="Settings">&#9881;</button>
     </div>
+    <div class="searchwrap"><div class="search">&#9906;<input id="search" type="search" placeholder="Search figures, schools, notes" autocomplete="off"></div></div>
     <div class="chips" id="chips"></div>
     <div class="scroll" id="list"></div>
   </section>
 
-  <!-- DETAIL -->
+  <!-- LESSON -->
   <section class="screen" id="s-detail">
-    <div class="back" onclick="go('library')">&#8249; Library</div>
-    <div class="player">
-      <video id="video" playsinline controls preload="metadata"
-        src="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"></video>
-    </div>
+    <button class="back" id="btn-back">&#8249; Library</button>
+    <div class="player"><video id="video" playsinline controls preload="metadata"></video></div>
     <div class="controls">
-      <div class="ctl on" data-rate="1" onclick="setRate(this)">1x</div>
-      <div class="ctl" data-rate="0.5" onclick="setRate(this)">0.5x</div>
-      <div class="ctl" data-rate="0.25" onclick="setRate(this)">0.25x</div>
-      <div class="ctl" id="mirror" onclick="toggleMirror()">Mirror</div>
-      <div class="ctl" id="loop" onclick="loopStep()">Loop A–B</div>
+      <button class="ctl on" data-rate="1">1x</button>
+      <button class="ctl" data-rate="0.75">0.75x</button>
+      <button class="ctl" data-rate="0.5">0.5x</button>
+      <button class="ctl" data-rate="0.25">0.25x</button>
+      <button class="ctl" id="btn-mirror">Mirror</button>
+      <button class="ctl" id="btn-loop">Loop A–B</button>
     </div>
-    <div class="scroll" id="detail-body"></div>
+    <div class="scroll plain" id="detail-body"></div>
   </section>
 
   <!-- ADD / EDIT -->
   <section class="screen" id="s-add">
-    <div class="top">
-      <h1 id="add-title">Add lesson</h1>
-      <div class="sub">Takes about 20 seconds right after class</div>
+    <div class="top row">
+      <div><h1 id="add-title">Add lesson</h1><div class="sub" id="add-sub">Pick the recap, tag it, done.</div></div>
+      <button class="iconbtn" id="btn-cancel" aria-label="Cancel">&#10005;</button>
     </div>
-    <div class="scroll">
+    <div class="scroll plain">
       <div class="form">
-        <div class="pick" id="pick" onclick="pickVideo()">
-          <b>Choose video from Photos</b>
-          <span>Recorded today · picks the newest by default</span>
-        </div>
+        <label class="pick" id="pick" for="f-file">
+          <input type="file" id="f-file" class="vh" accept="video/*">
+          <div class="txt"><b>Choose a video</b><span>Photo Library, Files, or record now</span></div>
+        </label>
 
-        <div class="field"><label>Date</label>
-          <div class="input"><span id="f-date">17 Sep 2026, 19:40</span><span class="auto">from video</span></div></div>
+        <div class="field"><label for="f-date">Date</label>
+          <div class="input"><input type="date" id="f-date"></div></div>
 
         <div class="field"><label>Lesson</label>
           <div class="seg" id="f-type">
-            <div class="on" onclick="setType(this,'group')">Group class</div>
-            <div onclick="setType(this,'private')">Private</div>
+            <button type="button" class="on" data-type="group">Group class</button>
+            <button type="button" data-type="private">Private</button>
           </div></div>
 
-        <div class="field"><label id="f-source-label">School</label>
-          <div class="input">
-            <select id="f-source"></select>
-          </div>
-          <div class="hint" id="f-source-hint" style="padding-top:6px"></div></div>
+        <div class="field"><label id="f-source-label" for="f-source">School</label>
+          <div class="input"><select id="f-source"></select></div>
+          <div class="input" id="f-new-wrap" hidden><input id="f-new" placeholder="Name" autocomplete="off"></div>
+          <div class="hint" id="f-source-hint"></div></div>
 
-        <div class="field"><label>Figures covered</label>
-          <div class="input"><input id="f-figs" placeholder="Sombrero, hammerlock exit, body roll"></div></div>
+        <div class="field"><label for="f-figs">Figures covered</label>
+          <div class="input"><input id="f-figs" placeholder="Sombrero, hammerlock exit, body roll" autocomplete="off"></div></div>
 
-        <div class="field"><label>Notes (optional)</label>
+        <div class="field"><label for="f-note">Notes (optional)</label>
           <div class="input"><textarea id="f-note" placeholder="What to practice, corrections, homework"></textarea></div></div>
 
-        <button class="primary" id="save" onclick="save()">Save &amp; upload to Drive</button>
+        <button class="primary" id="btn-save">Save &amp; upload to Drive</button>
         <div class="progress" id="prog"><i></i></div>
-        <div class="hint">Uploads to Drive › Bachata Library. Skip the fields and it lands in <b>Untagged</b> so you can fill them in later.</div>
+        <div class="hint" id="prog-hint"></div>
+        <button class="danger" id="btn-delete" hidden>Delete this recap</button>
       </div>
     </div>
-    <div class="back" style="background:var(--chip);color:var(--ink);left:auto;right:16px" onclick="go('library')">Cancel</div>
   </section>
 
   <!-- SCHOOLS -->
   <section class="screen" id="s-schools">
-    <div class="top">
-      <h1>Schools</h1>
-      <div class="sub">Private teachers listed alongside. Tap one to filter.</div>
-    </div>
+    <div class="top"><h1>Schools</h1><div class="sub">Private teachers listed alongside. Tap one to filter.</div></div>
     <div class="scroll" id="schools"></div>
   </section>
 
-  <div class="tabbar">
-    <div class="tab on" id="tab-library" onclick="go('library')"><div class="ic"></div>Library</div>
-    <div class="fab" onclick="openAdd()">+</div>
-    <div class="tab" id="tab-schools" onclick="go('schools')"><div class="ic house"></div>Schools</div>
-  </div>
+  <!-- SETTINGS -->
+  <section class="screen" id="s-settings">
+    <div class="top row">
+      <div><h1>Settings</h1><div class="sub" id="set-sub"></div></div>
+      <button class="iconbtn" id="btn-settings-back" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="scroll plain" id="settings-body"></div>
+  </section>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="tab on" data-go="library"><span class="ic"></span>Library</button>
+    <button class="fab" id="btn-add" aria-label="Add lesson">+</button>
+    <button class="tab" data-go="schools"><span class="ic house"></span>Schools</button>
+  </nav>
 </div>
-
-<div class="aside">
-  <h2>What you're looking at</h2>
-  <p>A static mockup with fake data. Nothing is uploaded and nothing is stored. The player uses a public sample clip so the controls can be tried for real.</p>
-  <ol>
-    <li><span class="k">Library</span> is the home screen. Chips filter by school, by private teacher, or untagged.</li>
-    <li>Tap a card to open the <span class="k">Lesson</span>. Try <span class="k">Mirror</span>, <span class="k">0.5x</span>, and <span class="k">Loop A–B</span>: tap once to set A, again to set B.</li>
-    <li>The <span class="k">+</span> button is where classification happens. Date comes from the video. Pick Group and choose the school, or pick Private and choose the teacher. Then type the figures.</li>
-    <li>Untagged videos get a dashed card so nothing gets lost.</li>
-  </ol>
-  <p>Resize the window narrower than 900px to see it as a full-screen phone app.</p>
-</div>
-</div>
-
-<script>
-/* One list of "sources": a school for group classes, a teacher's name for private lessons. */
-const SOURCES = [
-  {name:"Bachata Lab",       kind:"school"},
-  {name:"Salsa Loca Studio", kind:"school"},
-  {name:"Studio 7",          kind:"school"},
-  {name:"Ana Ruiz",          kind:"private"},
-  {name:"Luis Ortega",       kind:"private"},
-];
-let LESSONS = [
-  {id:1, date:"2026-09-17", source:"Ana Ruiz",          type:"private", dur:"3:42", th:"",   figs:[["Sombrero","0:00"],["Hammerlock exit","0:04"],["Body roll cue","0:09"]], note:"Keep the frame soft on the sombrero prep. Left hand lower on count 5."},
-  {id:2, date:"2026-09-14", source:"Salsa Loca Studio", type:"group",   dur:"2:18", th:"t2", figs:[["Basic lateral","0:00"],["Cross-body lead","0:05"]], note:"Cross-body starts on 1, not 5."},
-  {id:3, date:"2026-09-10", source:"Studio 7",          type:"group",   dur:"4:05", th:"t3", figs:[["Cambré","0:00"],["Dip prep","0:04"],["Musicality: guitar accents","0:10"]], note:""},
-  {id:4, date:"2026-08-28", source:"Bachata Lab",       type:"group",   dur:"1:55", th:"",   figs:[["Shadow position","0:00"],["Sombrero","0:06"]], note:""},
-  {id:5, date:"2026-08-21", source:"Luis Ortega",       type:"private", dur:"3:10", th:"t2", figs:[["Hip isolation drill","0:00"],["Wave","0:07"]], note:"Homework: 10 min isolation drill daily."},
-  {id:6, date:"2026-08-19", source:null, type:null, dur:"2:40", th:"t3", figs:[], note:"", untagged:true},
-];
-let filter = {kind:"all", value:null};
-let current = null;
-
-const fmtDate = d => new Date(d+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});
-const monthOf = d => new Date(d+"T12:00:00").toLocaleDateString("en-GB",{month:"long",year:"numeric"});
-const toSec = t => { const [m,s]=t.split(":").map(Number); return m*60+s; };
-const typeBadge = t => `<span class="type ${t}">${t==="private"?"Private":"Group"}</span>`;
-
-function go(name){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById("s-"+name).classList.add("active");
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));
-  const tab = document.getElementById("tab-"+name); if(tab) tab.classList.add("on");
-  if(name!=="detail"){ document.getElementById("video").pause(); }
-  if(name==="library") renderLibrary();
-  if(name==="schools") renderSchools();
-}
-
-function renderChips(){
-  const c = document.getElementById("chips");
-  const untagged = LESSONS.filter(l=>l.untagged).length;
-  let html = `<div class="chip ${filter.kind==="all"?"on":""}" onclick="setFilter('all')">All</div>`;
-  if(untagged) html += `<div class="chip warn ${filter.kind==="untagged"?"on":""}" onclick="setFilter('untagged')">Untagged · ${untagged}</div>`;
-  SOURCES.filter(s=>s.kind==="school").forEach(s=> html += `<div class="chip ${filter.kind==="source"&&filter.value===s.name?"on":""}" onclick="setFilter('source','${s.name}')">${s.name}</div>`);
-  SOURCES.filter(s=>s.kind==="private").forEach(s=> html += `<div class="chip priv ${filter.kind==="source"&&filter.value===s.name?"on":""}" onclick="setFilter('source','${s.name}')">${s.name}</div>`);
-  c.innerHTML = html;
-}
-function setFilter(kind,value=null){ filter={kind,value}; renderLibrary(); }
-
-function renderLibrary(){
-  renderChips();
-  const list = document.getElementById("list");
-  let items = LESSONS.slice().sort((a,b)=>b.date.localeCompare(a.date));
-  if(filter.kind==="untagged") items = items.filter(l=>l.untagged);
-  if(filter.kind==="source")   items = items.filter(l=>l.source===filter.value);
-  const nSchools = SOURCES.filter(s=>s.kind==="school").length, nPriv = SOURCES.filter(s=>s.kind==="private").length;
-  document.getElementById("lib-sub").textContent = `${LESSONS.length} recaps · ${nSchools} schools · ${nPriv} private teachers`;
-  let html="", lastMonth="";
-  items.forEach(l=>{
-    const m = monthOf(l.date);
-    if(m!==lastMonth){ html += `<div class="month">${m}</div>`; lastMonth=m; }
-    const title = l.untagged ? "Untagged recap" : l.figs.map(f=>f[0]).slice(0,2).join(" · ");
-    const who = l.untagged ? `Recorded ${fmtDate(l.date)} · tap to tag` : `${l.source} · ${fmtDate(l.date)}`;
-    const badges = l.untagged ? `<span class="tag">Needs school &amp; figures</span>` :
-      typeBadge(l.type) + l.figs.slice(0,2).map(f=>`<span class="tag">${f[0]}</span>`).join("");
-    html += `<div class="card ${l.untagged?"untagged":""}" onclick="${l.untagged?`openAdd(${l.id})`:`openDetail(${l.id})`}">
-      <div class="thumb ${l.th}"><div class="play"></div><div class="dur">${l.dur}</div></div>
-      <div class="meta"><div class="title">${title}</div><div class="who">${who}</div><div class="badges">${badges}</div></div></div>`;
-  });
-  if(!items.length) html = `<div class="hint">Nothing here yet.</div>`;
-  list.innerHTML = html;
-}
-
-function openDetail(id){
-  current = LESSONS.find(l=>l.id===id);
-  const l = current;
-  document.getElementById("detail-body").innerHTML = `
-    <div class="section"><div class="headline">
-      <div><div class="title">${l.figs.map(f=>f[0]).join(" · ")}</div>
-      <div class="who" style="margin-top:4px">${l.source} · ${fmtDate(l.date)} · ${typeBadge(l.type)}</div></div>
-      <div class="link" onclick="openAdd(${l.id})">Edit</div></div></div>
-    <div class="section"><h3>Figures in this recap</h3>
-      ${l.figs.map(f=>`<div class="fig" onclick="seek(${toSec(f[1])})"><span>${f[0]}</span><span class="t">${f[1]}</span></div>`).join("")}
-      <div class="fig" style="color:var(--muted);border-style:dashed" onclick="alert('In the real app: pauses the video and asks for a figure name at the current time.')">+ Mark figure at current time</div></div>
-    <div class="section"><h3>Notes</h3><div class="note">${l.note || "<span style='color:var(--muted)'>No notes. Tap Edit to add what to practice.</span>"}</div></div>
-    <div class="section"><h3>Stored in</h3><div class="note">Google Drive › Bachata Library › ${l.source} › ${l.date}.mp4<br><span style="color:var(--muted)">Streams from Drive. Nothing kept on this phone.</span></div></div>`;
-  loopReset();
-  go("detail");
-}
-
-/* player controls */
-const video = document.getElementById("video");
-function setRate(el){ document.querySelectorAll("[data-rate]").forEach(c=>c.classList.remove("on")); el.classList.add("on"); video.playbackRate=parseFloat(el.dataset.rate); }
-function toggleMirror(){ video.classList.toggle("mirror"); document.getElementById("mirror").classList.toggle("on"); }
-function seek(s){ video.currentTime=s; video.play(); }
-let loopA=null, loopB=null;
-function loopStep(){
-  const b=document.getElementById("loop");
-  if(loopA===null){ loopA=video.currentTime; b.textContent=`A ${video.currentTime.toFixed(1)}s · tap for B`; b.classList.add("on"); }
-  else if(loopB===null){ loopB=Math.max(video.currentTime, loopA+0.5); b.textContent=`Looping ${loopA.toFixed(1)}–${loopB.toFixed(1)}s · tap to clear`; video.currentTime=loopA; video.play(); }
-  else loopReset();
-}
-function loopReset(){ loopA=loopB=null; const b=document.getElementById("loop"); b.textContent="Loop A–B"; b.classList.remove("on"); }
-video.addEventListener("timeupdate",()=>{ if(loopB!==null && video.currentTime>loopB) video.currentTime=loopA; });
-
-/* add / edit form */
-let editing=null, formType="group", picked=false;
-function fillSources(selected){
-  const sel=document.getElementById("f-source");
-  const kind = formType==="private" ? "private" : "school";
-  const opts = SOURCES.filter(s=>s.kind===kind);
-  sel.innerHTML = opts.map(s=>`<option>${s.name}</option>`).join("") + `<option>+ New ${kind==="private"?"teacher":"school"}…</option>`;
-  sel.value = selected && opts.some(s=>s.name===selected) ? selected : (opts[0]?opts[0].name:"");
-  document.getElementById("f-source-label").textContent = kind==="private" ? "Teacher" : "School";
-  document.getElementById("f-source-hint").textContent = kind==="private"
-    ? "Private lessons are filed under the teacher's name instead of a school."
-    : "Last used school is preselected.";
-}
-function openAdd(id=null){
-  editing = id ? LESSONS.find(l=>l.id===id) : null;
-  document.getElementById("add-title").textContent = editing ? (editing.untagged?"Tag this recap":"Edit lesson") : "Add lesson";
-  const pick=document.getElementById("pick");
-  picked = !!editing;
-  pick.className = "pick"+(picked?" picked":"");
-  pick.innerHTML = picked ? `<b>${editing.dur} recap</b><span>Already in Drive</span>` : `<b>Choose video from Photos</b><span>Recorded today · picks the newest by default</span>`;
-  document.getElementById("f-date").textContent = editing ? fmtDate(editing.date)+" 2026" : "17 Sep 2026, 19:40";
-  formType = (editing && editing.type) || "group";
-  document.querySelectorAll("#f-type div").forEach((d,i)=>d.classList.toggle("on", (i===0)===(formType==="group")));
-  fillSources(editing && editing.source);
-  document.getElementById("f-figs").value = editing ? editing.figs.map(f=>f[0]).join(", ") : "";
-  document.getElementById("f-note").value = editing ? editing.note : "";
-  document.getElementById("prog").style.display="none";
-  document.getElementById("save").disabled=false;
-  document.getElementById("save").textContent = editing && !editing.untagged ? "Save changes" : "Save & upload to Drive";
-  go("add");
-}
-function pickVideo(){ picked=true; const p=document.getElementById("pick"); p.classList.add("picked"); p.innerHTML=`<b>IMG_4821.MOV · 3:12</b><span>Recorded today 19:40 · 210 MB</span>`; }
-function setType(el,type){ formType=type; document.querySelectorAll("#f-type div").forEach(d=>d.classList.remove("on")); el.classList.add("on"); fillSources(); }
-function save(){
-  if(!picked){ alert("Pick a video first (in the demo, just tap the box)."); return; }
-  const btn=document.getElementById("save"), prog=document.getElementById("prog"), bar=prog.querySelector("i");
-  btn.disabled=true; btn.textContent = editing && !editing.untagged ? "Saving…" : "Uploading to Drive…";
-  prog.style.display="block"; let p=0;
-  const tick=setInterval(()=>{ p=Math.min(100,p+Math.random()*22); bar.style.width=p+"%"; if(p>=100){ clearInterval(tick); setTimeout(commit,300);} },180);
-}
-function commit(){
-  let source=document.getElementById("f-source").value;
-  if(source.startsWith("+")) source = formType==="private" ? "New teacher" : "New school";
-  if(!SOURCES.some(s=>s.name===source)) SOURCES.push({name:source, kind: formType==="private"?"private":"school"});
-  const figs=document.getElementById("f-figs").value.split(",").map(s=>s.trim()).filter(Boolean).map((f,i)=>[f, `0:0${Math.min(9,i*3)}`]);
-  const note=document.getElementById("f-note").value;
-  const data={source,type:formType,figs:figs.length?figs:[["Recap","0:00"]],note,untagged:false};
-  if(editing) Object.assign(editing,data);
-  else LESSONS.unshift(Object.assign({id:Date.now(),date:"2026-09-17",dur:"3:12",th:""},data));
-  filter={kind:"all",value:null};
-  go("library");
-}
-
-function renderSchools(){
-  const el=document.getElementById("schools");
-  const row = s => {
-    const ls=LESSONS.filter(l=>l.source===s.name);
-    const last=ls.map(l=>l.date).sort().pop();
-    return `<div class="trow" onclick="setFilter('source','${s.name}');go('library')">
-      <div><div class="n">${s.name}</div><div class="s">${s.kind==="private"?"Private teacher":"Group classes"}</div></div>
-      <div class="count">${ls.length} recaps<br>last ${last?fmtDate(last):"–"}</div></div>`;
-  };
-  el.innerHTML = `<div class="month">Schools</div>` + SOURCES.filter(s=>s.kind==="school").map(row).join("")
-    + `<div class="month">Private teachers</div>` + SOURCES.filter(s=>s.kind==="private").map(row).join("")
-    + `<div class="trow" style="border-style:dashed;color:var(--muted)" onclick="alert('In the real app: add a school or teacher once; every later upload just picks from the list.')">+ Add school or teacher</div>`;
-}
-
-renderLibrary();
-</script>
+<script src="./config.js"></script>
+<script src="./app.js"></script>
 </body>
 </html>
