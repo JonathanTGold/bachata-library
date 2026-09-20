@@ -127,11 +127,16 @@ async function uploadSource(source, key, onProgress) {
   if (!size) throw new GeminiError('Video size unknown', 0, 'other');
   const mime = source.type || 'video/mp4';
   const uploadUrl = await startUploadSession(size, mime, source.name, key);
+  const getChunk = (start, end) => typeof source.slice === 'function' ? Promise.resolve(source.slice(start, end)) : source.fetchRange(start, end - 1);
+  // Two-stage pipeline: while one chunk is being sent, the next one is already being fetched,
+  // so a relay from Drive overlaps its download and upload instead of doing them in turn.
   let offset = 0, file = null;
+  let next = getChunk(0, Math.min(UPLOAD_CHUNK, size));
   while (offset < size) {
     const end = Math.min(offset + UPLOAD_CHUNK, size);
-    const chunk = typeof source.slice === 'function' ? source.slice(offset, end) : await source.fetchRange(offset, end - 1);
+    const chunk = await next;
     const isLast = end >= size;
+    if (!isLast) next = getChunk(end, Math.min(end + UPLOAD_CHUNK, size));
     const result = await sendChunk(uploadUrl, key, offset, chunk, isLast, loaded => onProgress && onProgress(Math.min(1, (offset + loaded) / size)));
     if (isLast) file = result;
     offset = end;
