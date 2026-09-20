@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.1.3';
+const APP_VERSION = '2.2.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -547,12 +547,9 @@ function renderAuth() {
 
 // Library
 function renderStylePill() {
-  const used = usedStyles();
   const pill = $('style-pill');
-  if (used.length < 2) { pill.hidden = true; if (filter.style) filter.style = null; return; }
-  const order = allStyles().filter(s => used.includes(s));
   pill.hidden = false;
-  pill.innerHTML = `<button class="${!filter.style ? 'on' : ''}" data-style="">${esc(T.all)}</button>` + order.map(s => `<button class="${filter.style === s ? 'on' : ''}" data-style="${esc(s)}">${esc(styleName(s))}</button>`).join('');
+  pill.innerHTML = `<button class="${!filter.style ? 'on' : ''}" data-style="">${esc(T.all)}</button>` + allStyles().map(s => `<button class="${filter.style === s ? 'on' : ''}" data-style="${esc(s)}">${esc(styleName(s))}</button>`).join('');
 }
 function renderChips() {
   const untagged = lib.lessons.filter(l => !l.source).length;
@@ -569,7 +566,7 @@ function visibleLessons() {
   if (filter.kind === 'untagged') items = items.filter(l => !l.source);
   if (filter.kind === 'source') items = items.filter(l => l.source === filter.value);
   const q = query.trim().toLowerCase();
-  if (q) items = items.filter(l => [l.title, l.source, l.note, l.date, l.name, styleName(l.style), ...l.figures.map(f => f.name)].filter(Boolean).some(v => String(v).toLowerCase().includes(q)));
+  if (q) items = items.filter(l => [l.title, l.note, ...l.figures.map(f => f.name)].filter(Boolean).some(v => String(v).toLowerCase().includes(q)));
   return items;
 }
 function renderLibrary() {
@@ -601,7 +598,7 @@ function renderLibrary() {
 // Lesson detail
 async function openDetail(id) {
   const l = lib.lessons.find(x => x.id === id); if (!l) return;
-  current = l; loopReset(); setRate(1); toggleSpeedMenu(false); setPlayIcon(false); $('center').classList.remove('faded');
+  current = l; loopReset(); setRate(1); toggleSpeedMenu(false); setPlayIcon(false); $('s-detail').classList.remove('hidectl');
   video.classList.remove('mirror'); $('btn-mirror').classList.remove('on');
   $('btn-drive').href = `https://drive.google.com/file/d/${encodeURIComponent(l.id)}/view`;
   const dd = $('detail-delete'); dd.dataset.armed = ''; dd.classList.remove('armed'); dd.disabled = false;
@@ -705,7 +702,8 @@ function toggleSpeedMenu(force) { const m = $('speed-menu'); m.hidden = force ==
 function skip(sec) { if (!video.duration) return; video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + sec)); updateTime(); }
 function setPlayIcon(playing) { $('playicon').innerHTML = `<use href="#i-${playing ? 'pause' : 'play'}"/>`; $('bigplay').setAttribute('aria-label', playing ? T.aria.pause : T.aria.play); }
 let fadeTimer;
-function showCenter() { const c = $('center'); c.classList.remove('faded'); clearTimeout(fadeTimer); if (!video.paused) fadeTimer = setTimeout(() => c.classList.add('faded'), 2200); }
+function showControls() { $('s-detail').classList.remove('hidectl'); clearTimeout(fadeTimer); if (!video.paused) fadeTimer = setTimeout(() => { if (!video.paused && $('speed-menu').hidden) $('s-detail').classList.add('hidectl'); }, 2600); }
+function hideControls() { clearTimeout(fadeTimer); $('s-detail').classList.add('hidectl'); toggleSpeedMenu(false); }
 function pct(t) { return video.duration ? (t / video.duration * 100) + '%' : '0%'; }
 function updateTime() {
   const d = isFinite(video.duration) ? video.duration : 0;
@@ -743,13 +741,20 @@ function enterFullscreen() {
   if (player.requestFullscreen) player.requestFullscreen().catch(() => { if (video.webkitEnterFullscreen) video.webkitEnterFullscreen(); });
   else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
 }
+function pipSupported() {
+  return !!(document.pictureInPictureEnabled || (typeof video.webkitSupportsPresentationMode === 'function' && video.webkitSupportsPresentationMode('picture-in-picture')) || typeof video.webkitSetPresentationMode === 'function');
+}
 async function togglePip() {
   try {
     if (document.pictureInPictureElement) { await document.exitPictureInPicture(); return; }
+    if (video.webkitPresentationMode === 'picture-in-picture') { video.webkitSetPresentationMode('inline'); return; }
+    // iOS needs a playing video with media loaded before it will switch presentation mode.
+    if (video.readyState < 1) await new Promise(res => { const h = () => { video.removeEventListener('loadedmetadata', h); res(); }; video.addEventListener('loadedmetadata', h); setTimeout(res, 3000); });
+    if (video.paused) { try { await video.play(); } catch (e) { /* keep going */ } }
+    if (typeof video.webkitSetPresentationMode === 'function' && (!video.webkitSupportsPresentationMode || video.webkitSupportsPresentationMode('picture-in-picture'))) { video.webkitSetPresentationMode('picture-in-picture'); return; }
     if (video.requestPictureInPicture) { await video.requestPictureInPicture(); return; }
-    if (video.webkitSupportsPresentationMode && video.webkitSupportsPresentationMode('picture-in-picture')) { video.webkitSetPresentationMode(video.webkitPresentationMode === 'picture-in-picture' ? 'inline' : 'picture-in-picture'); return; }
     toast(T.noPip);
-  } catch (e) { toast(T.playFirst); }
+  } catch (e) { toast(T.noPip); }
 }
 
 // ---------- add / edit form ----------
@@ -1019,13 +1024,14 @@ function bindEvents() {
   $('list').addEventListener('click', e => { const card = e.target.closest('.card'); if (!card) return; const l = lib.lessons.find(x => x.id === card.dataset.id); if (!l) return; if (!l.source) openAdd(l.id); else openDetail(l.id); });
 
   // player
-  $('bigplay').addEventListener('click', () => { if (video.paused) video.play().catch(() => {}); else video.pause(); showCenter(); });
-  $('btn-back5').addEventListener('click', () => { skip(-SKIP); showCenter(); });
-  $('btn-fwd5').addEventListener('click', () => { skip(SKIP); showCenter(); });
-  video.addEventListener('click', () => { const c = $('center'); if (c.classList.contains('faded')) showCenter(); else if (video.paused) video.play().catch(() => {}); else video.pause(); });
-  video.addEventListener('play', () => { setPlayIcon(true); showCenter(); });
-  video.addEventListener('pause', () => { setPlayIcon(false); showCenter(); });
-  video.addEventListener('ended', () => { setPlayIcon(false); showCenter(); });
+  $('bigplay').addEventListener('click', () => { if (video.paused) video.play().catch(() => {}); else video.pause(); showControls(); });
+  $('btn-back5').addEventListener('click', () => { skip(-SKIP); showControls(); });
+  $('btn-fwd5').addEventListener('click', () => { skip(SKIP); showControls(); });
+  video.addEventListener('click', () => { if ($('s-detail').classList.contains('hidectl')) showControls(); else if (!video.paused) hideControls(); });
+  ['btn-loop', 'btn-mirror', 'btn-speed', 'btn-pip', 'btn-fs', 'scrub'].forEach(id => $(id).addEventListener('pointerdown', () => showControls()));
+  video.addEventListener('play', () => { setPlayIcon(true); showControls(); });
+  video.addEventListener('pause', () => { setPlayIcon(false); showControls(); });
+  video.addEventListener('ended', () => { setPlayIcon(false); showControls(); });
   $('btn-speed').addEventListener('click', e => { e.stopPropagation(); toggleSpeedMenu(); });
   $('speed-menu').addEventListener('click', e => { const b = e.target.closest('button[data-rate]'); if (!b) return; setRate(parseFloat(b.dataset.rate)); toggleSpeedMenu(false); });
   document.addEventListener('click', e => { if (!e.target.closest('.speedwrap')) toggleSpeedMenu(false); });
@@ -1047,7 +1053,7 @@ function bindEvents() {
   $('btn-loop').addEventListener('click', loopStep);
   $('btn-fs').addEventListener('click', enterFullscreen);
   $('btn-pip').addEventListener('click', togglePip);
-  if (!(document.pictureInPictureEnabled || (video.webkitSupportsPresentationMode && video.webkitSupportsPresentationMode('picture-in-picture')))) $('btn-pip').style.display = 'none';
+  if (!pipSupported()) $('btn-pip').style.display = 'none';
   $('detail-body').addEventListener('click', onDetailClick);
   $('detail-body').addEventListener('keydown', e => { if (e.target.id === 'mark-name' && e.key === 'Enter') { e.preventDefault(); submitMark(); } });
 
