@@ -194,8 +194,9 @@ async function generateWithRetries(fileUri, mime, key, model, lang, report) {
       } catch (e) {
         lastErr = e;
         if (e.kind === 'busy' && attempt < RETRY_DELAYS_MS.length) { report('retry', 0, models[mi]); await sleep(RETRY_DELAYS_MS[attempt]); continue; }
-        if (e.kind === 'busy' || e.kind === 'model') break; // try the next model
-        throw e; // key, quota, network, other: retrying will not help
+        // Each model has its own quota, so an exhausted one is worth a try on the next model too.
+        if (e.kind === 'busy' || e.kind === 'model' || e.kind === 'quota') break;
+        throw e; // key, network, other: retrying will not help
       }
     }
     if (mi + 1 < models.length) report('fallback', 0, models[mi + 1]);
