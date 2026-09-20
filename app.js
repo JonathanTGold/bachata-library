@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.1.0';
+const APP_VERSION = '2.1.2';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -44,8 +44,8 @@ const STR = {
     untaggedRecap: 'סיכום ללא תיוג', tapToTag: 'לחיצה לתיוג', needsTag: 'חסרים בית ספר ופיגורות', recap: 'סיכום', recorded: 'הוקלט',
     figures: 'פרקים', notes: 'הערות', noNotes: 'אין הערות עדיין. אפשר להוסיף דרך העריכה.', figureName: 'שם הפרק', noTime: 'ללא זמן', noChapters: 'אין פרקים עדיין. מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי.',
     title: 'כותרת', titlePh: 'למשל: האמרלוק ויציאה מסומבררו', deleteArmToast: 'לחיצה נוספת על סל המחזור מוחקת את הסרטון מ‑Drive.',
-    repeatIdle: 'חזרה על קטע: לחיצה ראשונה מסמנת התחלה (A), שנייה מסמנת סוף (B), והקטע ינוגן שוב ושוב.',
-    repeatA: a => `התחלה סומנה ב‑${a}. נגנו עד סוף הקטע ולחצו שוב.`, repeatOn: (a, b) => `חוזר על ${a}–${b}. לחיצה נוספת מבטלת.`,
+    repeatA: a => `התחלה סומנה ב‑${a}. לחצו שוב בסוף הקטע.`, repeatOn: (a, b) => `חוזר על ${a}–${b}.`, repeatOff: 'החזרה בוטלה.',
+    help: 'עזרה', helpItems: [['back5', 'דילוג', 'החצים על הסרטון מדלגים 5 שניות אחורה או קדימה. לחיצה על הסרטון מציגה או מסתירה אותם.'], ['repeat', 'חזרה על קטע', 'לחיצה ראשונה מסמנת התחלה (A), שנייה מסמנת סוף (B), והקטע ינוגן שוב ושוב עד ללחיצה שלישית.'], ['mirror', 'מראה', 'הופך את הסרטון אופקית, כמו להסתכל במראה של הסטודיו. נוח כשעומדים מול המורה.'], ['plus', 'פרקים', 'בעמוד השיעור, מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי. לחיצה על פרק קופצת אליו.'], ['pip', 'תמונה בתוך תמונה', 'ממשיך לנגן בחלון קטן מעל אפליקציות אחרות.'], ['fs', 'מסך מלא', 'פותח את הסרטון בנגן של המכשיר. מומלץ לסובב את המכשיר לסרטונים לרוחב.']],
     noPip: 'הדפדפן הזה לא תומך בתמונה‑בתוך‑תמונה.', playFirst: 'קודם מתחילים לנגן.',
     chooseVideo: 'בחירת סרטון', fromWhere: 'מהתמונות, מהקבצים או צילום עכשיו', alreadyInDrive: 'כבר ב‑Drive', reading: 'קורא…', previewNA: 'אין תצוגה מקדימה',
     style: 'סגנון', otherStyle: 'אחר…', styleName: 'שם הסגנון', lessonType: 'סוג שיעור', school: 'בית ספר', teacher: 'מורה', newSchool: '+ בית ספר חדש…', newTeacher: '+ מורה חדש…', leaveUntagged: 'להשאיר ללא תיוג בינתיים', name: 'שם',
@@ -77,8 +77,8 @@ const STR = {
     untaggedRecap: 'Untagged recap', tapToTag: 'tap to tag', needsTag: 'Needs school & figures', recap: 'recap', recorded: 'Recorded',
     figures: 'Chapters', notes: 'Notes', noNotes: 'No notes yet. Add some via edit.', figureName: 'Chapter name', noTime: 'no time', noChapters: 'No chapters yet. Play to the moment you want and tap + to mark a chapter at the current time.',
     title: 'Title', titlePh: 'e.g. Hammerlock and sombrero exit', deleteArmToast: 'Tap the trash icon again to delete the video from Drive.',
-    repeatIdle: 'Repeat a section: first tap marks the start (A), second marks the end (B), and the section loops.',
-    repeatA: a => `Start marked at ${a}. Play to the end of the section and tap again.`, repeatOn: (a, b) => `Repeating ${a}–${b}. Tap again to stop.`,
+    repeatA: a => `Start marked at ${a}. Tap again at the end of the section.`, repeatOn: (a, b) => `Repeating ${a}–${b}.`, repeatOff: 'Repeat cleared.',
+    help: 'Help', helpItems: [['back5', 'Skip', 'The arrows on the video skip 5 seconds back or forward. Tap the video to show or hide them.'], ['repeat', 'Repeat a section', 'First tap marks the start (A), second marks the end (B), and the section loops until a third tap.'], ['mirror', 'Mirror', 'Flips the video horizontally, like watching in the studio mirror. Handy when facing the teacher.'], ['plus', 'Chapters', 'On a lesson, play to the moment you want and tap + to mark a chapter at the current time. Tap a chapter to jump to it.'], ['pip', 'Picture in picture', 'Keeps playing in a small window over other apps.'], ['fs', 'Fullscreen', 'Opens the video in the device player. Rotate the phone for landscape clips.']],
     noPip: 'This browser does not support picture-in-picture.', playFirst: 'Start playing first.',
     chooseVideo: 'Choose a video', fromWhere: 'Photo Library, Files, or record now', alreadyInDrive: 'already in Drive', reading: 'reading…', previewNA: 'preview unavailable',
     style: 'Style', otherStyle: 'Other…', styleName: 'Style name', lessonType: 'Lesson', school: 'School', teacher: 'Teacher', newSchool: '+ New school…', newTeacher: '+ New teacher…', leaveUntagged: 'Leave untagged for now', name: 'Name',
@@ -207,7 +207,6 @@ function applyLanguage() {
   document.querySelectorAll('[data-t]').forEach(el => { const v = T[el.dataset.t]; if (typeof v === 'string') el.textContent = v; });
   document.querySelectorAll('[data-ph]').forEach(el => { const v = T[el.dataset.ph]; if (typeof v === 'string') el.placeholder = v; });
   document.querySelectorAll('[data-aria]').forEach(el => { const v = T.aria[el.dataset.aria]; if (v) { el.setAttribute('aria-label', v); el.title = v; } });
-  $('loop-hint').textContent = T.repeatIdle;
   if (video) setPlayIcon(!video.paused);
 }
 function setLanguage(l) { lang = STR[l] ? l : 'he'; localStorage.setItem(LS.lang, lang); applyLanguage(); render(); }
@@ -604,6 +603,8 @@ async function openDetail(id) {
   const l = lib.lessons.find(x => x.id === id); if (!l) return;
   current = l; loopReset(); setRate(1); toggleSpeedMenu(false); setPlayIcon(false); $('center').classList.remove('faded');
   video.classList.remove('mirror'); $('btn-mirror').classList.remove('on');
+  $('btn-drive').href = `https://drive.google.com/file/d/${encodeURIComponent(l.id)}/view`;
+  const dd = $('detail-delete'); dd.dataset.armed = ''; dd.classList.remove('armed'); dd.disabled = false;
   show('detail'); renderDetail();
   $('detail-scroll').scrollTop = 0;
   loadMedia(l);
@@ -614,8 +615,7 @@ function renderDetail() {
   const meta = [l.source || T.untagged, l.type ? typeLabel(l.type, true) : null, fmtDateLong(l.date)].filter(Boolean).map(esc).join(' <span class="dim">·</span> ');
   $('detail-body').innerHTML = `
     <div class="ttl2">${esc(lessonTitle(l))}</div>
-    <div class="meta2"><span>${meta}</span><span class="stl">${esc(styleName(l.style))}</span>
-      <span class="acts"><button class="ib" data-action="edit" aria-label="${esc(T.aria.edit)}" title="${esc(T.aria.edit)}">${icon('edit')}</button><a class="ib" href="https://drive.google.com/file/d/${encodeURIComponent(l.id)}/view" target="_blank" rel="noopener" aria-label="${esc(T.aria.drive)}" title="${esc(T.aria.drive)}">${icon('open')}</a><button class="ib" id="detail-delete" data-action="delete" aria-label="${esc(T.aria.delete)}" title="${esc(T.aria.delete)}">${icon('trash')}</button></span></div>
+    <div class="meta2"><span>${meta}</span><span class="stl">${esc(styleName(l.style))}</span></div>
     <h3>${esc(T.figures)}</h3>
     ${figs.length ? '' : `<div class="chapters-empty">${esc(T.noChapters)}</div>`}
     ${figs.map((f, i) => `<div class="fig" data-fig="${i}" role="button"><span class="fname">${esc(f.name)}</span><span class="fright">${f.t != null ? `<span class="tm">${fmtDur(f.t)}</span>` : `<span class="tm dim">${esc(T.noTime)}</span>`}<button class="x ib" data-remove="${i}" aria-label="${esc(T.aria.remove)}">${icon('close')}</button></span></div>`).join('')}
@@ -628,8 +628,6 @@ function onDetailClick(e) {
   if (!current) return;
   const rm = e.target.closest('[data-remove]');
   if (rm) { e.stopPropagation(); const i = +rm.dataset.remove; const f = current.figures[i]; if (!f) return; current.figures.splice(i, 1); current.updatedAt = nowIso(); renderDetail(); saveLibrary().then(() => toast(T.removed(f.name))).catch(err => toast(T.couldNotSave + shortErr(err))); return; }
-  if (e.target.closest('[data-action="edit"]')) { openAdd(current.id); return; }
-  if (e.target.closest('[data-action="delete"]')) { deleteFromDetail(e.target.closest('[data-action="delete"]')); return; }
   if (e.target.closest('#mark-row')) { $('mark-wrap').hidden = false; $('mark-name').focus(); if (!video.paused) video.pause(); return; }
   if (e.target.closest('#mark-add')) { submitMark(); return; }
   const row = e.target.closest('.fig[data-fig]');
@@ -724,21 +722,20 @@ function loopStep() {
   if (!video.duration) { toast(T.playFirst); return; }
   if (loopA === null) {
     loopA = video.currentTime; $('loop-bd').textContent = 'B'; $('loop-bd').hidden = false;
-    $('mkA').hidden = false; $('loop-hint').textContent = T.repeatA(fmtDur(loopA));
+    $('mkA').hidden = false; toast(T.repeatA(fmtDur(loopA)));
     if (video.paused) video.play().catch(() => {});
   } else if (loopB === null) {
     loopB = Math.max(video.currentTime, loopA + 0.5);
     $('btn-loop').classList.add('on'); $('loop-bd').hidden = true; $('mkB').hidden = false; $('ab').hidden = false;
-    $('loop-hint').textContent = T.repeatOn(fmtDur(loopA), fmtDur(loopB));
+    toast(T.repeatOn(fmtDur(loopA), fmtDur(loopB)));
     video.currentTime = loopA; video.play().catch(() => {});
-  } else loopReset();
+  } else { loopReset(); toast(T.repeatOff); }
   updateTime();
 }
 function loopReset() {
   loopA = loopB = null;
   $('btn-loop').classList.remove('on'); $('loop-bd').textContent = 'A'; $('loop-bd').hidden = false;
   ['mkA', 'mkB', 'ab'].forEach(i => { $(i).hidden = true; });
-  $('loop-hint').textContent = T.repeatIdle;
 }
 function enterFullscreen() {
   const player = $('player');
@@ -990,6 +987,8 @@ function renderSettings() {
     <div class="srow"><div><div class="lbl2">${esc(T.openDrive)}</div><div class="sm">${esc(T.storageBody)}</div></div>${root ? `<a class="ib" href="https://drive.google.com/drive/folders/${encodeURIComponent(root.id)}" target="_blank" rel="noopener" aria-label="${esc(T.aria.drive)}">${icon('open')}</a>` : ''}</div>
     <div class="month">${esc(T.maintenance)}</div>
     <div class="srow"><div><div class="lbl2">${esc(T.rescan)}</div><div class="sm">${esc(T.rescanHint)}</div></div><button class="ib" id="btn-rescan" aria-label="${esc(T.aria.rescan)}">${icon('refresh')}</button></div>
+    <div class="month">${esc(T.help)}</div>
+    <div class="help">${T.helpItems.map(([ic, t, d]) => `<div>${icon(ic)}<span><b>${esc(t)}</b>${esc(d)}</span></div>`).join('')}</div>
     <div class="month">${esc(T.language)}</div>
     <div class="seg" id="lang-seg"><button type="button" class="${lang === 'he' ? 'on' : ''}" data-lang="he">עברית</button><button type="button" class="${lang === 'en' ? 'on' : ''}" data-lang="en">English</button></div>
     <div class="month">${esc(T.account)}</div>
@@ -1007,6 +1006,8 @@ function bindEvents() {
   $('btn-settings').addEventListener('click', () => show('settings'));
   $('btn-settings-back').addEventListener('click', () => show('library'));
   $('btn-back').addEventListener('click', () => show('library'));
+  $('btn-edit').addEventListener('click', () => { if (current) openAdd(current.id); });
+  $('detail-delete').addEventListener('click', e => deleteFromDetail(e.currentTarget));
   $('btn-add').addEventListener('click', () => openAdd(null));
   $('btn-cancel').addEventListener('click', () => { if (uploading) { toast(T.waitUpload); return; } const back = editing; resetForm(); if (back && back.source) openDetail(back.id); else show('library'); });
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => show(t.dataset.go)));

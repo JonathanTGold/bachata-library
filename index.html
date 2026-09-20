@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=2.1.0">
+<link rel="stylesheet" href="./styles.css?v=2.1.2">
 </head>
 <body>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
@@ -86,6 +86,11 @@
   <!-- LESSON -->
   <section class="screen" id="s-detail">
     <button class="back ib" id="btn-back" data-aria="back"><svg class="i"><use href="#i-chev"/></svg></button>
+    <div class="topacts">
+      <button class="ib" id="btn-edit" data-aria="edit"><svg class="i"><use href="#i-edit"/></svg></button>
+      <a class="ib" id="btn-drive" href="#" target="_blank" rel="noopener" data-aria="drive"><svg class="i"><use href="#i-open"/></svg></a>
+      <button class="ib" id="detail-delete" data-aria="delete"><svg class="i"><use href="#i-trash"/></svg></button>
+    </div>
     <div class="player" id="player">
       <video id="video" playsinline preload="metadata"></video>
       <div class="center" id="center">
@@ -95,23 +100,18 @@
       </div>
       <div class="vload" id="vload" hidden></div>
       <div class="pctl">
+        <span class="time" id="time">0:00 / 0:00</span>
         <div class="scrub" id="scrub"><div class="track"></div><div class="ab" id="ab" hidden></div><div class="fill" id="fill"></div><div class="mk" id="mkA" data-l="A" hidden></div><div class="mk" id="mkB" data-l="B" hidden></div><div class="knob" id="knob"></div></div>
-        <div class="prow">
-          <span class="time" id="time">0:00 / 0:00</span>
-          <div class="pbtns">
-            <div class="speedwrap"><button class="pb speed" id="btn-speed" data-aria="speed">1×</button><div class="menu" id="speed-menu" hidden></div></div>
-            <button class="pb" id="btn-pip" data-aria="pip"><svg class="i"><use href="#i-pip"/></svg></button>
-            <button class="pb" id="btn-fs" data-aria="fullscreen"><svg class="i"><use href="#i-fs"/></svg></button>
-          </div>
-        </div>
       </div>
     </div>
+    <div class="toolbar" id="toolbar">
+      <button class="tb2" id="btn-loop" data-aria="repeat"><svg class="i"><use href="#i-repeat"/></svg><span class="bd" id="loop-bd">A</span></button>
+      <button class="tb2" id="btn-mirror" data-aria="mirror"><svg class="i"><use href="#i-mirror"/></svg></button>
+      <div class="speedwrap"><button class="tb2 speed" id="btn-speed" data-aria="speed">1×</button><div class="menu" id="speed-menu" hidden></div></div>
+      <button class="tb2" id="btn-pip" data-aria="pip"><svg class="i"><use href="#i-pip"/></svg></button>
+      <button class="tb2" id="btn-fs" data-aria="fullscreen"><svg class="i"><use href="#i-fs"/></svg></button>
+    </div>
     <div class="scroll plain" id="detail-scroll">
-      <div class="tools">
-        <button class="tool ib" id="btn-loop" data-aria="repeat"><svg class="i"><use href="#i-repeat"/></svg><span class="bd" id="loop-bd">A</span></button>
-        <button class="tool ib" id="btn-mirror" data-aria="mirror"><svg class="i"><use href="#i-mirror"/></svg></button>
-      </div>
-      <div class="hint" id="loop-hint"></div>
       <div id="detail-body"></div>
     </div>
   </section>
@@ -187,7 +187,7 @@
     <button class="tab" data-go="schools"><svg class="i"><use href="#i-school"/></svg><span data-t="schools"></span></button>
   </nav>
 </div>
-<script src="./config.js?v=2.1.0"></script>
-<script src="./app.js?v=2.1.0"></script>
+<script src="./config.js?v=2.1.2"></script>
+<script src="./app.js?v=2.1.2"></script>
 </body>
 </html>
