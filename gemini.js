@@ -3,15 +3,19 @@
  * API key. Uploads the clip to Gemini's file storage, waits for processing, asks for a title,
  * a description and chapters as structured JSON, then deletes the uploaded copy.
  *
- * Exposes window.GeminiClient = { analyzeVideo(file, opts), DEFAULT_MODEL }.
- *   opts: { key, model, lang, onProgress({ stage: 'upload'|'process'|'analyze', frac }) }
+ * Exposes window.GeminiClient = { analyzeVideo(file, opts), DEFAULT_MODEL, GeminiError }.
+ *   opts: { key, model, lang, onProgress({ stage, frac, detail }) }
+ *         stage is one of 'upload' | 'process' | 'analyze' | 'retry' | 'fallback'
  *   resolves: { title, desc, chapters: [{ name, t }] }   (t in seconds)
  */
 (function () {
 'use strict';
 
 const BASE = 'https://generativelanguage.googleapis.com';
-const DEFAULT_MODEL = 'gemini-2.5-flash';
+const DEFAULT_MODEL = 'gemini-3.6-flash';
+// Tried in order when the chosen model is overloaded or unavailable.
+const FALLBACK_MODELS = ['gemini-3-flash-preview', 'gemini-flash-latest'];
+const RETRY_DELAYS_MS = [4000, 12000];
 const PROCESS_POLL_MS = 2000;
 const PROCESS_MAX_POLLS = 120; // 4 minutes
 
@@ -53,10 +57,13 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 class GeminiError extends Error {
   constructor(message, status, kind) { super(message); this.status = status; this.kind = kind; }
 }
+// kind: 'key' | 'quota' | 'busy' | 'model' | 'network' | 'other'
 function classify(status, message) {
-  if (status === 400 && /API key/i.test(message || '')) return 'key';
+  const msg = message || '';
+  if (status === 400 && /API key/i.test(msg)) return 'key';
   if (status === 401 || status === 403) return 'key';
-  if (status === 429) return 'quota';
+  if (status === 429 && /quota|exceeded|limit/i.test(msg)) return 'quota';
+  if (status === 429 || status === 503 || /high demand|overloaded|try again later/i.test(msg)) return 'busy';
   if (status === 404) return 'model';
   return 'other';
 }
@@ -133,7 +140,8 @@ async function generate(fileUri, mime, key, model, lang) {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   });
   const j = await res.json();
-  const text = (((j.candidates || [])[0] || {}).content || {}).parts ? j.candidates[0].content.parts.map(p => p.text || '').join('') : '';
+  const cand = (j.candidates || [])[0];
+  const text = cand && cand.content && Array.isArray(cand.content.parts) ? cand.content.parts.map(p => p.text || '').join('') : '';
   let data;
   try { data = JSON.parse(text); } catch (e) { throw new GeminiError('Gemini returned an unreadable answer', 0, 'other'); }
   return {
@@ -146,20 +154,39 @@ async function generate(fileUri, mime, key, model, lang) {
   };
 }
 
+async function generateWithRetries(fileUri, mime, key, model, lang, report) {
+  const models = [model].concat(FALLBACK_MODELS.filter(m => m !== model));
+  let lastErr = null;
+  for (let mi = 0; mi < models.length; mi++) {
+    for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {
+      try {
+        return await generate(fileUri, mime, key, models[mi], lang);
+      } catch (e) {
+        lastErr = e;
+        if (e.kind === 'busy' && attempt < RETRY_DELAYS_MS.length) { report('retry', 0, models[mi]); await sleep(RETRY_DELAYS_MS[attempt]); continue; }
+        if (e.kind === 'busy' || e.kind === 'model') break; // try the next model
+        throw e; // key, quota, network, other: retrying will not help
+      }
+    }
+    if (mi + 1 < models.length) report('fallback', 0, models[mi + 1]);
+  }
+  throw lastErr;
+}
+
 async function deleteFile(fileName, key) {
   try { await call(`${BASE}/v1beta/${fileName}`, key, { method: 'DELETE' }); } catch (e) { /* files expire on their own after 48 hours */ }
 }
 
 async function analyzeVideo(file, { key, model, lang, onProgress } = {}) {
   if (!key) throw new GeminiError('Missing API key', 0, 'key');
-  const report = (stage, frac) => { if (onProgress) onProgress({ stage, frac }); };
+  const report = (stage, frac, detail) => { if (onProgress) onProgress({ stage, frac, detail }); };
   report('upload', 0);
   const uploaded = await uploadFile(file, key, frac => report('upload', frac));
   try {
     report('process');
     const active = await waitUntilActive(uploaded.name, key);
     report('analyze');
-    return await generate(active.uri, active.mimeType || file.type || 'video/mp4', key, (model || DEFAULT_MODEL).trim(), lang);
+    return await generateWithRetries(active.uri, active.mimeType || file.type || 'video/mp4', key, (model || DEFAULT_MODEL).trim(), lang, report);
   } finally {
     deleteFile(uploaded.name, key);
   }
