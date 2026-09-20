@@ -9,12 +9,17 @@ and no server that ever sees your videos.
 
 ## What it does
 
+- Hebrew, right-to-left interface by default, with English available in Settings. Dark theme, Rubik typeface, icon-only actions.
+- Each lesson carries a dance style (Bachata, Salsa, or your own). A style switch appears at the top once more than one style is in use.
+
 - **Library** grouped by month, filter chips per school and per private teacher, plus an Untagged inbox.
 - **Add lesson**: pick a clip from Photos or Files, date auto-filled from the file, choose Group class
   (school) or Private (teacher name), type the figures covered, optional notes. Uploads to Drive in
   resumable chunks with a progress bar.
-- **Lesson player**: streams straight from Drive. Speed 1x / 0.75x / 0.5x / 0.25x, mirror flip,
-  A-B loop, tap a figure to jump to its timestamp, mark a figure at the current time.
+- **Lesson player**: custom controls streaming straight from Drive. Speed 1x / 0.75x / 0.5x / 0.25x,
+  mirror flip, fullscreen, picture-in-picture, and a section repeat: tap once to mark A, again to
+  mark B, and the section loops with both marks drawn on the scrubber. Tap a figure to jump to its
+  timestamp, mark a figure at the current time.
 - **Schools** list with counts; private teachers listed alongside.
 - **Settings**: open the Drive folder, rescan and repair the index, sign out.
 - Installable on iPhone via Add to Home Screen. Works on Android and desktop Chrome too.

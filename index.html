@@ -1,21 +1,47 @@
 <!doctype html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Bachata Library</title>
-<meta name="description" content="Organize, browse, and watch your Bachata lesson recap videos, stored in your own Google Drive.">
+<meta name="description" content="Organize, browse, and watch your dance lesson recap videos, stored in your own Google Drive.">
 <link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#f6f4f1">
+<meta name="theme-color" content="#0e1218">
+<meta name="color-scheme" content="dark">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Bachata">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
+  <symbol id="i-open" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
+  <symbol id="i-mirror" viewBox="0 0 24 24"><path d="M15 21h2v-2h-2v2zm4-12h2V7h-2v2zM3 5v14c0 1.1.9 2 2 2h4v-2H5V5h4V3H5c-1.1 0-2 .9-2 2zm16-2v2h2c0-1.1-.9-2-2-2zm-8 20h2V1h-2v22zm8-6h2v-2h-2v2zM15 5h2V3h-2v2zm4 8h2v-2h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2z"/></symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></symbol>
+  <symbol id="i-fs" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></symbol>
+  <symbol id="i-pip" viewBox="0 0 24 24"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></symbol>
+  <symbol id="i-lib" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/></symbol>
+  <symbol id="i-school" viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></symbol>
+</svg>
+
 <div class="app">
 
   <!-- SIGN IN -->
@@ -23,104 +49,127 @@
     <div class="auth">
       <img class="logo" src="./icons/icon-192.png" alt="">
       <h1>Bachata Library</h1>
-      <p class="sub">Your lesson recaps, organized by school, streamed from your own Google Drive. Nothing is stored anywhere else.</p>
-      <button class="primary" id="btn-signin">Sign in with Google</button>
-      <p class="hint" id="auth-hint">Asks only for access to files this app creates in your Drive.</p>
-
+      <p class="sub" data-t="tagline"></p>
+      <button class="primary" id="btn-signin" data-t="signin"></button>
+      <p class="hint" id="auth-hint" data-t="signinHint"></p>
       <div class="setup" id="setup" hidden>
-        <h3>One-time setup</h3>
-        <p>This copy of the app has no Google client ID yet. Create one in the Google Cloud console, then paste it below.</p>
+        <h3 data-t="setupTitle"></h3>
+        <p data-t="setupBody"></p>
         <ol>
-          <li>Create a project and enable the <b>Google Drive API</b>.</li>
-          <li>Under <b>Google Auth Platform</b> set up branding, choose audience <b>External</b>, add the scope <code>…/auth/drive.file</code>, and publish the app.</li>
-          <li>Create an OAuth client of type <b>Web application</b> with<br>
-            Authorized JavaScript origin: <code id="setup-origin"></code><br>
-            Authorized redirect URI: <code id="setup-redirect"></code></li>
+          <li data-t="setupStep1"></li>
+          <li data-t="setupStep2"></li>
+          <li><span data-t="setupStep3"></span><br><span data-t="origin"></span>: <code id="setup-origin"></code><br><span data-t="redirect"></span>: <code id="setup-redirect"></code></li>
         </ol>
-        <div class="input"><input id="setup-client" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Paste client ID (ends with .apps.googleusercontent.com)"></div>
-        <button class="primary" id="btn-save-client">Save and sign in</button>
+        <div class="input"><input id="setup-client" autocapitalize="off" autocorrect="off" spellcheck="false" data-ph="pasteClient"></div>
+        <button class="primary" id="btn-save-client" data-t="saveSignin"></button>
       </div>
     </div>
   </section>
 
   <!-- LIBRARY -->
   <section class="screen" id="s-library">
-    <div class="top row">
-      <div><h1>Library</h1><div class="sub" id="lib-sub"></div></div>
-      <button class="iconbtn" id="btn-settings" aria-label="Settings">&#9881;</button>
+    <div class="top">
+      <div class="brand">
+        <div><h1 data-t="library"></h1><div class="sub" id="lib-sub"></div></div>
+        <button class="ib round" id="btn-settings" data-aria="settings"><svg class="i"><use href="#i-gear"/></svg></button>
+      </div>
+      <div class="pill" id="style-pill" hidden></div>
     </div>
-    <div class="searchwrap"><div class="search">&#9906;<input id="search" type="search" placeholder="Search figures, schools, notes" autocomplete="off"></div></div>
+    <div class="searchwrap"><div class="search"><svg class="i"><use href="#i-search"/></svg><input id="search" type="search" data-ph="search" autocomplete="off"></div></div>
     <div class="chips" id="chips"></div>
     <div class="scroll" id="list"></div>
   </section>
 
   <!-- LESSON -->
   <section class="screen" id="s-detail">
-    <button class="back" id="btn-back">&#8249; Library</button>
-    <div class="player"><video id="video" playsinline controls preload="metadata"></video><div class="vload" id="vload" hidden></div></div>
-    <div class="controls">
-      <button class="ctl on" data-rate="1">1x</button>
-      <button class="ctl" data-rate="0.75">0.75x</button>
-      <button class="ctl" data-rate="0.5">0.5x</button>
-      <button class="ctl" data-rate="0.25">0.25x</button>
-      <button class="ctl" id="btn-mirror">Mirror</button>
-      <button class="ctl" id="btn-loop">Loop A–B</button>
+    <button class="back ib" id="btn-back" data-aria="back"><svg class="i"><use href="#i-chev"/></svg></button>
+    <div class="player" id="player">
+      <video id="video" playsinline preload="metadata"></video>
+      <button class="bigplay" id="bigplay" data-aria="play"><svg class="i"><use href="#i-play"/></svg></button>
+      <div class="vload" id="vload" hidden></div>
+      <div class="pctl">
+        <div class="scrub" id="scrub"><div class="track"></div><div class="ab" id="ab" hidden></div><div class="fill" id="fill"></div><div class="mk" id="mkA" data-l="A" hidden></div><div class="mk" id="mkB" data-l="B" hidden></div><div class="knob" id="knob"></div></div>
+        <div class="prow">
+          <span class="time" id="time">0:00 / 0:00</span>
+          <div class="pbtns">
+            <button class="pb" id="btn-pip" data-aria="pip"><svg class="i"><use href="#i-pip"/></svg></button>
+            <button class="pb" id="btn-fs" data-aria="fullscreen"><svg class="i"><use href="#i-fs"/></svg></button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="scroll plain" id="detail-body"></div>
+    <div class="scroll plain" id="detail-scroll">
+      <div class="tools">
+        <button class="tool ib" id="btn-loop" data-aria="repeat"><svg class="i"><use href="#i-repeat"/></svg><span class="bd" id="loop-bd">A</span></button>
+        <button class="tool ib" id="btn-mirror" data-aria="mirror"><svg class="i"><use href="#i-mirror"/></svg></button>
+        <div class="tool speed" id="speed">
+          <button data-rate="0.25">0.25×</button><button data-rate="0.5">0.5×</button><button data-rate="0.75">0.75×</button><button data-rate="1" class="on">1×</button>
+        </div>
+      </div>
+      <div class="hint" id="loop-hint"></div>
+      <div id="detail-body"></div>
+    </div>
   </section>
 
   <!-- ADD / EDIT -->
   <section class="screen" id="s-add">
     <div class="top row">
-      <div><h1 id="add-title">Add lesson</h1><div class="sub" id="add-sub">Pick the recap, tag it, done.</div></div>
-      <button class="iconbtn" id="btn-cancel" aria-label="Cancel">&#10005;</button>
+      <div><h1 id="add-title"></h1><div class="sub" id="add-sub"></div></div>
+      <button class="ib round" id="btn-cancel" data-aria="close"><svg class="i"><use href="#i-close"/></svg></button>
     </div>
     <div class="scroll plain">
       <div class="form">
         <label class="pick" id="pick" for="f-file">
           <input type="file" id="f-file" class="vh" accept="video/*">
-          <div class="txt"><b>Choose a video</b><span>Photo Library, Files, or record now</span></div>
+          <div class="txt"><b data-t="chooseVideo"></b><span data-t="fromWhere"></span></div>
         </label>
 
-        <div class="field"><label for="f-date">Date</label>
-          <div class="input"><input type="date" id="f-date"></div></div>
+        <div class="field"><label data-t="style"></label>
+          <div class="seg wrap" id="f-style"></div>
+          <div class="input" id="f-style-new-wrap" hidden><input id="f-style-new" data-ph="styleName" autocomplete="off"></div></div>
 
-        <div class="field"><label>Lesson</label>
+        <div class="field"><label data-t="lessonType"></label>
           <div class="seg" id="f-type">
-            <button type="button" class="on" data-type="group">Group class</button>
-            <button type="button" data-type="private">Private</button>
+            <button type="button" class="on" data-type="group" data-t="groupLesson"></button>
+            <button type="button" data-type="private" data-t="privateLesson"></button>
           </div></div>
 
-        <div class="field"><label id="f-source-label" for="f-source">School</label>
+        <div class="field"><label id="f-source-label" for="f-source"></label>
           <div class="input"><select id="f-source"></select></div>
-          <div class="input" id="f-new-wrap" hidden><input id="f-new" placeholder="Name" autocomplete="off"></div>
+          <div class="input" id="f-new-wrap" hidden><input id="f-new" data-ph="name" autocomplete="off"></div>
           <div class="hint" id="f-source-hint"></div></div>
 
-        <div class="field"><label for="f-figs">Figures covered</label>
-          <div class="input"><input id="f-figs" placeholder="Sombrero, hammerlock exit, body roll" autocomplete="off"></div></div>
+        <div class="field"><label for="f-date" data-t="date"></label>
+          <div class="input"><input type="date" id="f-date"></div></div>
 
-        <div class="field"><label for="f-note">Notes (optional)</label>
-          <div class="input"><textarea id="f-note" placeholder="What to practice, corrections, homework"></textarea></div></div>
+        <div class="field"><label for="f-figs" data-t="figuresCovered"></label>
+          <div class="input"><input id="f-figs" data-ph="figuresPh" autocomplete="off"></div></div>
 
-        <button class="primary" id="btn-save">Save &amp; upload to Drive</button>
+        <div class="field"><label for="f-note" data-t="notesOptional"></label>
+          <div class="input"><textarea id="f-note" data-ph="notesPh"></textarea></div></div>
+
+        <button class="primary" id="btn-save"></button>
         <div class="progress" id="prog"><i></i></div>
         <div class="hint" id="prog-hint"></div>
-        <button class="danger" id="btn-delete" hidden>Delete this recap</button>
+        <div class="dangerrow" id="delete-row" hidden>
+          <button class="ib danger" id="btn-delete" data-aria="delete"><svg class="i"><use href="#i-trash"/></svg></button>
+          <span class="hint" id="delete-hint"></span>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- SCHOOLS -->
   <section class="screen" id="s-schools">
-    <div class="top"><h1>Schools</h1><div class="sub">Private teachers listed alongside. Tap one to filter.</div></div>
+    <div class="top"><h1 data-t="schools"></h1><div class="sub" data-t="schoolsSub"></div></div>
     <div class="scroll" id="schools"></div>
   </section>
 
   <!-- SETTINGS -->
   <section class="screen" id="s-settings">
     <div class="top row">
-      <div><h1>Settings</h1><div class="sub" id="set-sub"></div></div>
-      <button class="iconbtn" id="btn-settings-back" aria-label="Close">&#10005;</button>
+      <div><h1 data-t="settings"></h1><div class="sub" id="set-sub"></div></div>
+      <button class="ib round" id="btn-settings-back" data-aria="close"><svg class="i"><use href="#i-close"/></svg></button>
     </div>
     <div class="scroll plain" id="settings-body"></div>
   </section>
@@ -128,9 +177,9 @@
   <div class="toast" id="toast" role="status"></div>
 
   <nav class="tabbar" id="tabbar">
-    <button class="tab on" data-go="library"><span class="ic"></span>Library</button>
-    <button class="fab" id="btn-add" aria-label="Add lesson">+</button>
-    <button class="tab" data-go="schools"><span class="ic house"></span>Schools</button>
+    <button class="tab on" data-go="library"><svg class="i"><use href="#i-lib"/></svg><span data-t="library"></span></button>
+    <button class="fab" id="btn-add" data-aria="add"><svg class="i"><use href="#i-plus"/></svg></button>
+    <button class="tab" data-go="schools"><svg class="i"><use href="#i-school"/></svg><span data-t="schools"></span></button>
   </nav>
 </div>
 <script src="./config.js"></script>
