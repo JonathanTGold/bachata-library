@@ -1,6 +1,6 @@
 /* Bachata Library service worker: caches the app shell, network-first so updates
  * arrive on the next open. Never touches Google API requests. */
-const VERSION = 'bl-v4';
+const VERSION = 'bl-v5';
 // Same-origin virtual path the app uses for video playback. The service worker turns it into an
 // authenticated Drive request, because a <video> element cannot send an Authorization header and
 // Google no longer accepts the token as a URL parameter.
@@ -20,7 +20,9 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;
   e.respondWith((async () => {
     try {
-      const net = await fetch(e.request);
+      // Revalidate with the server instead of trusting the HTTP cache: GitHub Pages sends a
+      // 10-minute max-age, which otherwise lets a fresh index.html pair with a stale stylesheet.
+      const net = await fetch(e.request, { cache: 'no-cache' });
       if (net.ok) { const c = await caches.open(VERSION); c.put(e.request, net.clone()); }
       return net;
     } catch (err) {
