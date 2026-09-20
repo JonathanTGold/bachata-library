@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.3.0';
+const APP_VERSION = '2.3.1';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -620,8 +620,7 @@ function renderDetail() {
       <button class="figc add" id="mark-row" aria-label="${esc(T.aria.addFigure)}" title="${esc(T.aria.addFigure)}">${icon('plus')}</button>
     </div>
     <div class="markwrap" id="mark-wrap" hidden><div class="input"><input id="mark-name" placeholder="${esc(T.figureName)}" list="fig-names" autocomplete="off"><button class="mini" id="mark-add" aria-label="${esc(T.aria.save)}">${icon('check')}</button></div><datalist id="fig-names">${allFigureNames().map(n => `<option value="${esc(n)}">`).join('')}</datalist></div>
-    <h3>${esc(T.notes)}</h3>
-    <div class="note ${l.note ? '' : 'dim'}">${l.note ? esc(l.note).replace(/\n/g, '<br>') : esc(T.noNotes)}</div>`;
+    ${l.note ? `<h3>${esc(T.notes)}</h3><div class="note">${esc(l.note).replace(/\n/g, '<br>')}</div>` : ''}`;
 }
 function onDetailClick(e) {
   if (!current) return;
