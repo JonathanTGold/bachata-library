@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.5.4';
+const APP_VERSION = '2.6.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -51,7 +51,7 @@ const STR = {
     noPip: 'הדפדפן הזה לא תומך בתמונה‑בתוך‑תמונה.', playFirst: 'קודם מתחילים לנגן.',
     chooseVideo: 'בחירת סרטון', fromWhere: 'מהתמונות, מהקבצים או צילום עכשיו', alreadyInDrive: 'כבר ב‑Drive', reading: 'קורא…', previewNA: 'אין תצוגה מקדימה',
     style: 'סגנון', otherStyle: 'אחר…', styleName: 'שם הסגנון', lessonType: 'סוג שיעור', school: 'בית ספר', teacher: 'מורה', newSchool: '+ בית ספר חדש…', newTeacher: '+ מורה חדש…', leaveUntagged: 'להשאיר ללא תיוג בינתיים', name: 'שם',
-    privateHint: 'שיעורים פרטיים נשמרים תחת שם המורה במקום בית ספר.', date: 'תאריך', figuresCovered: 'פיגורות שנלמדו', figuresPh: 'סומבררו, האמרלוק, בודי רול', notesOptional: 'הערות (לא חובה)', notesPh: 'מה לתרגל, תיקונים, שיעורי בית',
+    privateHint: 'שיעורים פרטיים נשמרים תחת שם המורה במקום בית ספר.', date: 'תאריך', figuresCovered: 'פיגורות שנלמדו', figuresPh: 'סומבררו, האמרלוק, בודי רול', notesOptional: 'הערות', notesPh: 'מה לתרגל, תיקונים, שיעורי בית',
     saveUpload: 'שמירה והעלאה ל‑Drive', saveChanges: 'שמירת שינויים', uploading: 'מעלה…', uploadingPct: p => `מעלה… ${p}% · להשאיר את האפליקציה פתוחה`, finishing: 'מסיים…', savedToIndex: 'השינויים נשמרים לאינדקס ב‑Drive שלך.', pickTagDone: 'בוחרים סרטון, מתייגים, וזה עולה ל‑Drive.', skipHint: 'אפשר לדלג על השדות והסרטון יופיע תחת „ללא תיוג”.',
     deleteArm: 'לחיצה נוספת מעבירה את הסרטון לסל המחזור של Drive.', deleteIdle: 'מחיקת הסיכום', deleted: 'הועבר לסל המחזור של Drive.', deleteFailed: 'המחיקה נכשלה. ',
     pickFirst: 'קודם בוחרים סרטון.', typeName: k => `צריך להקליד שם ${k}.`, typeStyle: 'צריך להקליד שם סגנון.', saved: 'נשמר.', uploaded: 'הועלה ל‑Drive.', uploadedUntagged: 'הועלה. מחכה תחת „ללא תיוג”.', saveFailed: 'השמירה נכשלה. ', nothingLost: 'משהו השתבש. שום דבר לא אבד, אפשר לנסות שוב.', waitUpload: 'ההעלאה עדיין רצה. מחכים שתסתיים.',
@@ -86,7 +86,7 @@ const STR = {
     noPip: 'This browser does not support picture-in-picture.', playFirst: 'Start playing first.',
     chooseVideo: 'Choose a video', fromWhere: 'Photo Library, Files, or record now', alreadyInDrive: 'already in Drive', reading: 'reading…', previewNA: 'preview unavailable',
     style: 'Style', otherStyle: 'Other…', styleName: 'Style name', lessonType: 'Lesson', school: 'School', teacher: 'Teacher', newSchool: '+ New school…', newTeacher: '+ New teacher…', leaveUntagged: 'Leave untagged for now', name: 'Name',
-    privateHint: 'Private lessons are filed under the teacher’s name instead of a school.', date: 'Date', figuresCovered: 'Figures covered', figuresPh: 'Sombrero, hammerlock exit, body roll', notesOptional: 'Notes (optional)', notesPh: 'What to practice, corrections, homework',
+    privateHint: 'Private lessons are filed under the teacher’s name instead of a school.', date: 'Date', figuresCovered: 'Figures covered', figuresPh: 'Sombrero, hammerlock exit, body roll', notesOptional: 'Notes', notesPh: 'What to practice, corrections, homework',
     saveUpload: 'Save & upload to Drive', saveChanges: 'Save changes', uploading: 'Uploading…', uploadingPct: p => `Uploading… ${p}% · keep the app open`, finishing: 'Finishing…', savedToIndex: 'Changes are saved to the index in your Drive.', pickTagDone: 'Pick the recap, tag it, done.', skipHint: 'Skip the fields and it lands under “Untagged”.',
     deleteArm: 'Tap again to move the video to the Drive trash.', deleteIdle: 'Delete this recap', deleted: 'Moved to the Drive trash.', deleteFailed: 'Delete failed. ',
     pickFirst: 'Pick a video first.', typeName: k => `Type the ${k} name.`, typeStyle: 'Type the style name.', saved: 'Saved.', uploaded: 'Uploaded to Drive.', uploadedUntagged: 'Uploaded. It is waiting under Untagged.', saveFailed: 'Save failed. ', nothingLost: 'Something went wrong. Nothing was lost; try again.', waitUpload: 'Upload in progress. Wait for it to finish.',
@@ -122,6 +122,7 @@ let loopA = null, loopB = null;
 let lastSync = 0;
 let video, toastTimer;
 let pendingAi = null;        // last Gemini result waiting to be saved with the form
+let formChapters = [];       // chapters shown in the add/edit form; saved with it
 let aiBusy = false;
 let blobUrl = null;          // object URL when a video was downloaded whole
 let mediaTriedBlob = false;  // fallback already attempted for the current lesson
@@ -786,6 +787,7 @@ function openAdd(id) {
   fillSources(editing ? editing.source : lastSource(formType));
   $('f-title').value = editing ? (editing.title || '') : '';
   $('f-desc').value = editing ? (editing.desc || '') : '';
+  formChapters = editing ? editing.figures.map(f => ({ name: f.name, t: f.t })) : []; renderFormChapters();
   $('f-note').value = editing ? editing.note : '';
   $('btn-save').textContent = editing ? T.saveChanges : T.saveUpload;
   $('btn-save').disabled = false;
@@ -876,7 +878,7 @@ async function saveLesson() {
       // Move or rename the file in Drive first; only touch the local record once that succeeded.
       const l = editing;
       const next = { date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, note: form.note };
-      if (pendingAi && pendingAi.chapters.length) next.figures = mergeChapters(l.figures, pendingAi.chapters);
+      next.figures = formChapters.map(c => ({ name: c.name, t: c.t }));
       const moved = l.source !== next.source || l.date !== next.date;
       if (moved) next.name = await moveLesson(Object.assign({}, l, next));
       if (form.source) ensureSource(form.source, formType);
@@ -890,7 +892,7 @@ async function saveLesson() {
       const parentId = form.source ? await ensureSourceFolder(form.source, formType) : root.id;
       const name = `${form.date} ${form.source || 'Untagged'}.${extOf(f.name)}`;
       const file = await resumableUpload(f, { name, parentId, mime, appProperties: { bachata: 'lesson', date: form.date, type: type || '', style: form.style }, onProgress: setProgress });
-      const l = { id: file.id, thumbId: null, name: file.name || name, date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, figures: pendingAi ? pendingAi.chapters.map(c => ({ name: c.name, t: c.t })) : [], note: form.note,
+      const l = { id: file.id, thumbId: null, name: file.name || name, date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, figures: formChapters.map(c => ({ name: c.name, t: c.t })), note: form.note,
         duration: pending.duration != null ? Math.round(pending.duration) : (file.videoMediaMetadata && file.videoMediaMetadata.durationMillis ? Math.round(file.videoMediaMetadata.durationMillis / 1000) : null),
         size: +file.size || f.size, mimeType: file.mimeType || mime, createdAt: nowIso(), updatedAt: nowIso() };
       if (pending.poster) {
@@ -958,6 +960,11 @@ async function deleteLesson() {
 
 // ---------- Gemini auto-fill ----------
 function setAiHint(msg) { $('ai-hint').textContent = msg || ''; }
+function renderFormChapters() {
+  const wrap = $('f-chapters-wrap');
+  wrap.hidden = !formChapters.length;
+  $('f-chapters').innerHTML = formChapters.map((c, i) => `<div class="fig"><span class="fname">${esc(c.name)}</span><span class="tm">${c.t != null ? fmtDur(c.t) : '·'}</span><button type="button" class="x ib" data-remove-chapter="${i}" aria-label="${esc(T.aria.remove)}">${icon('close')}</button></div>`).join('');
+}
 function setAiBusy(b) { $('btn-ai').classList.toggle('busy', b); $('btn-ai-detail').classList.toggle('busy', b); }
 function mergeChapters(existing, incoming) {
   const out = existing.slice();
@@ -1005,6 +1012,7 @@ async function runAi() {
     });
     if (res.title) $('f-title').value = res.title;
     if (res.desc) $('f-desc').value = res.desc;
+    if (res.chapters.length) { formChapters = editing ? mergeChapters(formChapters, res.chapters) : res.chapters.map(c => ({ name: c.name, t: c.t })); renderFormChapters(); }
     pendingAi = res;
     setAiHint(T.aiDone); toast(T.aiDone, 4000);
   } catch (e) {
@@ -1144,6 +1152,7 @@ function bindEvents() {
   $('f-type').addEventListener('click', e => { const b = e.target.closest('button[data-type]'); if (!b) return; formType = b.dataset.type; setTypeUI(); fillSources(lastSource(formType)); });
   $('f-style').addEventListener('click', e => { const b = e.target.closest('button[data-style]'); if (!b) return; formStyle = b.dataset.style; renderStyleSeg(); if (formStyle === '__new__') setTimeout(() => $('f-style-new').focus(), 50); });
   $('f-source').addEventListener('change', onSourceChange);
+  $('f-chapters').addEventListener('click', e => { const b = e.target.closest('[data-remove-chapter]'); if (!b) return; formChapters.splice(+b.dataset.removeChapter, 1); renderFormChapters(); });
   $('btn-save').addEventListener('click', saveLesson);
   $('btn-ai').addEventListener('click', runAi);
   $('btn-ai-detail').addEventListener('click', () => { if (!current) return; openAdd(current.id); runAi(); });

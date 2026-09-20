@@ -27,11 +27,13 @@ const PROMPTS = {
       'החזירו: כותרת קצרה (עד 8 מילים); תיאור מפורט שמכסה את הרעיונות המרכזיים, טכניקת התנועה, ' +
       'טיפים להובלה ולמובלים, תרגילים, והכללים שהמורה הדגיש או הדגישה; ו‑3 עד 8 פרקים כלליים, ' +
       'לכל אחד זמן התחלה בפורמט MM:SS וכותרת נושא קצרה.\n' +
+      'הכותרת מתארת את תוכן השיעור עצמו, למשל „הלו בובה, שדו רגיל ושדו נגדי”, בלי קידומות כמו „סיכום שיעור” או „שיעור ריקוד”.\n' +
       'השתמשו במונחי הריקוד שהמורה משתמש בהם. אל תמציאו תוכן שלא מופיע בסרטון.',
   en: 'Analyze this dance lesson recap video. Answer in English.\n' +
       'Return: a short title (max 8 words); a detailed description covering the core concepts, ' +
       'movement technique, leading and following tips, exercises, and the rules the instructor stressed; ' +
       'and 3 to 8 broad chapters, each with a start time in MM:SS and a short topic title.\n' +
+      'The title names the content itself, for example "Hello Bubba, regular and counter shadow", with no prefix such as "Lesson summary" or "Dance lesson".\n' +
       'Use the dance vocabulary the instructor uses. Do not invent content that is not in the video.'
 };
 
@@ -155,6 +157,16 @@ async function waitUntilActive(fileName, key) {
   throw new GeminiError('Video processing timed out', 0, 'other');
 }
 
+// Models like to open titles with "lesson summary"; the app's list already says what it is.
+const TITLE_PREFIX = /^(?:סיכום|תקציר|תיאור)\s+(?:של\s+)?(?:ה?שיעור|ה?תרגול|ה?אימון)(?:\s+(?:ריקוד|בצ'אטה|בצ׳אטה|באצ'טה|באצ׳טה|סלסה|קיזומבה|זוק))?(?:\s+(?:מס'|מספר)?\s*\d+)?\s*[:\-–—]?\s*|^(?:dance\s+)?(?:lesson|class|practice)\s+(?:summary|recap)(?:\s*#?\d+)?\s*[:\-–—]?\s*/i;
+function cleanTitle(t) {
+  const orig = String(t || '').trim();
+  let out = orig.replace(TITLE_PREFIX, '').trim();
+  // "סיכום שיעור ריקוד בצ'אטה" would collapse to one word; then only drop the leading "summary".
+  if (out.split(/\s+/).filter(Boolean).length < 2) out = orig.replace(/^(?:סיכום|תקציר|summary)\s+/i, '').trim();
+  return out ? out.charAt(0).toUpperCase() + out.slice(1) : orig;
+}
+
 function parseTime(s) {
   const parts = String(s || '').trim().split(':').map(x => parseInt(x, 10));
   if (!parts.length || parts.some(isNaN)) return null;
@@ -175,7 +187,7 @@ async function generate(fileUri, mime, key, model, lang) {
   let data;
   try { data = JSON.parse(text); } catch (e) { throw new GeminiError('Gemini returned an unreadable answer', 0, 'other'); }
   return {
-    title: String(data.title || '').trim(),
+    title: cleanTitle(data.title),
     desc: String(data.description || '').trim(),
     chapters: (Array.isArray(data.chapters) ? data.chapters : [])
       .map(c => ({ name: String(c.title || '').trim(), t: parseTime(c.start) }))
@@ -223,5 +235,5 @@ async function analyzeVideo(source, { key, model, lang, onProgress } = {}) {
   }
 }
 
-window.GeminiClient = { analyzeVideo, DEFAULT_MODEL, GeminiError };
+window.GeminiClient = { analyzeVideo, cleanTitle, DEFAULT_MODEL, GeminiError };
 })();
