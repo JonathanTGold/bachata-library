@@ -12,12 +12,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Bachata">
-<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.4.2">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.4.2">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.5.0">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.5.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=2.4.2">
+<link rel="stylesheet" href="./styles.css?v=2.5.0">
 </head>
 <body>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
@@ -42,6 +42,7 @@
   <symbol id="i-logout" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></symbol>
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+  <symbol id="i-ai" viewBox="0 0 24 24"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"/></symbol>
   <symbol id="i-upload" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></symbol>
 </svg>
 
@@ -111,6 +112,7 @@
         <button class="ib" id="btn-edit" data-aria="edit"><svg class="i"><use href="#i-edit"/></svg></button>
         <a class="ib" id="btn-drive" href="#" target="_blank" rel="noopener" data-aria="drive"><svg class="i"><use href="#i-open"/></svg></a>
         <button class="ib" id="detail-delete" data-aria="delete"><svg class="i"><use href="#i-trash"/></svg></button>
+        <button class="ib aibtn" id="btn-ai-detail" data-aria="ai"><svg class="i"><use href="#i-ai"/></svg></button>
       </div>
       <div id="detail-body"></div>
     </div>
@@ -128,6 +130,10 @@
           <input type="file" id="f-file" class="vh" accept="video/*">
           <div class="txt"><b data-t="chooseVideo"></b><span data-t="fromWhere"></span></div>
         </label>
+        <div class="airow" id="ai-row" hidden>
+          <button class="ib aibtn" id="btn-ai" data-aria="ai"><svg class="i"><use href="#i-ai"/></svg></button>
+          <span class="hint" id="ai-hint" data-t="aiIdle"></span>
+        </div>
 
         <div class="field"><label data-t="style"></label>
           <div class="seg wrap" id="f-style"></div>
@@ -190,7 +196,8 @@
     <button class="tab" data-go="schools"><svg class="i"><use href="#i-school"/></svg><span data-t="schools"></span></button>
   </nav>
 </div>
-<script src="./config.js?v=2.4.2"></script>
-<script src="./app.js?v=2.4.2"></script>
+<script src="./config.js?v=2.5.0"></script>
+<script src="./gemini.js?v=2.5.0"></script>
+<script src="./app.js?v=2.5.0"></script>
 </body>
 </html>

@@ -22,6 +22,10 @@ and no server that ever sees your videos.
   timestamp, mark a figure at the current time.
 - **Schools** list with counts; private teachers listed alongside.
 - **Settings**: open the Drive folder, rescan and repair the index, sign out.
+- **Auto-fill with Gemini** (optional): with your own Gemini API key from Google AI Studio, saved in Settings,
+  the sparkle button fills the title, description, and chapters from the video. The key is stored in your
+  Drive folder and syncs across your devices; the clip is uploaded to Gemini for analysis and deleted there
+  right after. Everything runs in the browser; there is still no backend.
 - Installable on iPhone via Add to Home Screen. Works on Android and desktop Chrome too.
 
 ## How the data is laid out in Drive
@@ -81,11 +85,18 @@ python3 -m http.server 8787
 
 Then open http://localhost:8787/ . Sign-in only works if that origin is registered on the OAuth client.
 
+## Gemini key security
+
+Create the key in Google Cloud for the same project and restrict it to the Generative Language API and to the
+website `https://jonathantgold.github.io/*`. The app sends it only in a request header to Google, never in a URL,
+and never ships it in the code.
+
 ## Repository layout
 
 ```
 index.html   app shell
 app.js       all application logic (auth, Drive API, upload, player, screens)
+gemini.js    Gemini video analysis client (upload, poll, structured JSON, delete)
 styles.css   styles
 sw.js        service worker
 config.js    Google client ID

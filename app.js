@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.4.2';
+const APP_VERSION = '2.5.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -45,7 +45,9 @@ const STR = {
     figures: 'פרקים', notes: 'הערות', noNotes: 'אין הערות עדיין. אפשר להוסיף דרך העריכה.', figureName: 'שם הפרק', noTime: 'ללא זמן', noChapters: 'אין פרקים עדיין. מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי.',
     title: 'כותרת', titlePh: 'למשל: האמרלוק ויציאה מסומבררו', desc: 'תיאור', descPh: 'מה היה בשיעור: פיגורות, תיקונים, דגשים', deleteArmToast: 'לחיצה נוספת על סל המחזור מוחקת את הסרטון מ‑Drive.',
     repeatA: a => `התחלה סומנה ב‑${a}. לחצו שוב בסוף הקטע.`, repeatOn: (a, b) => `חוזר על ${a}–${b}.`, repeatOff: 'החזרה בוטלה.',
-    help: 'עזרה', helpItems: [['back5', 'דילוג', 'החצים על הסרטון מדלגים 5 שניות אחורה או קדימה. לחיצה על הסרטון מציגה או מסתירה אותם.'], ['repeat', 'חזרה על קטע', 'לחיצה ראשונה מסמנת התחלה (A), שנייה מסמנת סוף (B), והקטע ינוגן שוב ושוב עד ללחיצה שלישית.'], ['mirror', 'מראה', 'הופך את הסרטון אופקית, כמו להסתכל במראה של הסטודיו. נוח כשעומדים מול המורה.'], ['plus', 'פרקים', 'בעמוד השיעור, מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי. לחיצה על פרק קופצת אליו.'], ['pip', 'תמונה בתוך תמונה', 'ממשיך לנגן בחלון קטן מעל אפליקציות אחרות.'], ['fs', 'מסך מלא', 'פותח את הסרטון בנגן של המכשיר. מומלץ לסובב את המכשיר לסרטונים לרוחב.']],
+    ai: 'ניתוח אוטומטי', aiIdle: 'מילוי כותרת, תיאור ופרקים מהסרטון עם Gemini.', aiNeedKey: 'צריך מפתח Gemini API. מוסיפים אותו בהגדרות.', aiDownloading: p => `מוריד את הסרטון מ‑Drive… ${p}%`, aiUploading: p => `מעלה לניתוח… ${p}%`, aiProcessing: 'Gemini מעבד את הסרטון…', aiAnalyzing: 'מנתח את השיעור…', aiDone: 'הכותרת, התיאור והפרקים מולאו. בודקים ושומרים.', aiFailed: 'הניתוח נכשל. ', aiBadKey: 'המפתח לא תקין, או שהוא מוגבל לכתובת אחרת.', aiQuota: 'חרגתם ממכסת Gemini להיום. אפשר לנסות מאוחר יותר.', aiBadModel: 'שם המודל לא נמצא. בודקים את השם בהגדרות.',
+    geminiKey: 'מפתח Gemini API', geminiHelp: 'המפתח נשמר בתיקייה שלך ב‑Drive ומסתנכרן בין המכשירים שלך. הסרטון נשלח ל‑Gemini לניתוח ונמחק משם מיד אחרי. בחבילה החינמית Google עשויה להשתמש בתוכן לשיפור המודלים.', geminiModelHint: 'שם המודל. ריק = ברירת המחדל', getKey: 'יצירת מפתח ב‑Google AI Studio', keySaved: 'הגדרות Gemini נשמרו.', badGeminiKey: 'זה לא נראה כמו מפתח Gemini API.',
+    help: 'עזרה', helpItems: [['ai', 'ניתוח אוטומטי', 'עם מפתח Gemini API מההגדרות, הכפתור הנוצץ ממלא כותרת, תיאור ופרקים מתוך הסרטון. בודקים את התוצאה לפני השמירה.'], ['back5', 'דילוג', 'החצים על הסרטון מדלגים 5 שניות אחורה או קדימה. לחיצה על הסרטון מציגה או מסתירה אותם.'], ['repeat', 'חזרה על קטע', 'לחיצה ראשונה מסמנת התחלה (A), שנייה מסמנת סוף (B), והקטע ינוגן שוב ושוב עד ללחיצה שלישית.'], ['mirror', 'מראה', 'הופך את הסרטון אופקית, כמו להסתכל במראה של הסטודיו. נוח כשעומדים מול המורה.'], ['plus', 'פרקים', 'בעמוד השיעור, מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי. לחיצה על פרק קופצת אליו.'], ['pip', 'תמונה בתוך תמונה', 'ממשיך לנגן בחלון קטן מעל אפליקציות אחרות.'], ['fs', 'מסך מלא', 'פותח את הסרטון בנגן של המכשיר. מומלץ לסובב את המכשיר לסרטונים לרוחב.']],
     noPip: 'הדפדפן הזה לא תומך בתמונה‑בתוך‑תמונה.', playFirst: 'קודם מתחילים לנגן.',
     chooseVideo: 'בחירת סרטון', fromWhere: 'מהתמונות, מהקבצים או צילום עכשיו', alreadyInDrive: 'כבר ב‑Drive', reading: 'קורא…', previewNA: 'אין תצוגה מקדימה',
     style: 'סגנון', otherStyle: 'אחר…', styleName: 'שם הסגנון', lessonType: 'סוג שיעור', school: 'בית ספר', teacher: 'מורה', newSchool: '+ בית ספר חדש…', newTeacher: '+ מורה חדש…', leaveUntagged: 'להשאיר ללא תיוג בינתיים', name: 'שם',
@@ -61,7 +63,7 @@ const STR = {
     signInAgain: 'צריך להתחבר שוב.', signinCheckFailed: 'בדיקת ההתחברות נכשלה. נסו שוב.', driveNotGranted: 'לא ניתנה גישה ל‑Drive. התחברו שוב והשאירו את תיבת Google Drive מסומנת.',
     recapsN: n => n === 1 ? 'סיכום אחד' : `${n} סיכומים`, schoolsN: n => n === 1 ? 'בית ספר אחד' : `${n} בתי ספר`, teachersN: n => n === 1 ? 'מורה פרטי אחד' : `${n} מורים פרטיים`,
     styles: { bachata: 'באצ׳טה', salsa: 'סלסה', kizomba: 'קיזומבה', zouk: 'זוק' },
-    aria: { back: 'חזרה', settings: 'הגדרות', add: 'שיעור חדש', close: 'סגירה', edit: 'עריכה', drive: 'פתיחה ב‑Drive', remove: 'הסרה', addFigure: 'סימון פרק בזמן הנוכחי', mirror: 'מראה', repeat: 'חזרה על קטע', fullscreen: 'מסך מלא', pip: 'תמונה בתוך תמונה', play: 'נגן', pause: 'השהיה', back5: 'אחורה 5 שניות', fwd5: 'קדימה 5 שניות', speed: 'מהירות', delete: 'מחיקה', signout: 'התנתקות', rescan: 'סריקה', save: 'שמירה' }
+    aria: { ai: 'ניתוח אוטומטי עם Gemini', back: 'חזרה', settings: 'הגדרות', add: 'שיעור חדש', close: 'סגירה', edit: 'עריכה', drive: 'פתיחה ב‑Drive', remove: 'הסרה', addFigure: 'סימון פרק בזמן הנוכחי', mirror: 'מראה', repeat: 'חזרה על קטע', fullscreen: 'מסך מלא', pip: 'תמונה בתוך תמונה', play: 'נגן', pause: 'השהיה', back5: 'אחורה 5 שניות', fwd5: 'קדימה 5 שניות', speed: 'מהירות', delete: 'מחיקה', signout: 'התנתקות', rescan: 'סריקה', save: 'שמירה' }
   },
   en: {
     dir: 'ltr', locale: 'en-GB',
@@ -78,7 +80,9 @@ const STR = {
     figures: 'Chapters', notes: 'Notes', noNotes: 'No notes yet. Add some via edit.', figureName: 'Chapter name', noTime: 'no time', noChapters: 'No chapters yet. Play to the moment you want and tap + to mark a chapter at the current time.',
     title: 'Title', titlePh: 'e.g. Hammerlock and sombrero exit', desc: 'Description', descPh: 'What the lesson covered: figures, corrections, focus points', deleteArmToast: 'Tap the trash icon again to delete the video from Drive.',
     repeatA: a => `Start marked at ${a}. Tap again at the end of the section.`, repeatOn: (a, b) => `Repeating ${a}–${b}.`, repeatOff: 'Repeat cleared.',
-    help: 'Help', helpItems: [['back5', 'Skip', 'The arrows on the video skip 5 seconds back or forward. Tap the video to show or hide them.'], ['repeat', 'Repeat a section', 'First tap marks the start (A), second marks the end (B), and the section loops until a third tap.'], ['mirror', 'Mirror', 'Flips the video horizontally, like watching in the studio mirror. Handy when facing the teacher.'], ['plus', 'Chapters', 'On a lesson, play to the moment you want and tap + to mark a chapter at the current time. Tap a chapter to jump to it.'], ['pip', 'Picture in picture', 'Keeps playing in a small window over other apps.'], ['fs', 'Fullscreen', 'Opens the video in the device player. Rotate the phone for landscape clips.']],
+    ai: 'Auto-fill', aiIdle: 'Fill title, description and chapters from the video with Gemini.', aiNeedKey: 'A Gemini API key is needed. Add it in Settings.', aiDownloading: p => `Downloading the video from Drive… ${p}%`, aiUploading: p => `Uploading for analysis… ${p}%`, aiProcessing: 'Gemini is processing the video…', aiAnalyzing: 'Analyzing the lesson…', aiDone: 'Title, description and chapters filled in. Review and save.', aiFailed: 'Analysis failed. ', aiBadKey: 'The key is invalid, or restricted to another website.', aiQuota: 'Gemini quota exceeded for today. Try again later.', aiBadModel: 'Model name not found. Check it in Settings.',
+    geminiKey: 'Gemini API key', geminiHelp: 'The key is stored in your Drive folder and syncs across your devices. The video is sent to Gemini for analysis and deleted there right after. On the free tier Google may use content to improve its models.', geminiModelHint: 'Model name. Empty = default', getKey: 'Create a key in Google AI Studio', keySaved: 'Gemini settings saved.', badGeminiKey: 'That does not look like a Gemini API key.',
+    help: 'Help', helpItems: [['ai', 'Auto-fill', 'With a Gemini API key from Settings, the sparkle button fills the title, description and chapters from the video. Review before saving.'], ['back5', 'Skip', 'The arrows on the video skip 5 seconds back or forward. Tap the video to show or hide them.'], ['repeat', 'Repeat a section', 'First tap marks the start (A), second marks the end (B), and the section loops until a third tap.'], ['mirror', 'Mirror', 'Flips the video horizontally, like watching in the studio mirror. Handy when facing the teacher.'], ['plus', 'Chapters', 'On a lesson, play to the moment you want and tap + to mark a chapter at the current time. Tap a chapter to jump to it.'], ['pip', 'Picture in picture', 'Keeps playing in a small window over other apps.'], ['fs', 'Fullscreen', 'Opens the video in the device player. Rotate the phone for landscape clips.']],
     noPip: 'This browser does not support picture-in-picture.', playFirst: 'Start playing first.',
     chooseVideo: 'Choose a video', fromWhere: 'Photo Library, Files, or record now', alreadyInDrive: 'already in Drive', reading: 'reading…', previewNA: 'preview unavailable',
     style: 'Style', otherStyle: 'Other…', styleName: 'Style name', lessonType: 'Lesson', school: 'School', teacher: 'Teacher', newSchool: '+ New school…', newTeacher: '+ New teacher…', leaveUntagged: 'Leave untagged for now', name: 'Name',
@@ -94,7 +98,7 @@ const STR = {
     signInAgain: 'Please sign in again.', signinCheckFailed: 'Sign-in check failed. Please try again.', driveNotGranted: 'Drive access was not granted. Sign in again and keep the Google Drive box ticked.',
     recapsN: n => `${n} recap${n === 1 ? '' : 's'}`, schoolsN: n => `${n} school${n === 1 ? '' : 's'}`, teachersN: n => `${n} private teacher${n === 1 ? '' : 's'}`,
     styles: { bachata: 'Bachata', salsa: 'Salsa', kizomba: 'Kizomba', zouk: 'Zouk' },
-    aria: { back: 'Back', settings: 'Settings', add: 'New lesson', close: 'Close', edit: 'Edit', drive: 'Open in Drive', remove: 'Remove', addFigure: 'Mark a chapter at the current time', mirror: 'Mirror', repeat: 'Repeat a section', fullscreen: 'Fullscreen', pip: 'Picture in picture', play: 'Play', pause: 'Pause', back5: 'Back 5 seconds', fwd5: 'Forward 5 seconds', speed: 'Speed', delete: 'Delete', signout: 'Sign out', rescan: 'Rescan', save: 'Save' }
+    aria: { ai: 'Auto-fill with Gemini', back: 'Back', settings: 'Settings', add: 'New lesson', close: 'Close', edit: 'Edit', drive: 'Open in Drive', remove: 'Remove', addFigure: 'Mark a chapter at the current time', mirror: 'Mirror', repeat: 'Repeat a section', fullscreen: 'Fullscreen', pip: 'Picture in picture', play: 'Play', pause: 'Pause', back5: 'Back 5 seconds', fwd5: 'Forward 5 seconds', speed: 'Speed', delete: 'Delete', signout: 'Sign out', rescan: 'Rescan', save: 'Save' }
   }
 };
 let lang = localStorage.getItem(LS.lang) || 'he';
@@ -117,11 +121,13 @@ let uploading = false;
 let loopA = null, loopB = null;
 let lastSync = 0;
 let video, toastTimer;
+let pendingAi = null;        // last Gemini result waiting to be saved with the form
+let aiBusy = false;
 let blobUrl = null;          // object URL when a video was downloaded whole
 let mediaTriedBlob = false;  // fallback already attempted for the current lesson
 
 // ---------- helpers ----------
-function emptyLib() { return { version: 2, updatedAt: null, sources: [], styles: [], lessons: [] }; }
+function emptyLib() { return { version: 2, updatedAt: null, sources: [], styles: [], lessons: [], settings: { geminiKey: '', geminiModel: '' } }; }
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const qesc = s => String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
@@ -148,6 +154,8 @@ function normalize(d) {
   out.updatedAt = d.updatedAt || null;
   out.sources = (d.sources || []).filter(s => s && s.name).map(s => ({ name: String(s.name), kind: s.kind === 'private' ? 'private' : 'school', folderId: s.folderId || null }));
   out.styles = (d.styles || []).filter(s => typeof s === 'string' && s.trim()).map(s => s.trim());
+  const st = d.settings || {};
+  out.settings = { geminiKey: typeof st.geminiKey === 'string' ? st.geminiKey.trim() : '', geminiModel: typeof st.geminiModel === 'string' ? st.geminiModel.trim() : '' };
   out.lessons = (d.lessons || []).filter(l => l && l.id).map(l => {
     let figures = (l.figures || []).map(f => typeof f === 'string' ? { name: f, t: null } : { name: String(f.name || ''), t: (f.t == null ? null : +f.t) }).filter(f => f.name);
     let title = (l.title == null ? '' : String(l.title)).trim();
@@ -783,6 +791,7 @@ function openAdd(id) {
   $('btn-save').disabled = false;
   $('prog').style.display = 'none'; $('prog').querySelector('i').style.width = '0'; $('prog-hint').textContent = editing ? '' : T.skipHint;
   $('delete-row').hidden = !editing; disarmDelete();
+  pendingAi = null; $('ai-row').hidden = !editing; setAiHint(T.aiIdle); setAiBusy(false);
   show('add');
 }
 function setTypeUI() { document.querySelectorAll('#f-type button').forEach(b => b.classList.toggle('on', b.dataset.type === formType)); }
@@ -821,6 +830,7 @@ function fileChosen(input) {
   const pick = $('pick'); pick.classList.add('picked'); pick.querySelectorAll('img').forEach(i => i.remove());
   pick.querySelector('.txt').innerHTML = `<b>${esc(f.name)}</b><span>${mb} MB · ${esc(T.reading)}</span>`;
   if (!editing) $('f-date').value = isoDate(when);
+  pendingAi = null; $('ai-row').hidden = false; setAiHint(T.aiIdle);
   const v = document.createElement('video'); v.preload = 'metadata'; v.muted = true; v.playsInline = true; v.src = url;
   v.onloadedmetadata = () => {
     pending.duration = isFinite(v.duration) ? v.duration : null;
@@ -866,6 +876,7 @@ async function saveLesson() {
       // Move or rename the file in Drive first; only touch the local record once that succeeded.
       const l = editing;
       const next = { date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, note: form.note };
+      if (pendingAi && pendingAi.chapters.length) next.figures = mergeChapters(l.figures, pendingAi.chapters);
       const moved = l.source !== next.source || l.date !== next.date;
       if (moved) next.name = await moveLesson(Object.assign({}, l, next));
       if (form.source) ensureSource(form.source, formType);
@@ -879,7 +890,7 @@ async function saveLesson() {
       const parentId = form.source ? await ensureSourceFolder(form.source, formType) : root.id;
       const name = `${form.date} ${form.source || 'Untagged'}.${extOf(f.name)}`;
       const file = await resumableUpload(f, { name, parentId, mime, appProperties: { bachata: 'lesson', date: form.date, type: type || '', style: form.style }, onProgress: setProgress });
-      const l = { id: file.id, thumbId: null, name: file.name || name, date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, figures: [], note: form.note,
+      const l = { id: file.id, thumbId: null, name: file.name || name, date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, figures: pendingAi ? pendingAi.chapters.map(c => ({ name: c.name, t: c.t })) : [], note: form.note,
         duration: pending.duration != null ? Math.round(pending.duration) : (file.videoMediaMetadata && file.videoMediaMetadata.durationMillis ? Math.round(file.videoMediaMetadata.durationMillis / 1000) : null),
         size: +file.size || f.size, mimeType: file.mimeType || mime, createdAt: nowIso(), updatedAt: nowIso() };
       if (pending.poster) {
@@ -899,7 +910,7 @@ async function saveLesson() {
     $('btn-save').textContent = editing ? T.saveChanges : T.saveUpload;
   }
 }
-function resetForm() { if (pending && pending.url) URL.revokeObjectURL(pending.url); pending = null; editing = null; $('f-file').value = ''; }
+function resetForm() { if (pending && pending.url) URL.revokeObjectURL(pending.url); pending = null; editing = null; pendingAi = null; $('f-file').value = ''; }
 async function moveLesson(l) {
   const newParent = l.source ? await ensureSourceFolder(l.source, l.type || 'group') : root.id;
   const cur = await api(`/files/${l.id}`, { query: { fields: 'parents,name' } });
@@ -943,6 +954,56 @@ async function deleteLesson() {
     toast(T.deleted); resetForm(); current = null; show('library');
   } catch (e) { if (e.message !== 'signed out') toast(T.deleteFailed + shortErr(e)); }
   finally { disarmDelete(); $('btn-save').disabled = false; }
+}
+
+// ---------- Gemini auto-fill ----------
+function setAiHint(msg) { $('ai-hint').textContent = msg || ''; }
+function setAiBusy(b) { $('btn-ai').classList.toggle('busy', b); $('btn-ai-detail').classList.toggle('busy', b); }
+function mergeChapters(existing, incoming) {
+  const out = existing.slice();
+  incoming.forEach(c => { if (!out.some(f => f.name.toLowerCase() === c.name.toLowerCase())) out.push({ name: c.name, t: c.t }); });
+  return out.sort((a, b) => (a.t == null ? 1e9 : a.t) - (b.t == null ? 1e9 : b.t));
+}
+async function downloadLessonFile(l, onProgress) {
+  const at = await ensureToken();
+  const res = await fetch(`${API}/files/${encodeURIComponent(l.id)}?alt=media`, { headers: { Authorization: 'Bearer ' + at } });
+  if (!res.ok) throw new Error('Drive error ' + res.status);
+  const total = +res.headers.get('content-length') || l.size || 0;
+  const reader = res.body.getReader(); const chunks = []; let got = 0;
+  for (;;) { const { done, value } = await reader.read(); if (done) break; chunks.push(value); got += value.length; if (total && onProgress) onProgress(got / total); }
+  return new File(chunks, l.name || 'lesson.mp4', { type: res.headers.get('content-type') || l.mimeType || 'video/mp4' });
+}
+async function runAi() {
+  if (aiBusy) return;
+  const key = (lib.settings.geminiKey || '').trim();
+  if (!key) { toast(T.aiNeedKey, 5000); show('settings'); return; }
+  if (!window.GeminiClient) { toast(T.aiFailed); return; }
+  let file = pending && pending.file;
+  if (!file && !editing) { toast(T.pickFirst); return; }
+  aiBusy = true; setAiBusy(true);
+  try {
+    if (!file) file = await downloadLessonFile(editing, f => setAiHint(T.aiDownloading(Math.round(f * 100))));
+    const res = await window.GeminiClient.analyzeVideo(file, {
+      key, model: lib.settings.geminiModel || window.GeminiClient.DEFAULT_MODEL, lang,
+      onProgress: p => { if (p.stage === 'upload') setAiHint(T.aiUploading(Math.round((p.frac || 0) * 100))); else if (p.stage === 'process') setAiHint(T.aiProcessing); else setAiHint(T.aiAnalyzing); }
+    });
+    if (res.title) $('f-title').value = res.title;
+    if (res.desc) $('f-desc').value = res.desc;
+    pendingAi = res;
+    setAiHint(T.aiDone); toast(T.aiDone, 4000);
+  } catch (e) {
+    console.error(e);
+    if (e.message === 'signed out') return;
+    const kind = e && e.kind;
+    setAiHint(kind === 'key' ? T.aiBadKey : kind === 'quota' ? T.aiQuota : kind === 'model' ? T.aiBadModel : T.aiFailed + shortErr(e));
+  } finally { aiBusy = false; setAiBusy(false); }
+}
+function saveGeminiSettings() {
+  const key = ($('set-gemini-key').value || '').trim();
+  const model = ($('set-gemini-model').value || '').trim();
+  if (key && !/^AIza[0-9A-Za-z_-]{20,}$/.test(key)) { toast(T.badGeminiKey); return; }
+  lib.settings.geminiKey = key; lib.settings.geminiModel = model;
+  saveLibrary().then(() => toast(T.keySaved)).catch(err => toast(T.couldNotSave + shortErr(err)));
 }
 
 // ---------- schools ----------
@@ -994,6 +1055,11 @@ function renderSettings() {
     <div class="srow"><div><div class="lbl2">${esc(T.openDrive)}</div><div class="sm">${esc(T.storageBody)}</div></div>${root ? `<a class="ib" href="https://drive.google.com/drive/folders/${encodeURIComponent(root.id)}" target="_blank" rel="noopener" aria-label="${esc(T.aria.drive)}">${icon('open')}</a>` : ''}</div>
     <div class="month">${esc(T.maintenance)}</div>
     <div class="srow"><div><div class="lbl2">${esc(T.rescan)}</div><div class="sm">${esc(T.rescanHint)}</div></div><button class="ib" id="btn-rescan" aria-label="${esc(T.aria.rescan)}">${icon('refresh')}</button></div>
+    <div class="month">Gemini</div>
+    <div class="srow"><div><div class="lbl2">${esc(T.geminiKey)}</div><div class="sm">${esc(T.geminiHelp)}</div></div><a class="ib" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" aria-label="${esc(T.getKey)}" title="${esc(T.getKey)}">${icon('open')}</a></div>
+    <div class="input"><input id="set-gemini-key" type="password" value="${esc(lib.settings.geminiKey)}" placeholder="AIza…" dir="ltr" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"><button class="mini" id="btn-save-gemini" aria-label="${esc(T.aria.save)}">${icon('check')}</button></div>
+    <div class="input" style="margin-top:8px"><input id="set-gemini-model" value="${esc(lib.settings.geminiModel)}" placeholder="${esc(window.GeminiClient ? window.GeminiClient.DEFAULT_MODEL : 'gemini-2.5-flash')}" dir="ltr" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"></div>
+    <div class="hint">${esc(T.geminiModelHint)}</div>
     <div class="month">${esc(T.help)}</div>
     <div class="help">${T.helpItems.map(([ic, t, d]) => `<div>${icon(ic)}<span><b>${esc(t)}</b>${esc(d)}</span></div>`).join('')}</div>
     <div class="month">${esc(T.language)}</div>
@@ -1016,7 +1082,7 @@ function bindEvents() {
   $('btn-edit').addEventListener('click', () => { if (current) openAdd(current.id); });
   $('detail-delete').addEventListener('click', e => deleteFromDetail(e.currentTarget));
   $('btn-add').addEventListener('click', () => openAdd(null));
-  $('btn-cancel').addEventListener('click', () => { if (uploading) { toast(T.waitUpload); return; } const back = editing; resetForm(); if (back && back.source) openDetail(back.id); else show('library'); });
+  $('btn-cancel').addEventListener('click', () => { if (uploading || aiBusy) { toast(T.waitUpload); return; } const back = editing; resetForm(); if (back && back.source) openDetail(back.id); else show('library'); });
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => show(t.dataset.go)));
   $('search').addEventListener('input', e => { query = e.target.value; renderLibrary(); });
   $('style-pill').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; filter.style = b.dataset.style || null; renderLibrary(); });
@@ -1063,13 +1129,15 @@ function bindEvents() {
   $('f-style').addEventListener('click', e => { const b = e.target.closest('button[data-style]'); if (!b) return; formStyle = b.dataset.style; renderStyleSeg(); if (formStyle === '__new__') setTimeout(() => $('f-style-new').focus(), 50); });
   $('f-source').addEventListener('change', onSourceChange);
   $('btn-save').addEventListener('click', saveLesson);
+  $('btn-ai').addEventListener('click', runAi);
+  $('btn-ai-detail').addEventListener('click', () => { if (!current) return; openAdd(current.id); runAi(); });
   $('btn-delete').addEventListener('click', deleteLesson);
 
   $('schools').addEventListener('click', onSchoolsClick);
   $('schools').addEventListener('keydown', e => { if (e.target.id === 'src-name' && e.key === 'Enter') { e.preventDefault(); addSource(); } });
   $('settings-body').addEventListener('click', e => {
     const btn = e.target.closest('button'); const id = btn ? btn.id : '';
-    if (id === 'btn-rescan') rescan(btn); else if (id === 'btn-signout') signOut(); else if (id === 'btn-save-client2') saveClientId($('set-client').value);
+    if (id === 'btn-rescan') rescan(btn); else if (id === 'btn-signout') signOut(); else if (id === 'btn-save-client2') saveClientId($('set-client').value); else if (id === 'btn-save-gemini') saveGeminiSettings();
     const lb = e.target.closest('#lang-seg button'); if (lb) setLanguage(lb.dataset.lang);
   });
 

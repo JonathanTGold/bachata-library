@@ -73,6 +73,12 @@ h1{font-size:26px;font-weight:600;margin:0;letter-spacing:-.01em;line-height:1.1
 .actrow{display:flex;gap:4px;padding:8px 0 0;margin:0 -6px}
 .actrow .ib{color:var(--text)}
 .actrow .ib.armed{background:var(--danger);color:#fff}
+.ib.aibtn{color:var(--accent)}
+.ib.aibtn.busy{opacity:.5;pointer-events:none;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:1}}
+.airow{display:flex;align-items:center;gap:10px;margin-top:10px}
+.airow .ib{background:var(--surf);flex:none}
+.airow .hint{padding:0;flex:1}
 #s-detail.hidectl .topctl,#s-detail.hidectl .center,#s-detail.hidectl .pctl{opacity:0;pointer-events:none}
 .player:before{content:"";position:absolute;left:0;right:0;top:0;height:calc(var(--sat) + 80px);background:linear-gradient(rgba(0,0,0,.6),transparent);pointer-events:none;z-index:1}
 .player{position:relative;background:#000;padding-top:var(--sat);flex:none;direction:ltr}

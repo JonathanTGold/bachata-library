@@ -1,11 +1,11 @@
 /* Bachata Library service worker: caches the app shell, network-first so updates
  * arrive on the next open. Never touches Google API requests. */
-const VERSION = 'bl-v5';
+const VERSION = 'bl-v6';
 // Same-origin virtual path the app uses for video playback. The service worker turns it into an
 // authenticated Drive request, because a <video> element cannot send an Authorization header and
 // Google no longer accepts the token as a URL parameter.
 const MEDIA_PATH = new URL('./media', self.registration.scope).pathname;
-const SHELL = ['./', './index.html', './styles.css', './app.js', './config.js', './manifest.webmanifest',
+const SHELL = ['./', './index.html', './styles.css', './app.js', './gemini.js', './config.js', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
