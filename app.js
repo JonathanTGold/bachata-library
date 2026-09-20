@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.0.2';
+const APP_VERSION = '2.1.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -21,6 +21,8 @@ const THUMBS_NAME = '.thumbnails';
 const FOLDER_MIME = 'application/vnd.google-apps.folder';
 const LS = { token: 'bl_token', lib: 'bl_library', clientId: 'bl_client_id', hint: 'bl_login_hint', root: 'bl_root', lang: 'bl_lang' };
 const SS = { state: 'bl_oauth_state', silent: 'bl_silent_tried', needConsent: 'bl_need_consent' };
+const SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5];
+const SKIP = 5;
 const CHUNK = 8 * 1024 * 1024; // resumable upload chunk size, a multiple of 256 KiB
 const STYLE_KEYS = ['bachata', 'salsa', 'kizomba', 'zouk'];
 const BASE_STYLES = ['bachata', 'salsa'];
@@ -40,7 +42,8 @@ const STR = {
     noRecaps: 'אין עדיין סיכומים', emptyTitle: 'אין עדיין סיכומים.', emptyBody: 'לחיצה על + מוסיפה את הראשון. הוא עולה לתיקייה „Bachata Library” ב‑Google Drive שלך.', nothingMatches: 'אין תוצאות לסינון הזה.',
     group: 'קבוצתי', private: 'פרטי', groupLesson: 'שיעור קבוצתי', privateLesson: 'שיעור פרטי',
     untaggedRecap: 'סיכום ללא תיוג', tapToTag: 'לחיצה לתיוג', needsTag: 'חסרים בית ספר ופיגורות', recap: 'סיכום', recorded: 'הוקלט',
-    figures: 'פיגורות בסיכום', notes: 'הערות', noNotes: 'אין הערות עדיין. אפשר להוסיף דרך העריכה.', figureName: 'שם הפיגורה', noTime: 'ללא זמן',
+    figures: 'פרקים', notes: 'הערות', noNotes: 'אין הערות עדיין. אפשר להוסיף דרך העריכה.', figureName: 'שם הפרק', noTime: 'ללא זמן', noChapters: 'אין פרקים עדיין. מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי.',
+    title: 'כותרת', titlePh: 'למשל: האמרלוק ויציאה מסומבררו', deleteArmToast: 'לחיצה נוספת על סל המחזור מוחקת את הסרטון מ‑Drive.',
     repeatIdle: 'חזרה על קטע: לחיצה ראשונה מסמנת התחלה (A), שנייה מסמנת סוף (B), והקטע ינוגן שוב ושוב.',
     repeatA: a => `התחלה סומנה ב‑${a}. נגנו עד סוף הקטע ולחצו שוב.`, repeatOn: (a, b) => `חוזר על ${a}–${b}. לחיצה נוספת מבטלת.`,
     noPip: 'הדפדפן הזה לא תומך בתמונה‑בתוך‑תמונה.', playFirst: 'קודם מתחילים לנגן.',
@@ -51,14 +54,14 @@ const STR = {
     deleteArm: 'לחיצה נוספת מעבירה את הסרטון לסל המחזור של Drive.', deleteIdle: 'מחיקת הסיכום', deleted: 'הועבר לסל המחזור של Drive.', deleteFailed: 'המחיקה נכשלה. ',
     pickFirst: 'קודם בוחרים סרטון.', typeName: k => `צריך להקליד שם ${k}.`, typeStyle: 'צריך להקליד שם סגנון.', saved: 'נשמר.', uploaded: 'הועלה ל‑Drive.', uploadedUntagged: 'הועלה. מחכה תחת „ללא תיוג”.', saveFailed: 'השמירה נכשלה. ', nothingLost: 'משהו השתבש. שום דבר לא אבד, אפשר לנסות שוב.', waitUpload: 'ההעלאה עדיין רצה. מחכים שתסתיים.',
     couldNotReach: 'אין גישה ל‑Google Drive. ', couldNotLoadVideo: 'לא ניתן לטעון את הסרטון. ', couldNotPlay: 'לא ניתן לנגן את הסרטון. ייתכן שהפורמט לא נתמך בדפדפן הזה.', loadingVideo: 'טוען סרטון…', loadingPct: p => `טוען סרטון… ${p}%`,
-    marked: (n, t) => `„${n}” סומנה ב‑${t}.`, removed: n => `„${n}” הוסרה.`, couldNotSave: 'לא ניתן לשמור. ', typeFigure: 'צריך להקליד שם פיגורה.',
+    marked: (n, t) => `„${n}” סומן ב‑${t}.`, removed: n => `„${n}” הוסר.`, couldNotSave: 'לא ניתן לשמור. ', typeFigure: 'צריך להקליד שם לפרק.',
     schoolsSub: 'מורים פרטיים מופיעים לצד בתי הספר. לחיצה מסננת את הרשימה.', noSchools: 'אין עדיין בתי ספר.', noTeachers: 'אין עדיין מורים פרטיים.', privateTeacher: 'מורה פרטי', groupClasses: 'שיעורים קבוצתיים', addSource: 'הוספה', schoolsAuto: 'בתי ספר ומורים נוספים אוטומטית גם כשמתייגים סיכום.', alreadyListed: 'כבר ברשימה.', added: n => `${n} נוסף.`, removedSource: n => `${n} הוסר.`, moveFirst: 'קודם מעבירים או מוחקים את הסיכומים שלו.', last: 'אחרון',
     signedInAs: e => `מחובר בתור ${e}`, signedIn: 'מחובר', storage: 'אחסון', storageBody: 'הכול נשמר בתיקייה בשם Bachata Library ב‑Google Drive שלך: תת‑תיקייה לכל בית ספר או מורה, הסרטונים, וקובץ אינדקס קטן.', openDrive: 'פתיחת התיקייה ב‑Drive', maintenance: 'תחזוקה', rescan: 'סריקת Drive ותיקון האינדקס', rescanHint: 'מוסיף סיכומים שהועלו ממכשיר אחר או חסרים ברשימה, ומסיר רשומות שהקבצים שלהן נמחקו.', scanning: 'סורק…', rescanDone: (a, r) => `הסתיים. ${a} נוספו, ${r} הוסרו.`, rescanFailed: 'הסריקה נכשלה. ',
     account: 'חשבון', signOut: 'התנתקות', signOutHint: 'מתנתק במכשיר הזה בלבד. שום דבר ב‑Drive לא נמחק.', language: 'שפה', advanced: 'מתקדם', clientId: 'מזהה לקוח Google OAuth', clientHint: 'נדרש רק אם מריצים עותק עצמאי של האפליקציה.', badClient: 'זה לא נראה כמו מזהה לקוח של Google.', clientSaved: 'המזהה נשמר.', addClientFirst: 'קודם מוסיפים מזהה לקוח.',
     signInAgain: 'צריך להתחבר שוב.', signinCheckFailed: 'בדיקת ההתחברות נכשלה. נסו שוב.', driveNotGranted: 'לא ניתנה גישה ל‑Drive. התחברו שוב והשאירו את תיבת Google Drive מסומנת.',
     recapsN: n => n === 1 ? 'סיכום אחד' : `${n} סיכומים`, schoolsN: n => n === 1 ? 'בית ספר אחד' : `${n} בתי ספר`, teachersN: n => n === 1 ? 'מורה פרטי אחד' : `${n} מורים פרטיים`,
     styles: { bachata: 'באצ׳טה', salsa: 'סלסה', kizomba: 'קיזומבה', zouk: 'זוק' },
-    aria: { back: 'חזרה', settings: 'הגדרות', add: 'שיעור חדש', close: 'סגירה', edit: 'עריכה', drive: 'פתיחה ב‑Drive', remove: 'הסרה', addFigure: 'סימון פיגורה בזמן הנוכחי', mirror: 'מראה', repeat: 'חזרה על קטע', fullscreen: 'מסך מלא', pip: 'תמונה בתוך תמונה', play: 'נגן', delete: 'מחיקה', signout: 'התנתקות', rescan: 'סריקה', save: 'שמירה' }
+    aria: { back: 'חזרה', settings: 'הגדרות', add: 'שיעור חדש', close: 'סגירה', edit: 'עריכה', drive: 'פתיחה ב‑Drive', remove: 'הסרה', addFigure: 'סימון פרק בזמן הנוכחי', mirror: 'מראה', repeat: 'חזרה על קטע', fullscreen: 'מסך מלא', pip: 'תמונה בתוך תמונה', play: 'נגן', pause: 'השהיה', back5: 'אחורה 5 שניות', fwd5: 'קדימה 5 שניות', speed: 'מהירות', delete: 'מחיקה', signout: 'התנתקות', rescan: 'סריקה', save: 'שמירה' }
   },
   en: {
     dir: 'ltr', locale: 'en-GB',
@@ -72,7 +75,8 @@ const STR = {
     noRecaps: 'No recaps yet', emptyTitle: 'No recaps yet.', emptyBody: 'Tap + to add the first one. It uploads to a “Bachata Library” folder in your Google Drive.', nothingMatches: 'Nothing matches this filter.',
     group: 'Group', private: 'Private', groupLesson: 'Group class', privateLesson: 'Private',
     untaggedRecap: 'Untagged recap', tapToTag: 'tap to tag', needsTag: 'Needs school & figures', recap: 'recap', recorded: 'Recorded',
-    figures: 'Figures in this recap', notes: 'Notes', noNotes: 'No notes yet. Add some via edit.', figureName: 'Figure name', noTime: 'no time',
+    figures: 'Chapters', notes: 'Notes', noNotes: 'No notes yet. Add some via edit.', figureName: 'Chapter name', noTime: 'no time', noChapters: 'No chapters yet. Play to the moment you want and tap + to mark a chapter at the current time.',
+    title: 'Title', titlePh: 'e.g. Hammerlock and sombrero exit', deleteArmToast: 'Tap the trash icon again to delete the video from Drive.',
     repeatIdle: 'Repeat a section: first tap marks the start (A), second marks the end (B), and the section loops.',
     repeatA: a => `Start marked at ${a}. Play to the end of the section and tap again.`, repeatOn: (a, b) => `Repeating ${a}–${b}. Tap again to stop.`,
     noPip: 'This browser does not support picture-in-picture.', playFirst: 'Start playing first.',
@@ -90,7 +94,7 @@ const STR = {
     signInAgain: 'Please sign in again.', signinCheckFailed: 'Sign-in check failed. Please try again.', driveNotGranted: 'Drive access was not granted. Sign in again and keep the Google Drive box ticked.',
     recapsN: n => `${n} recap${n === 1 ? '' : 's'}`, schoolsN: n => `${n} school${n === 1 ? '' : 's'}`, teachersN: n => `${n} private teacher${n === 1 ? '' : 's'}`,
     styles: { bachata: 'Bachata', salsa: 'Salsa', kizomba: 'Kizomba', zouk: 'Zouk' },
-    aria: { back: 'Back', settings: 'Settings', add: 'New lesson', close: 'Close', edit: 'Edit', drive: 'Open in Drive', remove: 'Remove', addFigure: 'Mark a figure at the current time', mirror: 'Mirror', repeat: 'Repeat a section', fullscreen: 'Fullscreen', pip: 'Picture in picture', play: 'Play', delete: 'Delete', signout: 'Sign out', rescan: 'Rescan', save: 'Save' }
+    aria: { back: 'Back', settings: 'Settings', add: 'New lesson', close: 'Close', edit: 'Edit', drive: 'Open in Drive', remove: 'Remove', addFigure: 'Mark a chapter at the current time', mirror: 'Mirror', repeat: 'Repeat a section', fullscreen: 'Fullscreen', pip: 'Picture in picture', play: 'Play', pause: 'Pause', back5: 'Back 5 seconds', fwd5: 'Forward 5 seconds', speed: 'Speed', delete: 'Delete', signout: 'Sign out', rescan: 'Rescan', save: 'Save' }
   }
 };
 let lang = localStorage.getItem(LS.lang) || 'he';
@@ -144,14 +148,20 @@ function normalize(d) {
   out.updatedAt = d.updatedAt || null;
   out.sources = (d.sources || []).filter(s => s && s.name).map(s => ({ name: String(s.name), kind: s.kind === 'private' ? 'private' : 'school', folderId: s.folderId || null }));
   out.styles = (d.styles || []).filter(s => typeof s === 'string' && s.trim()).map(s => s.trim());
-  out.lessons = (d.lessons || []).filter(l => l && l.id).map(l => ({
-    id: String(l.id), thumbId: l.thumbId || null, name: l.name || '', date: l.date || '', source: l.source || null,
-    type: l.type === 'private' ? 'private' : (l.type === 'group' ? 'group' : null),
-    style: (l.style && String(l.style).trim()) || DEFAULT_STYLE,
-    figures: (l.figures || []).map(f => typeof f === 'string' ? { name: f, t: null } : { name: String(f.name || ''), t: (f.t == null ? null : +f.t) }).filter(f => f.name),
-    note: l.note || '', duration: l.duration == null ? null : +l.duration, size: l.size == null ? null : +l.size,
-    mimeType: l.mimeType || '', createdAt: l.createdAt || null, updatedAt: l.updatedAt || null
-  }));
+  out.lessons = (d.lessons || []).filter(l => l && l.id).map(l => {
+    let figures = (l.figures || []).map(f => typeof f === 'string' ? { name: f, t: null } : { name: String(f.name || ''), t: (f.t == null ? null : +f.t) }).filter(f => f.name);
+    let title = (l.title == null ? '' : String(l.title)).trim();
+    // Older records had no title; the figures typed in the form served as one. Turn those
+    // untimed entries into the title and keep only real chapters (entries with a time).
+    if (!title && figures.some(f => f.t == null)) { title = figures.filter(f => f.t == null).map(f => f.name).join(' · '); figures = figures.filter(f => f.t != null); }
+    return {
+      id: String(l.id), thumbId: l.thumbId || null, name: l.name || '', date: l.date || '', source: l.source || null,
+      type: l.type === 'private' ? 'private' : (l.type === 'group' ? 'group' : null),
+      style: (l.style && String(l.style).trim()) || DEFAULT_STYLE, title, figures,
+      note: l.note || '', duration: l.duration == null ? null : +l.duration, size: l.size == null ? null : +l.size,
+      mimeType: l.mimeType || '', createdAt: l.createdAt || null, updatedAt: l.updatedAt || null
+    };
+  });
   return out;
 }
 function sortLessons() { lib.lessons.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt || '').localeCompare(a.createdAt || '')); }
@@ -198,6 +208,7 @@ function applyLanguage() {
   document.querySelectorAll('[data-ph]').forEach(el => { const v = T[el.dataset.ph]; if (typeof v === 'string') el.placeholder = v; });
   document.querySelectorAll('[data-aria]').forEach(el => { const v = T.aria[el.dataset.aria]; if (v) { el.setAttribute('aria-label', v); el.title = v; } });
   $('loop-hint').textContent = T.repeatIdle;
+  if (video) setPlayIcon(!video.paused);
 }
 function setLanguage(l) { lang = STR[l] ? l : 'he'; localStorage.setItem(LS.lang, lang); applyLanguage(); render(); }
 
@@ -374,7 +385,7 @@ async function syncFiles({ prune = false } = {}) {
       const ap = f.appProperties || {};
       const source = (f.parents || []).map(p => folderNames[p]).find(Boolean) || null;
       const type = ap.type === 'private' ? 'private' : (source ? 'group' : null);
-      lib.lessons.push({ id: f.id, thumbId: null, name: f.name, date: ap.date || (f.createdTime || '').slice(0, 10), source, type, style: ap.style || DEFAULT_STYLE, figures: [], note: '',
+      lib.lessons.push({ id: f.id, thumbId: null, name: f.name, date: ap.date || (f.createdTime || '').slice(0, 10), source, type, style: ap.style || DEFAULT_STYLE, title: '', figures: [], note: '',
         duration: f.videoMediaMetadata && f.videoMediaMetadata.durationMillis ? Math.round(f.videoMediaMetadata.durationMillis / 1000) : null,
         size: +f.size || null, mimeType: f.mimeType || '', createdAt: f.createdTime || nowIso(), updatedAt: nowIso() });
       if (source) ensureSource(source, type || 'group');
@@ -505,12 +516,8 @@ function lastType() { const l = lastLesson(); return l && l.type; }
 function lastStyle() { const l = lastLesson(); return (l && l.style) || DEFAULT_STYLE; }
 function lastSource(kind) { const l = lib.lessons.slice().sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || '')).find(x => x.source && x.type === (kind === 'private' ? 'private' : 'group')); return l ? l.source : null; }
 function allFigureNames() { const set = new Set(); lib.lessons.forEach(l => l.figures.forEach(f => set.add(f.name))); return [...set].sort((a, b) => a.localeCompare(b, T.locale)); }
-function mergeFigures(oldFigs, newFigs) {
-  return newFigs.map(n => { const o = oldFigs.find(f => f.name.toLowerCase() === n.name.toLowerCase()); return { name: n.name, t: o ? o.t : null }; });
-}
-function lessonTitle(l, max) {
-  const figs = l.figures.map(f => f.name);
-  if (figs.length) return (max ? figs.slice(0, max) : figs).join(' · ');
+function lessonTitle(l) {
+  if (l.title) return l.title;
   return l.source ? `${l.source} · ${T.recap}` : T.untaggedRecap;
 }
 
@@ -563,7 +570,7 @@ function visibleLessons() {
   if (filter.kind === 'untagged') items = items.filter(l => !l.source);
   if (filter.kind === 'source') items = items.filter(l => l.source === filter.value);
   const q = query.trim().toLowerCase();
-  if (q) items = items.filter(l => [l.source, l.note, l.date, l.name, styleName(l.style), ...l.figures.map(f => f.name)].filter(Boolean).some(v => String(v).toLowerCase().includes(q)));
+  if (q) items = items.filter(l => [l.title, l.source, l.note, l.date, l.name, styleName(l.style), ...l.figures.map(f => f.name)].filter(Boolean).some(v => String(v).toLowerCase().includes(q)));
   return items;
 }
 function renderLibrary() {
@@ -586,7 +593,7 @@ function renderLibrary() {
       : `<span class="tag">${esc(T.needsTag)}</span>`;
     h += `<button class="card ${l.source ? '' : 'untagged'}" data-id="${esc(l.id)}">
       <div class="thumb ${hue(l.id)}"><img data-thumb="${esc(l.id)}" alt=""><div class="play"></div>${l.duration ? `<div class="dur">${fmtDur(l.duration)}</div>` : ''}</div>
-      <div class="meta"><div class="title">${esc(lessonTitle(l, 2))}</div><div class="who">${esc(who)}</div><div class="badges">${badges}</div></div></button>`;
+      <div class="meta"><div class="title">${esc(lessonTitle(l))}</div><div class="who">${esc(who)}</div><div class="badges">${badges}</div></div></button>`;
   }
   $('list').innerHTML = h;
   loadThumbs($('list'));
@@ -595,7 +602,7 @@ function renderLibrary() {
 // Lesson detail
 async function openDetail(id) {
   const l = lib.lessons.find(x => x.id === id); if (!l) return;
-  current = l; loopReset(); setRate(1);
+  current = l; loopReset(); setRate(1); toggleSpeedMenu(false); setPlayIcon(false); $('center').classList.remove('faded');
   video.classList.remove('mirror'); $('btn-mirror').classList.remove('on');
   show('detail'); renderDetail();
   $('detail-scroll').scrollTop = 0;
@@ -608,8 +615,9 @@ function renderDetail() {
   $('detail-body').innerHTML = `
     <div class="ttl2">${esc(lessonTitle(l))}</div>
     <div class="meta2"><span>${meta}</span><span class="stl">${esc(styleName(l.style))}</span>
-      <span class="acts"><button class="ib" data-action="edit" aria-label="${esc(T.aria.edit)}" title="${esc(T.aria.edit)}">${icon('edit')}</button><a class="ib" href="https://drive.google.com/file/d/${encodeURIComponent(l.id)}/view" target="_blank" rel="noopener" aria-label="${esc(T.aria.drive)}" title="${esc(T.aria.drive)}">${icon('open')}</a></span></div>
+      <span class="acts"><button class="ib" data-action="edit" aria-label="${esc(T.aria.edit)}" title="${esc(T.aria.edit)}">${icon('edit')}</button><a class="ib" href="https://drive.google.com/file/d/${encodeURIComponent(l.id)}/view" target="_blank" rel="noopener" aria-label="${esc(T.aria.drive)}" title="${esc(T.aria.drive)}">${icon('open')}</a><button class="ib" id="detail-delete" data-action="delete" aria-label="${esc(T.aria.delete)}" title="${esc(T.aria.delete)}">${icon('trash')}</button></span></div>
     <h3>${esc(T.figures)}</h3>
+    ${figs.length ? '' : `<div class="chapters-empty">${esc(T.noChapters)}</div>`}
     ${figs.map((f, i) => `<div class="fig" data-fig="${i}" role="button"><span class="fname">${esc(f.name)}</span><span class="fright">${f.t != null ? `<span class="tm">${fmtDur(f.t)}</span>` : `<span class="tm dim">${esc(T.noTime)}</span>`}<button class="x ib" data-remove="${i}" aria-label="${esc(T.aria.remove)}">${icon('close')}</button></span></div>`).join('')}
     <button class="fig add" id="mark-row" aria-label="${esc(T.aria.addFigure)}" title="${esc(T.aria.addFigure)}">${icon('plus')}</button>
     <div class="markwrap" id="mark-wrap" hidden><div class="input"><input id="mark-name" placeholder="${esc(T.figureName)}" list="fig-names" autocomplete="off"><button class="mini" id="mark-add" aria-label="${esc(T.aria.save)}">${icon('check')}</button></div><datalist id="fig-names">${allFigureNames().map(n => `<option value="${esc(n)}">`).join('')}</datalist></div>
@@ -621,6 +629,7 @@ function onDetailClick(e) {
   const rm = e.target.closest('[data-remove]');
   if (rm) { e.stopPropagation(); const i = +rm.dataset.remove; const f = current.figures[i]; if (!f) return; current.figures.splice(i, 1); current.updatedAt = nowIso(); renderDetail(); saveLibrary().then(() => toast(T.removed(f.name))).catch(err => toast(T.couldNotSave + shortErr(err))); return; }
   if (e.target.closest('[data-action="edit"]')) { openAdd(current.id); return; }
+  if (e.target.closest('[data-action="delete"]')) { deleteFromDetail(e.target.closest('[data-action="delete"]')); return; }
   if (e.target.closest('#mark-row')) { $('mark-wrap').hidden = false; $('mark-name').focus(); if (!video.paused) video.pause(); return; }
   if (e.target.closest('#mark-add')) { submitMark(); return; }
   const row = e.target.closest('.fig[data-fig]');
@@ -689,7 +698,16 @@ async function loadViaBlob(l, at) {
   }
 }
 function setVideoLoading(msg) { const el = $('vload'); el.textContent = msg; el.hidden = !msg; }
-function setRate(r) { video.playbackRate = r; document.querySelectorAll('#speed button').forEach(b => b.classList.toggle('on', parseFloat(b.dataset.rate) === r)); }
+function setRate(r) {
+  video.playbackRate = r;
+  $('btn-speed').textContent = (r === 1 ? '1' : String(r)) + '×';
+  $('speed-menu').innerHTML = SPEEDS.map(x => `<button type="button" class="${x === r ? 'on' : ''}" data-rate="${x}">${x}×</button>`).join('');
+}
+function toggleSpeedMenu(force) { const m = $('speed-menu'); m.hidden = force === undefined ? !m.hidden : !force; }
+function skip(sec) { if (!video.duration) return; video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + sec)); updateTime(); }
+function setPlayIcon(playing) { $('playicon').innerHTML = `<use href="#i-${playing ? 'pause' : 'play'}"/>`; $('bigplay').setAttribute('aria-label', playing ? T.aria.pause : T.aria.play); }
+let fadeTimer;
+function showCenter() { const c = $('center'); c.classList.remove('faded'); clearTimeout(fadeTimer); if (!video.paused) fadeTimer = setTimeout(() => c.classList.add('faded'), 2200); }
 function pct(t) { return video.duration ? (t / video.duration * 100) + '%' : '0%'; }
 function updateTime() {
   const d = isFinite(video.duration) ? video.duration : 0;
@@ -757,7 +775,7 @@ function openAdd(id) {
   formStyle = (editing && editing.style) || lastStyle();
   setTypeUI(); renderStyleSeg();
   fillSources(editing ? editing.source : lastSource(formType));
-  $('f-figs').value = editing ? editing.figures.map(f => f.name).join(', ') : '';
+  $('f-title').value = editing ? (editing.title || '') : '';
   $('f-note').value = editing ? editing.note : '';
   $('btn-save').textContent = editing ? T.saveChanges : T.saveUpload;
   $('btn-save').disabled = false;
@@ -825,8 +843,7 @@ function readForm() {
   if (!source) source = null;
   let style = formStyle, styleNew = false;
   if (style === '__new__' || !allStyles().includes(style)) { style = $('f-style-new').value.trim(); styleNew = true; }
-  const figures = $('f-figs').value.split(',').map(s => s.trim()).filter(Boolean).map(n => ({ name: n, t: null }));
-  return { date, source, isNew, style, styleNew, figures, note: $('f-note').value.trim() };
+  return { date, source, isNew, style, styleNew, title: $('f-title').value.trim(), note: $('f-note').value.trim() };
 }
 function setProgress(frac) {
   const p = $('prog'); p.style.display = 'block'; p.querySelector('i').style.width = Math.round(frac * 100) + '%';
@@ -846,7 +863,7 @@ async function saveLesson() {
     if (editing) {
       // Move or rename the file in Drive first; only touch the local record once that succeeded.
       const l = editing;
-      const next = { date: form.date, source: form.source, type, style: form.style, figures: mergeFigures(l.figures, form.figures), note: form.note };
+      const next = { date: form.date, source: form.source, type, style: form.style, title: form.title, note: form.note };
       const moved = l.source !== next.source || l.date !== next.date;
       if (moved) next.name = await moveLesson(Object.assign({}, l, next));
       if (form.source) ensureSource(form.source, formType);
@@ -860,7 +877,7 @@ async function saveLesson() {
       const parentId = form.source ? await ensureSourceFolder(form.source, formType) : root.id;
       const name = `${form.date} ${form.source || 'Untagged'}.${extOf(f.name)}`;
       const file = await resumableUpload(f, { name, parentId, mime, appProperties: { bachata: 'lesson', date: form.date, type: type || '', style: form.style }, onProgress: setProgress });
-      const l = { id: file.id, thumbId: null, name: file.name || name, date: form.date, source: form.source, type, style: form.style, figures: form.figures, note: form.note,
+      const l = { id: file.id, thumbId: null, name: file.name || name, date: form.date, source: form.source, type, style: form.style, title: form.title, figures: [], note: form.note,
         duration: pending.duration != null ? Math.round(pending.duration) : (file.videoMediaMetadata && file.videoMediaMetadata.durationMillis ? Math.round(file.videoMediaMetadata.durationMillis / 1000) : null),
         size: +file.size || f.size, mimeType: file.mimeType || mime, createdAt: nowIso(), updatedAt: nowIso() };
       if (pending.poster) {
@@ -889,6 +906,24 @@ async function moveLesson(l) {
   const upd = await api(`/files/${l.id}`, { method: 'PATCH', query: { addParents: newParent, removeParents: oldParents.join(','), fields: 'id,name' }, body: { name: newName, appProperties: { bachata: 'lesson', date: l.date, type: l.type || '', style: l.style || DEFAULT_STYLE } } });
   return (upd && upd.name) || newName;
 }
+async function performDelete(l) {
+  await api(`/files/${l.id}`, { method: 'PATCH', body: { trashed: true } });
+  if (l.thumbId) api(`/files/${l.thumbId}`, { method: 'PATCH', body: { trashed: true } }).catch(() => {});
+  lib.lessons = lib.lessons.filter(x => x.id !== l.id);
+  await saveLibrary(); idb.del(l.id); delete thumbs[l.id];
+}
+let detailDeleteTimer;
+async function deleteFromDetail(btn) {
+  const l = current; if (!l || !btn) return;
+  if (btn.dataset.armed !== '1') {
+    btn.dataset.armed = '1'; btn.classList.add('armed'); toast(T.deleteArmToast, 4000);
+    clearTimeout(detailDeleteTimer); detailDeleteTimer = setTimeout(() => { btn.dataset.armed = ''; btn.classList.remove('armed'); }, 4000);
+    return;
+  }
+  btn.disabled = true;
+  try { video.pause(); await performDelete(l); toast(T.deleted); current = null; show('library'); }
+  catch (e) { btn.disabled = false; btn.dataset.armed = ''; btn.classList.remove('armed'); if (e.message !== 'signed out') toast(T.deleteFailed + shortErr(e)); }
+}
 let deleteTimer;
 function disarmDelete() { const b = $('btn-delete'); b.classList.remove('armed'); b.dataset.armed = ''; b.disabled = false; $('delete-hint').textContent = T.deleteIdle; clearTimeout(deleteTimer); }
 async function deleteLesson() {
@@ -900,10 +935,7 @@ async function deleteLesson() {
   }
   b.disabled = true; $('btn-save').disabled = true;
   try {
-    await api(`/files/${l.id}`, { method: 'PATCH', body: { trashed: true } });
-    if (l.thumbId) api(`/files/${l.thumbId}`, { method: 'PATCH', body: { trashed: true } }).catch(() => {});
-    lib.lessons = lib.lessons.filter(x => x.id !== l.id);
-    await saveLibrary(); idb.del(l.id); delete thumbs[l.id];
+    await performDelete(l);
     toast(T.deleted); resetForm(); current = null; show('library');
   } catch (e) { if (e.message !== 'signed out') toast(T.deleteFailed + shortErr(e)); }
   finally { disarmDelete(); $('btn-save').disabled = false; }
@@ -984,11 +1016,16 @@ function bindEvents() {
   $('list').addEventListener('click', e => { const card = e.target.closest('.card'); if (!card) return; const l = lib.lessons.find(x => x.id === card.dataset.id); if (!l) return; if (!l.source) openAdd(l.id); else openDetail(l.id); });
 
   // player
-  $('bigplay').addEventListener('click', () => video.play().catch(() => {}));
-  video.addEventListener('click', () => { if (video.paused) video.play().catch(() => {}); else video.pause(); });
-  video.addEventListener('play', () => $('bigplay').classList.add('hide'));
-  video.addEventListener('pause', () => $('bigplay').classList.remove('hide'));
-  video.addEventListener('ended', () => $('bigplay').classList.remove('hide'));
+  $('bigplay').addEventListener('click', () => { if (video.paused) video.play().catch(() => {}); else video.pause(); showCenter(); });
+  $('btn-back5').addEventListener('click', () => { skip(-SKIP); showCenter(); });
+  $('btn-fwd5').addEventListener('click', () => { skip(SKIP); showCenter(); });
+  video.addEventListener('click', () => { const c = $('center'); if (c.classList.contains('faded')) showCenter(); else if (video.paused) video.play().catch(() => {}); else video.pause(); });
+  video.addEventListener('play', () => { setPlayIcon(true); showCenter(); });
+  video.addEventListener('pause', () => { setPlayIcon(false); showCenter(); });
+  video.addEventListener('ended', () => { setPlayIcon(false); showCenter(); });
+  $('btn-speed').addEventListener('click', e => { e.stopPropagation(); toggleSpeedMenu(); });
+  $('speed-menu').addEventListener('click', e => { const b = e.target.closest('button[data-rate]'); if (!b) return; setRate(parseFloat(b.dataset.rate)); toggleSpeedMenu(false); });
+  document.addEventListener('click', e => { if (!e.target.closest('.speedwrap')) toggleSpeedMenu(false); });
   video.addEventListener('timeupdate', () => { if (loopB !== null && video.currentTime >= loopB) video.currentTime = loopA; updateTime(); });
   video.addEventListener('loadedmetadata', updateTime);
   video.addEventListener('durationchange', updateTime);
@@ -1003,7 +1040,6 @@ function bindEvents() {
   scrub.addEventListener('pointermove', e => { if (scrub.dataset.drag === '1') seekFromPointer(e.clientX); });
   scrub.addEventListener('pointerup', () => { scrub.dataset.drag = ''; });
   scrub.addEventListener('pointercancel', () => { scrub.dataset.drag = ''; });
-  document.querySelectorAll('#speed button').forEach(b => b.addEventListener('click', () => setRate(parseFloat(b.dataset.rate))));
   $('btn-mirror').addEventListener('click', () => { video.classList.toggle('mirror'); $('btn-mirror').classList.toggle('on'); });
   $('btn-loop').addEventListener('click', loopStep);
   $('btn-fs').addEventListener('click', enterFullscreen);
