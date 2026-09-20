@@ -68,7 +68,8 @@ h1{font-size:26px;font-weight:600;margin:0;letter-spacing:-.01em;line-height:1.1
 .fab .i{width:30px;height:30px}
 /* player */
 .back{position:absolute;inset-inline-start:12px;top:max(10px,calc(var(--sat) + 4px));z-index:3;background:rgba(0,0,0,.5);color:#fff;border-radius:50%}
-.topctl{position:absolute;inset-inline-end:8px;top:max(8px,calc(var(--sat) + 2px));z-index:3;display:flex;gap:2px;direction:ltr;transition:opacity .25s}
+.topctl{position:absolute;right:8px;top:max(8px,calc(var(--sat) + 2px));z-index:3;display:flex;gap:2px;direction:ltr;transition:opacity .25s}
+[dir=rtl] .topctl{right:auto;left:8px}
 .actrow{display:flex;gap:4px;padding:8px 0 0;margin:0 -6px}
 .actrow .ib{color:var(--text)}
 .actrow .ib.armed{background:var(--danger);color:#fff}
