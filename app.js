@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.3.1';
+const APP_VERSION = '2.3.2';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -571,8 +571,7 @@ function visibleLessons() {
 }
 function renderLibrary() {
   renderStylePill(); renderChips();
-  const nS = lib.sources.filter(s => s.kind === 'school').length, nP = lib.sources.filter(s => s.kind === 'private').length;
-  $('lib-sub').textContent = lib.lessons.length ? [T.recapsN(lib.lessons.length), T.schoolsN(nS), nP ? T.teachersN(nP) : null].filter(Boolean).join(' · ') : T.noRecaps;
+  $('lib-sub').textContent = lib.lessons.length ? T.recapsN(lib.lessons.length) : T.noRecaps;
   const items = visibleLessons();
   if (!items.length) {
     $('list').innerHTML = `<div class="empty">${lib.lessons.length ? esc(T.nothingMatches) : `<b>${esc(T.emptyTitle)}</b><br>${esc(T.emptyBody)}`}</div>`;
