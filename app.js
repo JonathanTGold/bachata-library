@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.1.2';
+const APP_VERSION = '2.1.3';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -912,8 +912,9 @@ async function performDelete(l) {
 let detailDeleteTimer;
 async function deleteFromDetail(btn) {
   const l = current; if (!l || !btn) return;
+  if (btn.dataset.armed === '1' && Date.now() - (+btn.dataset.armedAt || 0) < 400) return;
   if (btn.dataset.armed !== '1') {
-    btn.dataset.armed = '1'; btn.classList.add('armed'); toast(T.deleteArmToast, 4000);
+    btn.dataset.armed = '1'; btn.dataset.armedAt = String(Date.now()); btn.classList.add('armed'); toast(T.deleteArmToast, 4000);
     clearTimeout(detailDeleteTimer); detailDeleteTimer = setTimeout(() => { btn.dataset.armed = ''; btn.classList.remove('armed'); }, 4000);
     return;
   }
@@ -925,8 +926,9 @@ let deleteTimer;
 function disarmDelete() { const b = $('btn-delete'); b.classList.remove('armed'); b.dataset.armed = ''; b.disabled = false; $('delete-hint').textContent = T.deleteIdle; clearTimeout(deleteTimer); }
 async function deleteLesson() {
   const b = $('btn-delete'); const l = editing; if (!l || uploading) return;
+  if (b.dataset.armed === '1' && Date.now() - (+b.dataset.armedAt || 0) < 400) return;
   if (b.dataset.armed !== '1') {
-    b.dataset.armed = '1'; b.classList.add('armed'); $('delete-hint').textContent = T.deleteArm;
+    b.dataset.armed = '1'; b.dataset.armedAt = String(Date.now()); b.classList.add('armed'); $('delete-hint').textContent = T.deleteArm;
     clearTimeout(deleteTimer); deleteTimer = setTimeout(() => { if (b.dataset.armed === '1') disarmDelete(); }, 4000);
     return;
   }
