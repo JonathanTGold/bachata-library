@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.3.2';
+const APP_VERSION = '2.3.3';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -43,7 +43,7 @@ const STR = {
     group: 'קבוצתי', private: 'פרטי', groupLesson: 'שיעור קבוצתי', privateLesson: 'שיעור פרטי',
     untaggedRecap: 'סיכום ללא תיוג', tapToTag: 'לחיצה לתיוג', needsTag: 'חסרים בית ספר ופיגורות', recap: 'סיכום', recorded: 'הוקלט',
     figures: 'פרקים', notes: 'הערות', noNotes: 'אין הערות עדיין. אפשר להוסיף דרך העריכה.', figureName: 'שם הפרק', noTime: 'ללא זמן', noChapters: 'אין פרקים עדיין. מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי.',
-    title: 'כותרת', titlePh: 'למשל: האמרלוק ויציאה מסומבררו', deleteArmToast: 'לחיצה נוספת על סל המחזור מוחקת את הסרטון מ‑Drive.',
+    title: 'תיאור', titlePh: 'מה היה בשיעור: פיגורות, תיקונים, דגשים', deleteArmToast: 'לחיצה נוספת על סל המחזור מוחקת את הסרטון מ‑Drive.',
     repeatA: a => `התחלה סומנה ב‑${a}. לחצו שוב בסוף הקטע.`, repeatOn: (a, b) => `חוזר על ${a}–${b}.`, repeatOff: 'החזרה בוטלה.',
     help: 'עזרה', helpItems: [['back5', 'דילוג', 'החצים על הסרטון מדלגים 5 שניות אחורה או קדימה. לחיצה על הסרטון מציגה או מסתירה אותם.'], ['repeat', 'חזרה על קטע', 'לחיצה ראשונה מסמנת התחלה (A), שנייה מסמנת סוף (B), והקטע ינוגן שוב ושוב עד ללחיצה שלישית.'], ['mirror', 'מראה', 'הופך את הסרטון אופקית, כמו להסתכל במראה של הסטודיו. נוח כשעומדים מול המורה.'], ['plus', 'פרקים', 'בעמוד השיעור, מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי. לחיצה על פרק קופצת אליו.'], ['pip', 'תמונה בתוך תמונה', 'ממשיך לנגן בחלון קטן מעל אפליקציות אחרות.'], ['fs', 'מסך מלא', 'פותח את הסרטון בנגן של המכשיר. מומלץ לסובב את המכשיר לסרטונים לרוחב.']],
     noPip: 'הדפדפן הזה לא תומך בתמונה‑בתוך‑תמונה.', playFirst: 'קודם מתחילים לנגן.',
@@ -76,7 +76,7 @@ const STR = {
     group: 'Group', private: 'Private', groupLesson: 'Group class', privateLesson: 'Private',
     untaggedRecap: 'Untagged recap', tapToTag: 'tap to tag', needsTag: 'Needs school & figures', recap: 'recap', recorded: 'Recorded',
     figures: 'Chapters', notes: 'Notes', noNotes: 'No notes yet. Add some via edit.', figureName: 'Chapter name', noTime: 'no time', noChapters: 'No chapters yet. Play to the moment you want and tap + to mark a chapter at the current time.',
-    title: 'Title', titlePh: 'e.g. Hammerlock and sombrero exit', deleteArmToast: 'Tap the trash icon again to delete the video from Drive.',
+    title: 'Description', titlePh: 'What the lesson covered: figures, corrections, focus points', deleteArmToast: 'Tap the trash icon again to delete the video from Drive.',
     repeatA: a => `Start marked at ${a}. Tap again at the end of the section.`, repeatOn: (a, b) => `Repeating ${a}–${b}.`, repeatOff: 'Repeat cleared.',
     help: 'Help', helpItems: [['back5', 'Skip', 'The arrows on the video skip 5 seconds back or forward. Tap the video to show or hide them.'], ['repeat', 'Repeat a section', 'First tap marks the start (A), second marks the end (B), and the section loops until a third tap.'], ['mirror', 'Mirror', 'Flips the video horizontally, like watching in the studio mirror. Handy when facing the teacher.'], ['plus', 'Chapters', 'On a lesson, play to the moment you want and tap + to mark a chapter at the current time. Tap a chapter to jump to it.'], ['pip', 'Picture in picture', 'Keeps playing in a small window over other apps.'], ['fs', 'Fullscreen', 'Opens the video in the device player. Rotate the phone for landscape clips.']],
     noPip: 'This browser does not support picture-in-picture.', playFirst: 'Start playing first.',
@@ -588,7 +588,7 @@ function renderLibrary() {
       : `<span class="tag">${esc(T.needsTag)}</span>`;
     h += `<button class="card ${l.source ? '' : 'untagged'}" data-id="${esc(l.id)}">
       <div class="thumb ${hue(l.id)}"><img data-thumb="${esc(l.id)}" alt=""><div class="play"></div>${l.duration ? `<div class="dur">${fmtDur(l.duration)}</div>` : ''}</div>
-      <div class="meta"><div class="title">${esc(lessonTitle(l))}</div><div class="who">${esc(who)}</div><div class="badges">${badges}</div></div></button>`;
+      <div class="meta"><div class="title">${esc(lessonTitle(l).replace(/\s*\n+\s*/g, ' '))}</div><div class="who">${esc(who)}</div><div class="badges">${badges}</div></div></button>`;
   }
   $('list').innerHTML = h;
   loadThumbs($('list'));
@@ -610,7 +610,7 @@ function renderDetail() {
   const figs = l.figures;
   const meta = [l.source || T.untagged, l.type ? typeLabel(l.type, true) : null, fmtDateLong(l.date)].filter(Boolean).map(esc).join(' <span class="dim">·</span> ');
   $('detail-body').innerHTML = `
-    <div class="ttl2">${esc(lessonTitle(l))}</div>
+    <div class="ttl2">${esc(lessonTitle(l)).replace(/\n/g, '<br>')}</div>
     <div class="meta2"><span>${meta}</span><span class="stl">${esc(styleName(l.style))}</span></div>
     <h3>${esc(T.figures)}</h3>
     ${figs.length ? '' : `<div class="chapters-empty">${esc(T.noChapters)}</div>`}
