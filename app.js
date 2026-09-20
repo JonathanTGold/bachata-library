@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.5.1';
+const APP_VERSION = '2.5.2';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -45,7 +45,7 @@ const STR = {
     figures: 'פרקים', notes: 'הערות', noNotes: 'אין הערות עדיין. אפשר להוסיף דרך העריכה.', figureName: 'שם הפרק', noTime: 'ללא זמן', noChapters: 'אין פרקים עדיין. מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי.',
     title: 'כותרת', titlePh: 'למשל: האמרלוק ויציאה מסומבררו', desc: 'תיאור', descPh: 'מה היה בשיעור: פיגורות, תיקונים, דגשים', deleteArmToast: 'לחיצה נוספת על סל המחזור מוחקת את הסרטון מ‑Drive.',
     repeatA: a => `התחלה סומנה ב‑${a}. לחצו שוב בסוף הקטע.`, repeatOn: (a, b) => `חוזר על ${a}–${b}.`, repeatOff: 'החזרה בוטלה.',
-    ai: 'ניתוח אוטומטי', aiIdle: 'מילוי כותרת, תיאור ופרקים מהסרטון עם Gemini.', aiNeedKey: 'צריך מפתח Gemini API. מוסיפים אותו בהגדרות.', aiDownloading: p => `מוריד את הסרטון מ‑Drive… ${p}%`, aiUploading: p => `מעלה לניתוח… ${p}%`, aiProcessing: 'Gemini מעבד את הסרטון…', aiAnalyzing: 'מנתח את השיעור…', aiRetry: 'המודל עמוס, מנסה שוב בעוד רגע…', aiFallback: m => `עובר למודל ${m}…`, aiBusy: 'Gemini עמוס כרגע. מנסים שוב בעוד כמה דקות.', aiDone: 'הכותרת, התיאור והפרקים מולאו. בודקים ושומרים.', aiFailed: 'הניתוח נכשל. ', aiBadKey: 'המפתח לא תקין, או שהוא מוגבל לכתובת אחרת.', aiQuota: 'חרגתם ממכסת Gemini להיום. אפשר לנסות מאוחר יותר.', aiBadModel: 'שם המודל לא נמצא. בודקים את השם בהגדרות.',
+    ai: 'ניתוח אוטומטי', aiIdle: 'מילוי כותרת, תיאור ופרקים מהסרטון עם Gemini.', aiNeedKey: 'צריך מפתח Gemini API. מוסיפים אותו בהגדרות.', aiDownloading: p => `מוריד את הסרטון מ‑Drive… ${p}%`, aiUploading: p => `מעלה לניתוח… ${p}%`, aiRelay: p => `מעביר את הסרטון מ‑Drive לניתוח… ${p}%`, aiRefreshing: 'מרענן את ההתחברות ל‑Drive לפני הניתוח…', aiProcessing: 'Gemini מעבד את הסרטון…', aiAnalyzing: 'מנתח את השיעור…', aiRetry: 'המודל עמוס, מנסה שוב בעוד רגע…', aiFallback: m => `עובר למודל ${m}…`, aiBusy: 'Gemini עמוס כרגע. מנסים שוב בעוד כמה דקות.', aiDone: 'הכותרת, התיאור והפרקים מולאו. בודקים ושומרים.', aiFailed: 'הניתוח נכשל. ', aiBadKey: 'המפתח לא תקין, או שהוא מוגבל לכתובת אחרת.', aiQuota: 'חרגתם ממכסת Gemini להיום. אפשר לנסות מאוחר יותר.', aiBadModel: 'שם המודל לא נמצא. בודקים את השם בהגדרות.',
     geminiKey: 'מפתח Gemini API', geminiHelp: 'המפתח נשמר בתיקייה שלך ב‑Drive ומסתנכרן בין המכשירים שלך. הסרטון נשלח ל‑Gemini לניתוח ונמחק משם מיד אחרי. בחבילה החינמית Google עשויה להשתמש בתוכן לשיפור המודלים.', geminiModelHint: 'שם המודל. ריק = ברירת המחדל', getKey: 'יצירת מפתח ב‑Google AI Studio', keySaved: 'הגדרות Gemini נשמרו.', badGeminiKey: 'זה לא נראה כמו מפתח Gemini API.',
     help: 'עזרה', helpItems: [['ai', 'ניתוח אוטומטי', 'עם מפתח Gemini API מההגדרות, הכפתור הנוצץ ממלא כותרת, תיאור ופרקים מתוך הסרטון. בודקים את התוצאה לפני השמירה.'], ['back5', 'דילוג', 'החצים על הסרטון מדלגים 5 שניות אחורה או קדימה. לחיצה על הסרטון מציגה או מסתירה אותם.'], ['repeat', 'חזרה על קטע', 'לחיצה ראשונה מסמנת התחלה (A), שנייה מסמנת סוף (B), והקטע ינוגן שוב ושוב עד ללחיצה שלישית.'], ['mirror', 'מראה', 'הופך את הסרטון אופקית, כמו להסתכל במראה של הסטודיו. נוח כשעומדים מול המורה.'], ['plus', 'פרקים', 'בעמוד השיעור, מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי. לחיצה על פרק קופצת אליו.'], ['pip', 'תמונה בתוך תמונה', 'ממשיך לנגן בחלון קטן מעל אפליקציות אחרות.'], ['fs', 'מסך מלא', 'פותח את הסרטון בנגן של המכשיר. מומלץ לסובב את המכשיר לסרטונים לרוחב.']],
     noPip: 'הדפדפן הזה לא תומך בתמונה‑בתוך‑תמונה.', playFirst: 'קודם מתחילים לנגן.',
@@ -80,7 +80,7 @@ const STR = {
     figures: 'Chapters', notes: 'Notes', noNotes: 'No notes yet. Add some via edit.', figureName: 'Chapter name', noTime: 'no time', noChapters: 'No chapters yet. Play to the moment you want and tap + to mark a chapter at the current time.',
     title: 'Title', titlePh: 'e.g. Hammerlock and sombrero exit', desc: 'Description', descPh: 'What the lesson covered: figures, corrections, focus points', deleteArmToast: 'Tap the trash icon again to delete the video from Drive.',
     repeatA: a => `Start marked at ${a}. Tap again at the end of the section.`, repeatOn: (a, b) => `Repeating ${a}–${b}.`, repeatOff: 'Repeat cleared.',
-    ai: 'Auto-fill', aiIdle: 'Fill title, description and chapters from the video with Gemini.', aiNeedKey: 'A Gemini API key is needed. Add it in Settings.', aiDownloading: p => `Downloading the video from Drive… ${p}%`, aiUploading: p => `Uploading for analysis… ${p}%`, aiProcessing: 'Gemini is processing the video…', aiAnalyzing: 'Analyzing the lesson…', aiRetry: 'The model is busy, retrying in a moment…', aiFallback: m => `Switching to ${m}…`, aiBusy: 'Gemini is overloaded right now. Try again in a few minutes.', aiDone: 'Title, description and chapters filled in. Review and save.', aiFailed: 'Analysis failed. ', aiBadKey: 'The key is invalid, or restricted to another website.', aiQuota: 'Gemini quota exceeded for today. Try again later.', aiBadModel: 'Model name not found. Check it in Settings.',
+    ai: 'Auto-fill', aiIdle: 'Fill title, description and chapters from the video with Gemini.', aiNeedKey: 'A Gemini API key is needed. Add it in Settings.', aiDownloading: p => `Downloading the video from Drive… ${p}%`, aiUploading: p => `Uploading for analysis… ${p}%`, aiRelay: p => `Relaying the video from Drive for analysis… ${p}%`, aiRefreshing: 'Refreshing the Drive sign-in before analysis…', aiProcessing: 'Gemini is processing the video…', aiAnalyzing: 'Analyzing the lesson…', aiRetry: 'The model is busy, retrying in a moment…', aiFallback: m => `Switching to ${m}…`, aiBusy: 'Gemini is overloaded right now. Try again in a few minutes.', aiDone: 'Title, description and chapters filled in. Review and save.', aiFailed: 'Analysis failed. ', aiBadKey: 'The key is invalid, or restricted to another website.', aiQuota: 'Gemini quota exceeded for today. Try again later.', aiBadModel: 'Model name not found. Check it in Settings.',
     geminiKey: 'Gemini API key', geminiHelp: 'The key is stored in your Drive folder and syncs across your devices. The video is sent to Gemini for analysis and deleted there right after. On the free tier Google may use content to improve its models.', geminiModelHint: 'Model name. Empty = default', getKey: 'Create a key in Google AI Studio', keySaved: 'Gemini settings saved.', badGeminiKey: 'That does not look like a Gemini API key.',
     help: 'Help', helpItems: [['ai', 'Auto-fill', 'With a Gemini API key from Settings, the sparkle button fills the title, description and chapters from the video. Review before saving.'], ['back5', 'Skip', 'The arrows on the video skip 5 seconds back or forward. Tap the video to show or hide them.'], ['repeat', 'Repeat a section', 'First tap marks the start (A), second marks the end (B), and the section loops until a third tap.'], ['mirror', 'Mirror', 'Flips the video horizontally, like watching in the studio mirror. Handy when facing the teacher.'], ['plus', 'Chapters', 'On a lesson, play to the moment you want and tap + to mark a chapter at the current time. Tap a chapter to jump to it.'], ['pip', 'Picture in picture', 'Keeps playing in a small window over other apps.'], ['fs', 'Fullscreen', 'Opens the video in the device player. Rotate the phone for landscape clips.']],
     noPip: 'This browser does not support picture-in-picture.', playFirst: 'Start playing first.',
@@ -964,28 +964,44 @@ function mergeChapters(existing, incoming) {
   incoming.forEach(c => { if (!out.some(f => f.name.toLowerCase() === c.name.toLowerCase())) out.push({ name: c.name, t: c.t }); });
   return out.sort((a, b) => (a.t == null ? 1e9 : a.t) - (b.t == null ? 1e9 : b.t));
 }
-async function downloadLessonFile(l, onProgress) {
-  const at = await ensureToken();
-  const res = await fetch(`${API}/files/${encodeURIComponent(l.id)}?alt=media`, { headers: { Authorization: 'Bearer ' + at } });
-  if (!res.ok) throw new Error('Drive error ' + res.status);
-  const total = +res.headers.get('content-length') || l.size || 0;
-  const reader = res.body.getReader(); const chunks = []; let got = 0;
-  for (;;) { const { done, value } = await reader.read(); if (done) break; chunks.push(value); got += value.length; if (total && onProgress) onProgress(got / total); }
-  return new File(chunks, l.name || 'lesson.mp4', { type: res.headers.get('content-type') || l.mimeType || 'video/mp4' });
+// A lesson already in Drive is relayed to Gemini piece by piece with Range requests, so a long
+// clip never has to fit in the phone's memory.
+async function driveSource(l) {
+  if (!l.size) { const meta = await api(`/files/${encodeURIComponent(l.id)}`, { query: { fields: 'size,mimeType' } }); l.size = +meta.size || 0; if (!l.mimeType && meta.mimeType) l.mimeType = meta.mimeType; }
+  return {
+    size: l.size, type: l.mimeType || 'video/mp4', name: l.name || 'lesson.mp4',
+    async fetchRange(start, end) {
+      const at = await ensureToken();
+      const r = await fetch(`${API}/files/${encodeURIComponent(l.id)}?alt=media`, { headers: { Authorization: 'Bearer ' + at, Range: `bytes=${start}-${end}` } });
+      if (!r.ok) throw new Error('Drive error ' + r.status);
+      return r.blob();
+    }
+  };
+}
+let wakeLock = null;
+async function keepAwake(on) {
+  try {
+    if (on && !wakeLock && navigator.wakeLock) wakeLock = await navigator.wakeLock.request('screen');
+    if (!on && wakeLock) { await wakeLock.release(); wakeLock = null; }
+  } catch (e) { wakeLock = null; }
 }
 async function runAi() {
   if (aiBusy) return;
   const key = (lib.settings.geminiKey || '').trim();
   if (!key) { toast(T.aiNeedKey, 5000); show('settings'); return; }
   if (!window.GeminiClient) { toast(T.aiFailed); return; }
-  let file = pending && pending.file;
-  if (!file && !editing) { toast(T.pickFirst); return; }
-  aiBusy = true; setAiBusy(true);
+  let source = pending && pending.file;
+  if (!source && !editing) { toast(T.pickFirst); return; }
+  const remote = !source;
+  // A relay from Drive can take minutes. If the Drive sign-in is about to expire, renew it first
+  // instead of being thrown to the sign-in page halfway through.
+  if (remote && token && token.expires_at - Date.now() < 15 * 60 * 1000 && localStorage.getItem(LS.hint)) { setAiHint(T.aiRefreshing); sessionStorage.setItem(SS.silent, '1'); if (startAuth({ silent: true })) return; }
+  aiBusy = true; setAiBusy(true); keepAwake(true);
   try {
-    if (!file) file = await downloadLessonFile(editing, f => setAiHint(T.aiDownloading(Math.round(f * 100))));
-    const res = await window.GeminiClient.analyzeVideo(file, {
+    if (remote) source = await driveSource(editing);
+    const res = await window.GeminiClient.analyzeVideo(source, {
       key, model: lib.settings.geminiModel || window.GeminiClient.DEFAULT_MODEL, lang,
-      onProgress: p => { if (p.stage === 'upload') setAiHint(T.aiUploading(Math.round((p.frac || 0) * 100))); else if (p.stage === 'process') setAiHint(T.aiProcessing); else if (p.stage === 'retry') setAiHint(T.aiRetry); else if (p.stage === 'fallback') setAiHint(T.aiFallback(p.detail || '')); else setAiHint(T.aiAnalyzing); }
+      onProgress: p => { if (p.stage === 'upload') setAiHint((remote ? T.aiRelay : T.aiUploading)(Math.round((p.frac || 0) * 100))); else if (p.stage === 'process') setAiHint(T.aiProcessing); else if (p.stage === 'retry') setAiHint(T.aiRetry); else if (p.stage === 'fallback') setAiHint(T.aiFallback(p.detail || '')); else setAiHint(T.aiAnalyzing); }
     });
     if (res.title) $('f-title').value = res.title;
     if (res.desc) $('f-desc').value = res.desc;
@@ -996,7 +1012,7 @@ async function runAi() {
     if (e.message === 'signed out') return;
     const kind = e && e.kind;
     setAiHint(kind === 'key' ? T.aiBadKey : kind === 'quota' ? T.aiQuota : kind === 'busy' ? T.aiBusy : kind === 'model' ? T.aiBadModel : T.aiFailed + shortErr(e));
-  } finally { aiBusy = false; setAiBusy(false); }
+  } finally { aiBusy = false; setAiBusy(false); keepAwake(false); }
 }
 function saveGeminiSettings() {
   const key = ($('set-gemini-key').value || '').trim();
