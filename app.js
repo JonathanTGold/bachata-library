@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.2.1';
+const APP_VERSION = '2.3.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -615,8 +615,10 @@ function renderDetail() {
     <div class="meta2"><span>${meta}</span><span class="stl">${esc(styleName(l.style))}</span></div>
     <h3>${esc(T.figures)}</h3>
     ${figs.length ? '' : `<div class="chapters-empty">${esc(T.noChapters)}</div>`}
-    ${figs.map((f, i) => `<div class="fig" data-fig="${i}" role="button"><span class="fname">${esc(f.name)}</span><span class="fright">${f.t != null ? `<span class="tm">${fmtDur(f.t)}</span>` : `<span class="tm dim">${esc(T.noTime)}</span>`}<button class="x ib" data-remove="${i}" aria-label="${esc(T.aria.remove)}">${icon('close')}</button></span></div>`).join('')}
-    <button class="fig add" id="mark-row" aria-label="${esc(T.aria.addFigure)}" title="${esc(T.aria.addFigure)}">${icon('plus')}</button>
+    <div class="figs">
+      ${figs.map((f, i) => `<span class="figc" data-fig="${i}" role="button"><span class="tm">${f.t != null ? fmtDur(f.t) : '·'}</span><span class="fname">${esc(f.name)}</span><button class="x" data-remove="${i}" aria-label="${esc(T.aria.remove)}">${icon('close')}</button></span>`).join('')}
+      <button class="figc add" id="mark-row" aria-label="${esc(T.aria.addFigure)}" title="${esc(T.aria.addFigure)}">${icon('plus')}</button>
+    </div>
     <div class="markwrap" id="mark-wrap" hidden><div class="input"><input id="mark-name" placeholder="${esc(T.figureName)}" list="fig-names" autocomplete="off"><button class="mini" id="mark-add" aria-label="${esc(T.aria.save)}">${icon('check')}</button></div><datalist id="fig-names">${allFigureNames().map(n => `<option value="${esc(n)}">`).join('')}</datalist></div>
     <h3>${esc(T.notes)}</h3>
     <div class="note ${l.note ? '' : 'dim'}">${l.note ? esc(l.note).replace(/\n/g, '<br>') : esc(T.noNotes)}</div>`;
@@ -627,7 +629,7 @@ function onDetailClick(e) {
   if (rm) { e.stopPropagation(); const i = +rm.dataset.remove; const f = current.figures[i]; if (!f) return; current.figures.splice(i, 1); current.updatedAt = nowIso(); renderDetail(); saveLibrary().then(() => toast(T.removed(f.name))).catch(err => toast(T.couldNotSave + shortErr(err))); return; }
   if (e.target.closest('#mark-row')) { $('mark-wrap').hidden = false; $('mark-name').focus(); if (!video.paused) video.pause(); return; }
   if (e.target.closest('#mark-add')) { submitMark(); return; }
-  const row = e.target.closest('.fig[data-fig]');
+  const row = e.target.closest('[data-fig]');
   if (row) { const f = current.figures[+row.dataset.fig]; if (f && f.t != null) { video.currentTime = f.t; video.play().catch(() => {}); } }
 }
 function submitMark() {

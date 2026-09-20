@@ -92,3 +92,8 @@ config.js    Google client ID
 manifest.webmanifest, icons/
 mockup/      the original clickable UI mockup with fake data
 ```
+
+## Credits
+
+- App icon: dancing-couple illustration provided by the project owner (`icons/icon-source.svg`).
+- The icon options page under `mockup/icons/` uses [Twemoji](https://github.com/twitter/twemoji) (CC-BY 4.0) and [OpenMoji](https://openmoji.org) (CC-BY-SA 4.0) artwork for comparison only.
