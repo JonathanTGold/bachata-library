@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.4.1';
+const APP_VERSION = '2.4.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -610,8 +610,8 @@ function renderDetail() {
   const figs = l.figures;
   const meta = [l.source || T.untagged, l.type ? typeLabel(l.type, true) : null, fmtDateLong(l.date)].filter(Boolean).map(esc).join(' <span class="dim">·</span> ');
   $('detail-body').innerHTML = `
-    <div class="meta2"><span>${meta}</span><span class="stl">${esc(styleName(l.style))}</span></div>
     <div class="ttl2">${esc(lessonTitle(l).replace(/\s*\n+\s*/g, ' '))}</div>
+    <div class="meta2"><span>${meta}</span><span class="stl">${esc(styleName(l.style))}</span></div>
     ${l.desc ? `<div class="desc">${esc(l.desc).replace(/\n/g, '<br>')}</div>` : ''}
     <h3>${esc(T.figures)}</h3>
     ${figs.length ? '' : `<div class="chapters-empty">${esc(T.noChapters)}</div>`}

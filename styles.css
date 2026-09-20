@@ -104,8 +104,8 @@ h1{font-size:26px;font-weight:600;margin:0;letter-spacing:-.01em;line-height:1.1
 .menu button{padding:9px 14px;border-radius:8px;text-align:left;font-size:14px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
 .menu button.on{background:var(--accent);color:var(--accent-ink)}
 .hint{color:var(--muted);font-size:13px;line-height:1.5;padding:10px 0 0}
-.ttl2{font-size:22px;font-weight:600;line-height:1.25;margin:6px 0 0;word-break:break-word}
-.meta2{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:14px;margin-top:14px}
+.ttl2{font-size:22px;font-weight:600;line-height:1.25;margin:16px 0 6px;word-break:break-word}
+.meta2{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:14px}
 .meta2 .stl{font-size:14px}
 h3{font-size:14px;font-weight:600;color:var(--muted);margin:18px 0 4px}
 .fig{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:15px;width:100%;text-align:start;color:var(--text);cursor:pointer}
