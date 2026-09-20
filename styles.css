@@ -104,19 +104,18 @@ h1{font-size:26px;font-weight:600;margin:0;letter-spacing:-.01em;line-height:1.1
 .menu button{padding:9px 14px;border-radius:8px;text-align:left;font-size:14px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
 .menu button.on{background:var(--accent);color:var(--accent-ink)}
 .hint{color:var(--muted);font-size:13px;line-height:1.5;padding:10px 0 0}
-.ttl2{font-size:19px;font-weight:600;line-height:1.35;margin:18px 0 6px;word-break:break-word}
+.ttl2{font-size:22px;font-weight:600;line-height:1.25;margin:16px 0 6px;word-break:break-word}
 .meta2{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:14px}
 .meta2 .stl{font-size:14px}
-h3{font-size:14px;font-weight:600;color:var(--muted);margin:24px 0 6px}
-.figs{display:flex;flex-wrap:wrap;gap:8px}
-.figc{display:inline-flex;align-items:center;gap:8px;background:var(--surf);border-radius:12px;padding:9px 10px 9px 6px;font-size:14px;font-weight:500;color:var(--text);cursor:pointer;max-width:100%}
-[dir=ltr] .figc{padding:9px 6px 9px 10px}
-.figc .tm{font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700;direction:ltr;font-size:14px}
-.figc .fname{word-break:break-word}
-.figc .x{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:var(--muted);flex:none}
-.figc .x .i{width:16px;height:16px}
-.figc.add{border:1px dashed #3a4658;background:none;color:var(--muted);width:46px;justify-content:center;padding:9px 0}
-.figc.add .i{width:20px;height:20px}
+h3{font-size:14px;font-weight:600;color:var(--muted);margin:18px 0 4px}
+.fig{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:15px;width:100%;text-align:start;color:var(--text);cursor:pointer}
+.fig .fname{flex:1;min-width:0;word-break:break-word}
+.fig .tm{font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700;direction:ltr;font-size:14px;flex:none}
+.fig .x{width:30px;height:30px;color:var(--muted);flex:none}
+.fig .x .i{width:16px;height:16px}
+.fig.add{border-bottom:0;color:var(--muted);justify-content:flex-start;padding:6px 0 0}
+.fig.add .i{width:20px;height:20px}
+.desc{font-size:15px;line-height:1.55;color:#d3d9e3;margin-top:12px;word-break:break-word}
 .markwrap{margin:4px 0 8px}
 .note{font-size:15px;line-height:1.6;color:#d3d9e3;background:var(--surf);border-radius:14px;padding:14px;word-break:break-word}
 .note.dim{color:var(--muted)}
