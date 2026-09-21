@@ -1,4 +1,4 @@
-/* Bachata Library · gemini.js
+/* DanceLab · gemini.js
  * Optional video analysis with the Gemini API, entirely in the browser with the user's own
  * API key. Uploads the clip to Gemini's file storage, waits for processing, asks for a title,
  * a description and chapters as structured JSON, then deletes the uploaded copy.

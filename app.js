@@ -1,4 +1,4 @@
-/* Bachata Library · app.js
+/* DanceLab · app.js
  * A single-user progressive web app. Everything lives in the user's own Google Drive
  * under the drive.file scope: one folder per school or teacher, the video files,
  * small thumbnails, and a library.json index. There is no backend.
@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.6.1';
+const APP_VERSION = '2.7.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -19,7 +19,8 @@ const ROOT_NAME = 'Bachata Library';
 const INDEX_NAME = 'library.json';
 const THUMBS_NAME = '.thumbnails';
 const FOLDER_MIME = 'application/vnd.google-apps.folder';
-const LS = { token: 'bl_token', lib: 'bl_library', clientId: 'bl_client_id', hint: 'bl_login_hint', root: 'bl_root', lang: 'bl_lang' };
+const LS = { token: 'bl_token', lib: 'bl_library', clientId: 'bl_client_id', hint: 'bl_login_hint', root: 'bl_root', lang: 'bl_lang', theme: 'bl_theme' };
+const THEMES = ['dark', 'light', 'auto'];
 const SS = { state: 'bl_oauth_state', silent: 'bl_silent_tried', needConsent: 'bl_need_consent' };
 const SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5];
 const SKIP = 5;
@@ -59,7 +60,7 @@ const STR = {
     marked: (n, t) => `„${n}” סומן ב‑${t}.`, removed: n => `„${n}” הוסר.`, couldNotSave: 'לא ניתן לשמור. ', typeFigure: 'צריך להקליד שם לפרק.',
     schoolsSub: 'מורים פרטיים מופיעים לצד בתי הספר. לחיצה מסננת את הרשימה.', noSchools: 'אין עדיין בתי ספר.', noTeachers: 'אין עדיין מורים פרטיים.', privateTeacher: 'מורה פרטי', groupClasses: 'שיעורים קבוצתיים', addSource: 'הוספה', schoolsAuto: 'בתי ספר ומורים נוספים אוטומטית גם כשמתייגים סיכום.', alreadyListed: 'כבר ברשימה.', added: n => `${n} נוסף.`, removedSource: n => `${n} הוסר.`, moveFirst: 'קודם מעבירים או מוחקים את הסיכומים שלו.', last: 'אחרון',
     signedInAs: e => `מחובר בתור ${e}`, signedIn: 'מחובר', storage: 'אחסון', storageBody: 'הכול נשמר בתיקייה בשם Bachata Library ב‑Google Drive שלך: תת‑תיקייה לכל בית ספר או מורה, הסרטונים, וקובץ אינדקס קטן.', openDrive: 'פתיחת התיקייה ב‑Drive', maintenance: 'תחזוקה', rescan: 'סריקת Drive ותיקון האינדקס', rescanHint: 'מוסיף סיכומים שהועלו ממכשיר אחר או חסרים ברשימה, ומסיר רשומות שהקבצים שלהן נמחקו.', scanning: 'סורק…', rescanDone: (a, r) => `הסתיים. ${a} נוספו, ${r} הוסרו.`, rescanFailed: 'הסריקה נכשלה. ',
-    account: 'חשבון', signOut: 'התנתקות', signOutHint: 'מתנתק במכשיר הזה בלבד. שום דבר ב‑Drive לא נמחק.', language: 'שפה', advanced: 'מתקדם', clientId: 'מזהה לקוח Google OAuth', clientHint: 'נדרש רק אם מריצים עותק עצמאי של האפליקציה.', badClient: 'זה לא נראה כמו מזהה לקוח של Google.', clientSaved: 'המזהה נשמר.', addClientFirst: 'קודם מוסיפים מזהה לקוח.',
+    account: 'חשבון', signOut: 'התנתקות', signOutHint: 'מתנתק במכשיר הזה בלבד. שום דבר ב‑Drive לא נמחק.', language: 'שפה', appearance: 'מראה', themeDark: 'כהה', themeLight: 'בהיר', themeAuto: 'אוטומטי', advanced: 'מתקדם', clientId: 'מזהה לקוח Google OAuth', clientHint: 'נדרש רק אם מריצים עותק עצמאי של האפליקציה.', badClient: 'זה לא נראה כמו מזהה לקוח של Google.', clientSaved: 'המזהה נשמר.', addClientFirst: 'קודם מוסיפים מזהה לקוח.',
     signInAgain: 'צריך להתחבר שוב.', signinCheckFailed: 'בדיקת ההתחברות נכשלה. נסו שוב.', driveNotGranted: 'לא ניתנה גישה ל‑Drive. התחברו שוב והשאירו את תיבת Google Drive מסומנת.',
     recapsN: n => n === 1 ? 'סיכום אחד' : `${n} סיכומים`, schoolsN: n => n === 1 ? 'בית ספר אחד' : `${n} בתי ספר`, teachersN: n => n === 1 ? 'מורה פרטי אחד' : `${n} מורים פרטיים`,
     styles: { bachata: 'באצ׳טה', salsa: 'סלסה', kizomba: 'קיזומבה', zouk: 'זוק' },
@@ -94,7 +95,7 @@ const STR = {
     marked: (n, t) => `“${n}” marked at ${t}.`, removed: n => `Removed “${n}”.`, couldNotSave: 'Could not save. ', typeFigure: 'Type the figure name.',
     schoolsSub: 'Private teachers listed alongside. Tap one to filter.', noSchools: 'No schools yet.', noTeachers: 'No private teachers yet.', privateTeacher: 'Private teacher', groupClasses: 'Group classes', addSource: 'Add', schoolsAuto: 'Schools and teachers also appear automatically when you tag a recap.', alreadyListed: 'Already in the list.', added: n => `Added ${n}.`, removedSource: n => `Removed ${n}.`, moveFirst: 'Move or delete its recaps first.', last: 'last',
     signedInAs: e => `Signed in as ${e}`, signedIn: 'Signed in', storage: 'Storage', storageBody: 'Everything lives in a folder called Bachata Library in your Google Drive: one subfolder per school or teacher, the videos, and a small index file.', openDrive: 'Open the folder in Drive', maintenance: 'Maintenance', rescan: 'Rescan Drive and repair the index', rescanHint: 'Adds recaps uploaded from another device or missing from this list, and removes entries whose files were deleted.', scanning: 'Scanning…', rescanDone: (a, r) => `Done. ${a} added, ${r} removed.`, rescanFailed: 'Rescan failed. ',
-    account: 'Account', signOut: 'Sign out', signOutHint: 'Signs out on this device only. Nothing in Drive is touched.', language: 'Language', advanced: 'Advanced', clientId: 'Google OAuth client ID', clientHint: 'Only needed if you run your own copy of this app.', badClient: 'That does not look like a Google client ID.', clientSaved: 'Client ID saved.', addClientFirst: 'Add the Google client ID first.',
+    account: 'Account', signOut: 'Sign out', signOutHint: 'Signs out on this device only. Nothing in Drive is touched.', language: 'Language', appearance: 'Appearance', themeDark: 'Dark', themeLight: 'Light', themeAuto: 'Automatic', advanced: 'Advanced', clientId: 'Google OAuth client ID', clientHint: 'Only needed if you run your own copy of this app.', badClient: 'That does not look like a Google client ID.', clientSaved: 'Client ID saved.', addClientFirst: 'Add the Google client ID first.',
     signInAgain: 'Please sign in again.', signinCheckFailed: 'Sign-in check failed. Please try again.', driveNotGranted: 'Drive access was not granted. Sign in again and keep the Google Drive box ticked.',
     recapsN: n => `${n} recap${n === 1 ? '' : 's'}`, schoolsN: n => `${n} school${n === 1 ? '' : 's'}`, teachersN: n => `${n} private teacher${n === 1 ? '' : 's'}`,
     styles: { bachata: 'Bachata', salsa: 'Salsa', kizomba: 'Kizomba', zouk: 'Zouk' },
@@ -103,6 +104,7 @@ const STR = {
 };
 let lang = localStorage.getItem(LS.lang) || 'he';
 let T = STR[lang] || STR.he;
+let theme = THEMES.includes(localStorage.getItem(LS.theme)) ? localStorage.getItem(LS.theme) : 'dark';
 
 // ---------- state ----------
 let token = null;            // { access_token, expires_at }
@@ -219,6 +221,19 @@ function applyLanguage() {
   if (video) setPlayIcon(!video.paused);
 }
 function setLanguage(l) { lang = STR[l] ? l : 'he'; localStorage.setItem(LS.lang, lang); applyLanguage(); render(); }
+
+// ---------- appearance ----------
+// Dark is the default; "auto" follows the system. The resolved theme goes on <html> so the
+// stylesheet, form controls (color-scheme) and the status bar (theme-color) all agree.
+const lightMq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
+function resolvedTheme() { return theme === 'auto' ? (lightMq && lightMq.matches ? 'light' : 'dark') : theme; }
+function applyTheme() {
+  const t = resolvedTheme();
+  document.documentElement.dataset.theme = t;
+  const tc = document.querySelector('meta[name=theme-color]'); if (tc) tc.content = t === 'light' ? '#f2f2f7' : '#000000';
+  const cs = document.querySelector('meta[name=color-scheme]'); if (cs) cs.content = t;
+}
+function setTheme(v) { theme = THEMES.includes(v) ? v : 'dark'; localStorage.setItem(LS.theme, theme); applyTheme(); renderSettings(); }
 
 // ---------- auth (OAuth 2.0 implicit flow via redirect; works inside iOS home-screen apps) ----------
 function clientId() { return (localStorage.getItem(LS.clientId) || CFG.GOOGLE_CLIENT_ID || '').trim(); }
@@ -538,7 +553,7 @@ function show(name) {
   if (name === 'auth') renderAuth();
   if (name === 'library') renderLibrary();
   if (name === 'schools') renderSchools();
-  if (name === 'settings') renderSettings();
+  if (name === 'settings') { renderSettings(); $('settings-body').scrollTop = 0; }
 }
 function render() {
   const active = document.querySelector('.screen.active'); const id = active ? active.id : '';
@@ -796,6 +811,7 @@ function openAdd(id) {
   $('delete-row').hidden = !editing; disarmDelete();
   pendingAi = null; $('ai-row').hidden = !editing; setAiHint(T.aiIdle); setAiBusy(false);
   show('add');
+  document.querySelector('#s-add .scroll').scrollTop = 0;
 }
 function setTypeUI() { document.querySelectorAll('#f-type button').forEach(b => b.classList.toggle('on', b.dataset.type === formType)); }
 function renderStyleSeg() {
@@ -966,7 +982,7 @@ function renderFormChapters() {
   wrap.hidden = !formChapters.length;
   $('f-chapters').innerHTML = formChapters.map((c, i) => `<div class="fig"><span class="fname">${esc(c.name)}</span><span class="tm">${c.t != null ? fmtDur(c.t) : '·'}</span><button type="button" class="x ib" data-remove-chapter="${i}" aria-label="${esc(T.aria.remove)}">${icon('close')}</button></div>`).join('');
 }
-function setAiBusy(b) { $('btn-ai').classList.toggle('busy', b); $('btn-ai-detail').classList.toggle('busy', b); }
+function setAiBusy(b) { $('btn-ai').classList.toggle('busy', b); }
 function mergeChapters(existing, incoming) {
   const out = existing.slice();
   incoming.forEach(c => { if (!out.some(f => f.name.toLowerCase() === c.name.toLowerCase())) out.push({ name: c.name, t: c.t }); });
@@ -1089,12 +1105,14 @@ function renderSettings() {
     <div class="help">${T.helpItems.map(([ic, t, d]) => `<div>${icon(ic)}<span><b>${esc(t)}</b>${esc(d)}</span></div>`).join('')}</div>
     <div class="month">${esc(T.language)}</div>
     <div class="seg" id="lang-seg"><button type="button" class="${lang === 'he' ? 'on' : ''}" data-lang="he">עברית</button><button type="button" class="${lang === 'en' ? 'on' : ''}" data-lang="en">English</button></div>
+    <div class="month">${esc(T.appearance)}</div>
+    <div class="seg" id="theme-seg">${THEMES.map(t => `<button type="button" class="${theme === t ? 'on' : ''}" data-theme="${t}">${esc(t === 'dark' ? T.themeDark : t === 'light' ? T.themeLight : T.themeAuto)}</button>`).join('')}</div>
     <div class="month">${esc(T.account)}</div>
     <div class="srow"><div><div class="lbl2">${esc(T.signOut)}</div><div class="sm">${esc(T.signOutHint)}</div></div><button class="ib" id="btn-signout" aria-label="${esc(T.aria.signout)}">${icon('logout')}</button></div>
     <div class="month">${esc(T.advanced)}</div>
     <div class="input"><input id="set-client" value="${esc(clientId())}" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="…apps.googleusercontent.com" dir="ltr"><button class="mini" id="btn-save-client2" aria-label="${esc(T.aria.save)}">${icon('check')}</button></div>
     <div class="hint">${esc(T.clientId)} · ${esc(T.clientHint)}</div>
-    <div class="hint" style="margin-top:18px">Bachata Library ${APP_VERSION}</div>`;
+    <div class="hint" style="margin-top:18px;text-align:center">DanceLab ${APP_VERSION}</div>`;
 }
 
 // ---------- events and boot ----------
@@ -1169,7 +1187,6 @@ function bindEvents() {
   $('f-chapters').addEventListener('click', e => { const b = e.target.closest('[data-remove-chapter]'); if (!b) return; formChapters.splice(+b.dataset.removeChapter, 1); renderFormChapters(); });
   $('btn-save').addEventListener('click', saveLesson);
   $('btn-ai').addEventListener('click', runAi);
-  $('btn-ai-detail').addEventListener('click', () => { if (!current) return; openAdd(current.id); runAi(); });
   $('btn-delete').addEventListener('click', deleteLesson);
 
   $('schools').addEventListener('click', onSchoolsClick);
@@ -1178,7 +1195,9 @@ function bindEvents() {
     const btn = e.target.closest('button'); const id = btn ? btn.id : '';
     if (id === 'btn-rescan') rescan(btn); else if (id === 'btn-signout') signOut(); else if (id === 'btn-save-client2') saveClientId($('set-client').value); else if (id === 'btn-save-gemini') saveGeminiSettings();
     const lb = e.target.closest('#lang-seg button'); if (lb) setLanguage(lb.dataset.lang);
+    const tb = e.target.closest('#theme-seg button'); if (tb) setTheme(tb.dataset.theme);
   });
+  if (lightMq) { const onChange = () => { if (theme === 'auto') applyTheme(); }; if (lightMq.addEventListener) lightMq.addEventListener('change', onChange); else if (lightMq.addListener) lightMq.addListener(onChange); }
 
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && tokenValid() && Date.now() - lastSync > 60000) refresh(); });
   window.addEventListener('beforeunload', e => { if (uploading) { e.preventDefault(); e.returnValue = ''; } });
@@ -1186,6 +1205,7 @@ function bindEvents() {
 
 async function boot() {
   video = $('video');
+  applyTheme();
   applyLanguage();
   bindEvents();
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('./sw.js').catch(() => {});
