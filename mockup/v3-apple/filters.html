@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DanceLab · שני מסננים</title>
+<style>
+:root{--bg:#000;--grp:#1c1c1e;--grp2:#2c2c2e;--grp3:#3a3a3c;--label:#fff;--label2:rgba(235,235,245,.6);--label3:rgba(235,235,245,.3);--sep:rgba(84,84,88,.6);--fill:rgba(120,120,128,.24);--tint:#ffd60a;--on-tint:#1a1400;--tint-soft:rgba(255,214,10,.16);--font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#141416;color:var(--label);font-family:var(--font);-webkit-font-smoothing:antialiased;padding:24px}
+h1{font-size:20px;margin:0 0 4px}
+p.lead{color:#aaa;margin:0 0 20px;font-size:14px;max-width:960px;line-height:1.5}
+.row{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start;margin-bottom:30px}
+.opt{width:342px}
+.opt h2{font-size:15px;margin:0 0 10px;color:#ddd}
+.opt h2 span{color:#888;font-weight:400;font-size:13px}
+.phone{position:relative;width:342px;height:600px;background:var(--bg);border-radius:40px;border:8px solid #000;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;flex:none}
+.top{padding:22px 16px 0}
+.navrow{display:flex;justify-content:space-between;align-items:center}
+h3{font-size:30px;font-weight:700;margin:0;letter-spacing:.3px;line-height:36px}
+.sub{font-size:14px;color:var(--label2)}
+.gear{width:32px;height:32px;border-radius:50%;background:var(--fill);color:var(--tint);display:grid;place-items:center}
+.search{margin:12px 16px 0;display:flex;gap:6px;align-items:center;background:var(--fill);border-radius:10px;padding:7px 8px;color:var(--label2);min-height:34px;font-size:15px}
+.filters{display:flex;gap:8px;padding:12px 16px 14px;align-items:center}
+.pillbtn{display:flex;align-items:center;gap:5px;padding:7px 12px 7px 10px;border-radius:999px;background:var(--fill);font-size:15px;font-weight:500;color:var(--label);white-space:nowrap}
+.pillbtn.on{background:var(--tint);color:var(--on-tint);font-weight:600}
+.pillbtn .i{width:14px;height:14px;stroke-width:2.6;opacity:.8}
+.pillbtn .badge{margin-inline-start:2px;font-size:11px;font-weight:700;background:var(--tint);color:var(--on-tint);border-radius:999px;padding:1px 6px}
+.list{padding:0 16px}
+.month{font-size:18px;font-weight:700;margin:8px 0 2px}
+.card{display:flex;gap:10px;padding:10px 0;position:relative}
+.card+.card:before{content:"";position:absolute;top:0;inset-inline-start:84px;inset-inline-end:0;height:.5px;background:var(--sep)}
+.thumb{width:74px;height:74px;border-radius:8px;flex:none;background:#2c3440}
+.thumb.b{background:#3d3629}.thumb.c{background:#2f4a3a}.thumb.d{background:#4a2f3a}
+.meta{flex:1;min-width:0}
+.ttl{font-size:15px;font-weight:600;line-height:1.25}
+.who{font-size:13px;color:var(--label2);margin-top:2px}
+.tags{display:flex;gap:5px;margin-top:6px}
+.tag{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--fill);color:var(--label2)}
+.tag.stl{color:var(--tint);background:var(--tint-soft);font-weight:600}
+/* half sheet */
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.sheet{position:absolute;inset-inline:0;bottom:0;background:var(--grp);border-radius:22px 22px 0 0;padding:8px 16px 22px;box-shadow:0 -10px 40px rgba(0,0,0,.5)}
+.grab{width:36px;height:5px;border-radius:3px;background:var(--label3);margin:0 auto 10px}
+.sheet h4{font-size:17px;font-weight:600;margin:4px 0 10px;display:flex;justify-content:space-between;align-items:center}
+.sheet h4 button{color:var(--tint);font-size:15px;font-weight:600}
+.shead{font-size:13px;color:var(--label2);margin:12px 12px 6px}
+.srows{background:var(--grp2);border-radius:12px;overflow:hidden}
+.srow{display:flex;align-items:center;gap:10px;padding:11px 12px;font-size:16px;position:relative}
+.srow+.srow:before{content:"";position:absolute;top:0;inset-inline-start:12px;inset-inline-end:0;height:.5px;background:var(--sep)}
+.srow .n{flex:1}
+.srow .c{font-size:13px;color:var(--label2)}
+.srow .ck{width:18px;color:var(--tint)}
+.srow .dot{width:6px;height:6px;border-radius:50%;background:var(--tint)}
+.srow.warn .n{color:var(--tint)}
+/* iOS menu */
+.menu{position:absolute;top:172px;inset-inline-start:16px;width:236px;background:rgba(44,44,46,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.55),inset 0 0 0 .5px rgba(255,255,255,.12);overflow:hidden;z-index:5}
+.mhead{font-size:12px;color:var(--label2);padding:8px 14px 4px}
+.mrow{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:16px;position:relative}
+.mrow+.mrow:before{content:"";position:absolute;top:0;inset-inline:0;height:.5px;background:var(--sep)}
+.mrow .n{flex:1}
+.mrow .c{font-size:13px;color:var(--label2)}
+.mrow .ck{width:16px;color:var(--label)}
+.mgroup+.mgroup{border-top:6px solid rgba(0,0,0,.35)}
+.note{font-size:13px;color:#999;margin-top:10px;line-height:1.5}
+.rec{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#0a84ff;color:#fff;margin-inline-start:6px;vertical-align:middle}
+</style>
+</head>
+<body>
+<h1>שני מסננים במקום הסגמנט והצ׳יפים · סגנון וגם בית ספר / מורה</h1>
+<p class="lead">שורה אחת עם שני כפתורי סינון. כפתור לא פעיל מציג את שם המסנן („סגנון”, „בית ספר”); כפתור פעיל נצבע בצהוב ומציג את הערך שנבחר („באצ׳טה”, „ניצן”). לחיצה פותחת חצי־גיליון עם כל האפשרויות ומספר הסיכומים בכל אחת. הסגמנט הכול/באצ׳טה/סלסה ושורת הצ׳יפים נעלמים, והרשימה מתחילה גבוה יותר.</p>
+
+<div class="row">
+<div class="opt"><h2>1 · מצב רגיל <span>(שום סינון לא פעיל)</span></h2>
+<div class="phone">
+  <div class="top"><div class="navrow"><h3>השיעורים שלי</h3><div class="gear"><svg class="i"><use href="#gear"/></svg></div></div><div class="sub">17 סיכומים</div></div>
+  <div class="search"><svg class="i"><use href="#search"/></svg>חיפוש</div>
+  <div class="filters"><button class="pillbtn">סגנון<svg class="i"><use href="#chev"/></svg></button><button class="pillbtn">בית ספר<svg class="i"><use href="#chev"/></svg></button></div>
+  <div class="list"><div class="month">ספטמבר 2026</div>
+    <div class="card"><div class="thumb"></div><div class="meta"><div class="ttl">הלו בובה, שדו רגיל ושדו נגדי</div><div class="who">ניצן · פרטי · 17 בספט׳</div><div class="tags"><span class="tag stl">באצ׳טה</span><span class="tag">אלמנטים</span></div></div></div>
+    <div class="card"><div class="thumb b"></div><div class="meta"><div class="ttl">שלוש קומבינציות וטכניקות סיבובים</div><div class="who">נטלי · פרטי · 14 בספט׳</div><div class="tags"><span class="tag stl">באצ׳טה</span><span class="tag">סיבובים</span></div></div></div>
+    <div class="card"><div class="thumb d"></div><div class="meta"><div class="ttl">טכניקה, אחיזה וסיבובים</div><div class="who">נטלי · פרטי · 10 בספט׳</div><div class="tags"><span class="tag stl">סלסה</span><span class="tag">בסיסים</span></div></div></div>
+    <div class="card"><div class="thumb c"></div><div class="meta"><div class="ttl">תפניות, בסיסים והכנות</div><div class="who">ניצן · פרטי · 5 בספט׳</div><div class="tags"><span class="tag stl">באצ׳טה</span><span class="tag">בסיסים</span></div></div></div>
+  </div>
+</div>
+<div class="note">הכותרת, החיפוש ושני הכפתורים תופסים פחות מקום מהסגמנט + הצ׳יפים של היום.</div>
+</div>
+
+<div class="opt"><h2>2 · בחירת בית ספר / מורה <span>(חצי־גיליון)</span><span class="rec">ההמלצה</span></h2>
+<div class="phone">
+  <div class="top"><div class="navrow"><h3>השיעורים שלי</h3><div class="gear"><svg class="i"><use href="#gear"/></svg></div></div><div class="sub">17 סיכומים</div></div>
+  <div class="search"><svg class="i"><use href="#search"/></svg>חיפוש</div>
+  <div class="filters"><button class="pillbtn on">באצ׳טה<svg class="i"><use href="#chev"/></svg></button><button class="pillbtn">בית ספר<svg class="i"><use href="#chev"/></svg></button></div>
+  <div class="list"><div class="month">ספטמבר 2026</div>
+    <div class="card"><div class="thumb"></div><div class="meta"><div class="ttl">הלו בובה, שדו רגיל ושדו נגדי</div><div class="who">ניצן · פרטי · 17 בספט׳</div><div class="tags"><span class="tag stl">באצ׳טה</span><span class="tag">אלמנטים</span></div></div></div>
+    <div class="card"><div class="thumb b"></div><div class="meta"><div class="ttl">שלוש קומבינציות וטכניקות סיבובים</div><div class="who">נטלי · פרטי · 14 בספט׳</div><div class="tags"><span class="tag stl">באצ׳טה</span><span class="tag">סיבובים</span></div></div></div>
+  </div>
+  <div class="dim"></div>
+  <div class="sheet"><div class="grab"></div><h4>בית ספר או מורה <button>איפוס</button></h4>
+    <div class="srows"><div class="srow"><span class="n">כל בתי הספר</span><span class="c">17</span><svg class="i ck"><use href="#check"/></svg></div></div>
+    <div class="shead">בתי ספר</div>
+    <div class="srows"><div class="srow"><span class="n">VDance</span><span class="c">1</span></div><div class="srow"><span class="n">הוואנה</span><span class="c">2</span></div></div>
+    <div class="shead">מורים פרטיים</div>
+    <div class="srows"><div class="srow"><span class="dot"></span><span class="n">ניצן</span><span class="c">6</span></div><div class="srow"><span class="dot"></span><span class="n">נטלי</span><span class="c">7</span></div></div>
+  </div>
+</div>
+<div class="note">הגיליון עולה מהתחתית, נוח לאגודל, וגולל בתוך עצמו כשיש הרבה מורים. בחירה סוגרת אותו מיד. המספרים מתעדכנים לפי הסגנון שכבר נבחר (כאן: באצ׳טה).</div>
+</div>
+
+<div class="opt"><h2>3 · בחירת סגנון <span>(אותו גיליון, רשימה קצרה)</span></h2>
+<div class="phone">
+  <div class="top"><div class="navrow"><h3>השיעורים שלי</h3><div class="gear"><svg class="i"><use href="#gear"/></svg></div></div><div class="sub">17 סיכומים</div></div>
+  <div class="search"><svg class="i"><use href="#search"/></svg>חיפוש</div>
+  <div class="filters"><button class="pillbtn">סגנון<svg class="i"><use href="#chev"/></svg></button><button class="pillbtn on">ניצן<svg class="i"><use href="#chev"/></svg></button></div>
+  <div class="list"><div class="month">ספטמבר 2026</div>
+    <div class="card"><div class="thumb"></div><div class="meta"><div class="ttl">הלו בובה, שדו רגיל ושדו נגדי</div><div class="who">ניצן · פרטי · 17 בספט׳</div><div class="tags"><span class="tag stl">באצ׳טה</span><span class="tag">אלמנטים</span></div></div></div>
+    <div class="card"><div class="thumb c"></div><div class="meta"><div class="ttl">תפניות, בסיסים והכנות</div><div class="who">ניצן · פרטי · 5 בספט׳</div><div class="tags"><span class="tag stl">באצ׳טה</span><span class="tag">בסיסים</span></div></div></div>
+    <div class="card"><div class="thumb b"></div><div class="meta"><div class="ttl">האמרלוק, קצב ומשחקי ידיים</div><div class="who">ניצן · פרטי · 21 באוג׳</div><div class="tags"><span class="tag stl">באצ׳טה</span><span class="tag">סיבובים</span></div></div></div>
+    <div class="card"><div class="thumb d"></div><div class="meta"><div class="ttl">שדו, האמרלוק ועבודת אגן בזוג</div><div class="who">ניצן · פרטי · 3 באוג׳</div><div class="tags"><span class="tag stl">באצ׳טה</span><span class="tag">איזולציות</span></div></div></div>
+  </div>
+  <div class="dim"></div>
+  <div class="sheet"><div class="grab"></div><h4>סגנון <button>איפוס</button></h4>
+    <div class="srows"><div class="srow"><span class="n">כל הסגנונות</span><span class="c">6</span><svg class="i ck"><use href="#check"/></svg></div><div class="srow"><span class="n">באצ׳טה</span><span class="c">6</span></div><div class="srow"><span class="n">סלסה</span><span class="c">0</span></div></div>
+  </div>
+</div>
+<div class="note">כאן ניצן כבר נבחר, ולכן המספרים בגיליון הסגנון הם רק של השיעורים שלו. שני המסננים עובדים יחד.</div>
+</div>
+</div>
+
+<h1 style="font-size:17px">חלופה · תפריט צף במקום גיליון</h1>
+<p class="lead">אותם שני כפתורים, אבל הרשימה נפתחת צמוד לכפתור כמו תפריט הקשר של iOS 26 (זכוכית). קליל יותר; פחות נוח כשיש הרבה מורים כי התפריט מתארך ונגלל בתוך עצמו.</p>
+<div class="row">
+<div class="opt">
+<div class="phone">
+  <div class="top"><div class="navrow"><h3>השיעורים שלי</h3><div class="gear"><svg class="i"><use href="#gear"/></svg></div></div><div class="sub">17 סיכומים</div></div>
+  <div class="search"><svg class="i"><use href="#search"/></svg>חיפוש</div>
+  <div class="filters"><button class="pillbtn on">באצ׳טה<svg class="i"><use href="#chev"/></svg></button><button class="pillbtn on">ניצן<svg class="i"><use href="#chev"/></svg></button></div>
+  <div class="menu">
+    <div class="mgroup"><div class="mrow"><span class="n">כל בתי הספר</span><span class="c">17</span></div></div>
+    <div class="mgroup"><div class="mhead">בתי ספר</div><div class="mrow"><span class="n">VDance</span><span class="c">1</span></div><div class="mrow"><span class="n">הוואנה</span><span class="c">2</span></div></div>
+    <div class="mgroup"><div class="mhead">מורים פרטיים</div><div class="mrow"><svg class="i ck"><use href="#check"/></svg><span class="n">ניצן</span><span class="c">6</span></div><div class="mrow"><span class="ck"></span><span class="n">נטלי</span><span class="c">7</span></div></div>
+  </div>
+  <div class="list"><div class="month">ספטמבר 2026</div>
+    <div class="card"><div class="thumb"></div><div class="meta"><div class="ttl">הלו בובה, שדו רגיל ושדו נגדי</div><div class="who">ניצן · פרטי · 17 בספט׳</div><div class="tags"><span class="tag stl">באצ׳טה</span><span class="tag">אלמנטים</span></div></div></div>
+    <div class="card"><div class="thumb c"></div><div class="meta"><div class="ttl">תפניות, בסיסים והכנות</div><div class="who">ניצן · פרטי · 5 בספט׳</div><div class="tags"><span class="tag stl">באצ׳טה</span><span class="tag">בסיסים</span></div></div></div>
+    <div class="card"><div class="thumb b"></div><div class="meta"><div class="ttl">האמרלוק, קצב ומשחקי ידיים</div><div class="who">ניצן · פרטי · 21 באוג׳</div><div class="tags"><span class="tag stl">באצ׳טה</span><span class="tag">סיבובים</span></div></div></div>
+    <div class="card"><div class="thumb d"></div><div class="meta"><div class="ttl">שדו, האמרלוק ועבודת אגן בזוג</div><div class="who">ניצן · פרטי · 3 באוג׳</div><div class="tags"><span class="tag stl">באצ׳טה</span><span class="tag">איזולציות</span></div></div></div>
+  </div>
+</div>
+</div>
+</div>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+</svg>
+</body>
+</html>

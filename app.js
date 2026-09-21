@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.8.1';
+const APP_VERSION = '2.9.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -42,7 +42,7 @@ const STR = {
     setupTitle: 'הגדרה חד‑פעמית', setupBody: 'לעותק הזה של האפליקציה אין עדיין מזהה לקוח של Google. יוצרים אחד ב‑Google Cloud Console ומדביקים למטה.',
     setupStep1: 'יוצרים פרויקט ומפעילים את Google Drive API.', setupStep2: 'ב‑Google Auth Platform מגדירים מיתוג, בוחרים קהל External, מוסיפים את ההרשאה drive.file ומפרסמים.', setupStep3: 'יוצרים לקוח OAuth מסוג Web application עם:', origin: 'מקור JavaScript מורשה', redirect: 'כתובת הפניה מורשית',
     pasteClient: 'הדבקת מזהה לקוח (מסתיים ב‑.apps.googleusercontent.com)', saveSignin: 'שמירה והתחברות',
-    all: 'הכול', untagged: 'ללא תיוג', search: 'חיפוש פיגורה, בית ספר, הערה', allSchools: 'כל בתי הספר',
+    all: 'הכול', untagged: 'ללא תיוג', search: 'חיפוש פיגורה, בית ספר, הערה', allSchools: 'כל בתי הספר', allStylesLabel: 'כל הסגנונות', privateTeachers: 'מורים פרטיים', reset: 'איפוס', pickSource: 'צריך לבחור בית ספר או מורה.',
     noRecaps: 'אין עדיין סיכומים', emptyTitle: 'אין עדיין סיכומים.', emptyBody: 'לחיצה על + מוסיפה את הראשון. הוא עולה לתיקייה „Bachata Library” ב‑Google Drive שלך.', nothingMatches: 'אין תוצאות לסינון הזה.',
     group: 'קבוצתי', private: 'פרטי', groupLesson: 'שיעור קבוצתי', privateLesson: 'שיעור פרטי',
     untaggedRecap: 'סיכום ללא תיוג', tapToTag: 'לחיצה לתיוג', needsTag: 'חסרים בית ספר ופיגורות', recap: 'סיכום', recorded: 'הוקלט',
@@ -80,7 +80,7 @@ const STR = {
     setupTitle: 'One-time setup', setupBody: 'This copy of the app has no Google client ID yet. Create one in the Google Cloud console, then paste it below.',
     setupStep1: 'Create a project and enable the Google Drive API.', setupStep2: 'Under Google Auth Platform set up branding, choose audience External, add the drive.file scope, and publish.', setupStep3: 'Create an OAuth client of type Web application with:', origin: 'Authorized JavaScript origin', redirect: 'Authorized redirect URI',
     pasteClient: 'Paste client ID (ends with .apps.googleusercontent.com)', saveSignin: 'Save and sign in',
-    all: 'All', untagged: 'Untagged', search: 'Search figures, schools, notes', allSchools: 'All schools',
+    all: 'All', untagged: 'Untagged', search: 'Search figures, schools, notes', allSchools: 'All schools', allStylesLabel: 'All styles', privateTeachers: 'Private teachers', reset: 'Reset', pickSource: 'Choose a school or teacher.',
     noRecaps: 'No recaps yet', emptyTitle: 'No recaps yet.', emptyBody: 'Tap + to add the first one. It uploads to a “Bachata Library” folder in your Google Drive.', nothingMatches: 'Nothing matches this filter.',
     group: 'Group', private: 'Private', groupLesson: 'Group class', privateLesson: 'Private',
     untaggedRecap: 'Untagged recap', tapToTag: 'tap to tag', needsTag: 'Needs school & figures', recap: 'recap', recorded: 'Recorded',
@@ -561,6 +561,7 @@ function show(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 's-' + name));
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.go === name));
   $('tabbar').style.display = (name === 'library' || name === 'schools') ? '' : 'none';
+  if (name !== 'library') closeSheet();
   if (name !== 'detail' && video && !video.paused) video.pause();
   if (name === 'auth') renderAuth();
   if (name === 'library') renderLibrary();
@@ -582,19 +583,47 @@ function renderAuth() {
 }
 
 // Library
-function renderStylePill() {
-  const pill = $('style-pill');
-  pill.hidden = false;
-  pill.innerHTML = `<button class="${!filter.style ? 'on' : ''}" data-style="">${esc(T.all)}</button>` + allStyles().map(s => `<button class="${filter.style === s ? 'on' : ''}" data-style="${esc(s)}">${esc(styleName(s))}</button>`).join('');
+// Two filter buttons (style, school/teacher). Each opens a bottom sheet listing the options with
+// the number of lessons behind each one, counted with the other filter already applied.
+function renderFilters() {
+  const sb = $('flt-style'), ob = $('flt-source');
+  const styleOn = !!filter.style, srcOn = filter.kind === 'source' && !!filter.value;
+  sb.classList.toggle('on', styleOn); sb.innerHTML = `<span>${esc(styleOn ? styleName(filter.style) : T.style)}</span>${icon('down')}`;
+  ob.classList.toggle('on', srcOn); ob.innerHTML = `<span>${esc(srcOn ? filter.value : T.school)}</span>${icon('down')}`;
 }
-function renderChips() {
-  const untagged = lib.lessons.filter(l => !l.source).length;
-  const chip = (label, kind, value, cls = '') => `<button class="chip ${cls} ${filter.kind === kind && filter.value === value ? 'on' : ''}" data-kind="${kind}" data-value="${esc(value == null ? '' : value)}">${esc(label)}</button>`;
-  let h = chip(T.allSchools, 'all', null);
-  if (untagged) h += chip(`${T.untagged} · ${untagged}`, 'untagged', null, 'warn');
-  lib.sources.filter(s => s.kind === 'school').forEach(s => { h += chip(s.name, 'source', s.name); });
-  lib.sources.filter(s => s.kind === 'private').forEach(s => { h += chip(s.name, 'source', s.name, 'priv'); });
-  $('chips').innerHTML = h;
+let sheetKind = null;
+function openSheet(kind) {
+  sheetKind = kind;
+  const byStyle = l => !filter.style || (l.style || DEFAULT_STYLE) === filter.style;
+  const bySource = l => filter.kind !== 'source' || l.source === filter.value;
+  const row = (label, value, on, count, cls = '') => `<button class="orow" data-value="${esc(value == null ? '' : value)}">${cls ? '<span class="dot"></span>' : ''}<span class="n">${esc(label)}</span><span class="c">${count}</span>${on ? icon('check', 'i ck') : ''}</button>`;
+  let h = '';
+  if (kind === 'style') {
+    const base = lib.lessons.filter(bySource);
+    $('sheet-title').textContent = T.style;
+    h = `<div class="orows">${row(T.allStylesLabel, null, !filter.style, base.length)}${allStyles().map(s => row(styleName(s), s, filter.style === s, base.filter(l => (l.style || DEFAULT_STYLE) === s).length)).join('')}</div>`;
+  } else {
+    const base = lib.lessons.filter(byStyle);
+    const cnt = name => base.filter(l => l.source === name).length;
+    const schools = lib.sources.filter(s => s.kind === 'school'), priv = lib.sources.filter(s => s.kind === 'private');
+    $('sheet-title').textContent = T.school;
+    h = `<div class="orows">${row(T.allSchools, null, filter.kind !== 'source', base.length)}</div>`;
+    if (schools.length) h += `<div class="shead">${esc(T.schools)}</div><div class="orows">${schools.map(s => row(s.name, s.name, filter.kind === 'source' && filter.value === s.name, cnt(s.name))).join('')}</div>`;
+    if (priv.length) h += `<div class="shead">${esc(T.privateTeachers)}</div><div class="orows">${priv.map(s => row(s.name, s.name, filter.kind === 'source' && filter.value === s.name, cnt(s.name), 'priv')).join('')}</div>`;
+  }
+  $('sheet-body').innerHTML = h;
+  const w = $('sheet'); w.hidden = false; w.querySelector('.sheet').scrollTop = 0;
+  requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('open')));
+}
+function closeSheet() {
+  const w = $('sheet'); if (w.hidden) return;
+  w.classList.remove('open'); sheetKind = null;
+  setTimeout(() => { if (!w.classList.contains('open')) w.hidden = true; }, 320);
+}
+function pickSheet(value) {
+  if (sheetKind === 'style') filter.style = value || null;
+  else filter = { kind: value ? 'source' : 'all', value: value || null, style: filter.style };
+  closeSheet(); renderLibrary();
 }
 function visibleLessons() {
   let items = lib.lessons.slice();
@@ -606,7 +635,7 @@ function visibleLessons() {
   return items;
 }
 function renderLibrary() {
-  renderStylePill(); renderChips();
+  renderFilters();
   $('lib-sub').textContent = lib.lessons.length ? T.recapsN(lib.lessons.length) : T.noRecaps;
   const items = visibleLessons();
   if (!items.length) {
@@ -820,7 +849,7 @@ function openAdd(id) {
   $('f-note').value = editing ? editing.note : '';
   $('btn-save').textContent = editing ? T.saveChanges : T.saveUpload;
   $('btn-save').disabled = false;
-  $('prog').style.display = 'none'; $('prog').querySelector('i').style.width = '0'; $('prog-hint').textContent = editing ? '' : T.skipHint;
+  $('prog').style.display = 'none'; $('prog').querySelector('i').style.width = '0'; $('prog-hint').textContent = '';
   $('delete-row').hidden = !editing; disarmDelete();
   pendingAi = null; $('ai-row').hidden = !editing; setAiHint(T.aiIdle); setAiBusy(false);
   show('add');
@@ -841,8 +870,7 @@ function fillSources(selected) {
   const opts = lib.sources.filter(s => s.kind === kind);
   const sel = $('f-source');
   sel.innerHTML = opts.map(s => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('')
-    + `<option value="__new__">${esc(kind === 'private' ? T.newTeacher : T.newSchool)}</option>`
-    + `<option value="">${esc(T.leaveUntagged)}</option>`;
+    + `<option value="__new__">${esc(kind === 'private' ? T.newTeacher : T.newSchool)}</option>`;
   if (selected && opts.some(s => s.name === selected)) sel.value = selected;
   else if (opts.length) sel.value = opts[0].name;
   else sel.value = '__new__';
@@ -898,6 +926,7 @@ async function saveLesson() {
   const form = readForm();
   if (!editing && !pending) { toast(T.pickFirst); return; }
   if (form.isNew && !form.source) { toast(T.typeName(formType === 'private' ? T.teacher : T.school)); return; }
+  if (!form.source) { toast(T.pickSource); return; }
   if (form.styleNew && !form.style) { toast(T.typeStyle); return; }
   uploading = true; $('btn-save').disabled = true; $('btn-delete').disabled = true;
   try {
@@ -1147,8 +1176,11 @@ function bindEvents() {
   $('btn-cancel').addEventListener('click', () => { if (uploading || aiBusy) { toast(T.waitUpload); return; } const back = editing; resetForm(); if (back && back.source) openDetail(back.id); else show('library'); });
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => show(t.dataset.go)));
   $('search').addEventListener('input', e => { query = e.target.value; renderLibrary(); });
-  $('style-pill').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; filter.style = b.dataset.style || null; renderLibrary(); });
-  $('chips').addEventListener('click', e => { const c = e.target.closest('.chip'); if (!c) return; filter = { kind: c.dataset.kind, value: c.dataset.kind === 'source' ? c.dataset.value : null, style: filter.style }; renderLibrary(); });
+  $('flt-style').addEventListener('click', () => openSheet('style'));
+  $('flt-source').addEventListener('click', () => openSheet('source'));
+  $('sheet-dim').addEventListener('click', closeSheet);
+  $('sheet-reset').addEventListener('click', () => pickSheet(null));
+  $('sheet-body').addEventListener('click', e => { const b = e.target.closest('.orow'); if (b) pickSheet(b.dataset.value || null); });
   $('list').addEventListener('click', e => { const card = e.target.closest('.card'); if (!card) return; const l = lib.lessons.find(x => x.id === card.dataset.id); if (!l) return; if (!l.source) openAdd(l.id); else openDetail(l.id); });
 
   // player

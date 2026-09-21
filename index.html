@@ -13,9 +13,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="DanceLab">
-<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.8.1">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.8.1">
-<link rel="stylesheet" href="./styles.css?v=2.8.1">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.9.0">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.9.0">
+<link rel="stylesheet" href="./styles.css?v=2.9.0">
 </head>
 <body>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
@@ -40,6 +40,7 @@
   <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
   <symbol id="i-ai" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z"/></symbol>
   <symbol id="i-upload" viewBox="0 0 24 24"><path d="M16 16l-4-4-4 4M12 12v9M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></symbol>
 </svg>
@@ -49,7 +50,7 @@
   <!-- SIGN IN -->
   <section class="screen" id="s-auth">
     <div class="auth">
-      <img class="logo" src="./icons/icon-192.png?v=2.8.1" alt="">
+      <img class="logo" src="./icons/icon-192.png?v=2.9.0" alt="">
       <h1>DanceLab</h1>
       <p class="sub" data-t="tagline"></p>
       <button class="primary" id="btn-signin" data-t="signin"></button>
@@ -75,10 +76,9 @@
         <div><h1 data-t="library"></h1><div class="sub" id="lib-sub"></div></div>
         <button class="ib round" id="btn-settings" data-aria="settings"><svg class="i"><use href="#i-gear"/></svg></button>
       </div>
-      <div class="pill" id="style-pill" hidden></div>
     </div>
     <div class="searchwrap"><div class="search"><svg class="i"><use href="#i-search"/></svg><input id="search" type="search" autocomplete="off" aria-label="search"></div></div>
-    <div class="chips" id="chips"></div>
+    <div class="filters"><button class="pillbtn" id="flt-style"></button><button class="pillbtn" id="flt-source"></button></div>
     <div class="scroll" id="list"></div>
   </section>
 
@@ -191,6 +191,8 @@
     <div class="scroll plain" id="settings-body"></div>
   </section>
 
+  <div class="sheetwrap" id="sheet" hidden><div class="dim" id="sheet-dim"></div><div class="sheet" role="dialog"><div class="grab"></div><h4><span id="sheet-title"></span><button id="sheet-reset" data-t="reset"></button></h4><div id="sheet-body"></div></div></div>
+
   <div class="toast" id="toast" role="status"></div>
 
   <nav class="tabbar" id="tabbar">
@@ -199,8 +201,8 @@
     <button class="tab" data-go="schools"><svg class="i"><use href="#i-school"/></svg><span data-t="schools"></span></button>
   </nav>
 </div>
-<script src="./config.js?v=2.8.1"></script>
-<script src="./gemini.js?v=2.8.1"></script>
-<script src="./app.js?v=2.8.1"></script>
+<script src="./config.js?v=2.9.0"></script>
+<script src="./gemini.js?v=2.9.0"></script>
+<script src="./app.js?v=2.9.0"></script>
 </body>
 </html>
