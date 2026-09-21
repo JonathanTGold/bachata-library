@@ -6,9 +6,9 @@
  * Exposes window.GeminiClient = { analyzeVideo(source, opts), DEFAULT_MODEL, GeminiError }.
  *   source: a File/Blob, or a remote descriptor { size, type, name, fetchRange(start, end) -> Blob }
  *           (the video is relayed in chunks, so a large clip never sits in memory as a whole)
- *   opts: { key, model, lang, onProgress({ stage, frac, detail }) }
+ *   opts: { key, model, lang, tags: [{ key, label, hint }], onProgress({ stage, frac, detail }) }
  *         stage is one of 'upload' | 'process' | 'analyze' | 'retry' | 'fallback'
- *   resolves: { title, desc, chapters: [{ name, t }] }   (t in seconds)
+ *   resolves: { title, desc, tags: [key], chapters: [{ name, t }] }   (t in seconds)
  */
 (function () {
 'use strict';
@@ -22,40 +22,108 @@ const UPLOAD_CHUNK = 8 * 1024 * 1024; // multiple of 256 KiB, as the upload prot
 const PROCESS_POLL_MS = 2000;
 const PROCESS_MAX_POLLS = 120; // 4 minutes
 
-const PROMPTS = {
-  he: 'נתחו את סרטון סיכום שיעור הריקוד הזה. ענו בעברית.\n' +
-      'החזירו: כותרת קצרה (עד 8 מילים); תיאור מפורט שמכסה את הרעיונות המרכזיים, טכניקת התנועה, ' +
-      'טיפים להובלה ולמובלים, תרגילים, והכללים שהמורה הדגיש או הדגישה; ו‑3 עד 8 פרקים כלליים, ' +
-      'לכל אחד זמן התחלה בפורמט MM:SS וכותרת נושא קצרה.\n' +
-      'הכותרת מתארת את תוכן השיעור עצמו, למשל „הלו בובה, שדו רגיל ושדו נגדי”, בלי קידומות כמו „סיכום שיעור” או „שיעור ריקוד”.\n' +
-      'השתמשו במונחי הריקוד שהמורה משתמש בהם. אל תמציאו תוכן שלא מופיע בסרטון.',
-  en: 'Analyze this dance lesson recap video. Answer in English.\n' +
-      'Return: a short title (max 8 words); a detailed description covering the core concepts, ' +
-      'movement technique, leading and following tips, exercises, and the rules the instructor stressed; ' +
-      'and 3 to 8 broad chapters, each with a start time in MM:SS and a short topic title.\n' +
-      'The title names the content itself, for example "Hello Bubba, regular and counter shadow", with no prefix such as "Lesson summary" or "Dance lesson".\n' +
-      'Use the dance vocabulary the instructor uses. Do not invent content that is not in the video.'
-};
+// Canonical dance vocabulary. The model hears Hebrew-accented English terms and otherwise invents a
+// phonetic spelling each time ("אנגלוק", "אמלוק", "אמנלוק" for hammerlock). The prompt shows the
+// accepted spellings, and normalizeTerms() below repairs the common mistakes deterministically.
+const LEXICON = [
+  { he: 'האמרלוק', en: 'hammerlock', alt: ['אנגלוק', 'אמלוק', 'אמנלוק', 'המרלוק', 'אמרלוק', 'ארמלוק', 'ארם לוק', 'הנגלוק', 'האנגלוק', 'האנגלון', 'אנגלון'] },
+  { he: 'שדו', en: 'shadow position', alt: ['שאדו', 'שאדוו', 'שדואו', 'צ׳דו'] },
+  { he: 'סומבררו', en: 'sombrero', alt: ['סומבררה', 'סומבררו', 'סמבררו'] },
+  { he: 'קרוס בודי', en: 'cross body lead', alt: ['קרוס באדי', 'קרוסבודי', 'קרוס בדי'] },
+  { he: 'כריכה', en: 'wrap (cuddle)', alt: [] },
+  { he: 'בודי רול', en: 'body roll', alt: ['בודירול', 'בודי רולל', 'בדי רול'] },
+  { he: 'גל גוף', en: 'body wave', alt: [] },
+  { he: 'איזולציה', en: 'isolation', alt: ['איזולציא', 'אייזולציה'] },
+  { he: 'בסיס', en: 'basic step', alt: [] },
+  { he: 'טאפ', en: 'tap', alt: ['טפ'] },
+  { he: 'סיבוב פנימי', en: 'inside turn', alt: [] },
+  { he: 'סיבוב חיצוני', en: 'outside turn', alt: [] },
+  { he: 'הכנה', en: 'prep (preparation for a turn)', alt: [] },
+  { he: 'מסגרת', en: 'frame', alt: [] },
+  { he: 'קונטרה', en: 'counter tension', alt: ['קונטרא'] },
+  { he: 'אחיזה סגורה', en: 'closed hold', alt: [] },
+  { he: 'אחיזה פתוחה', en: 'open hold', alt: [] },
+  { he: 'חיבוק צמוד', en: 'close embrace', alt: [] },
+  { he: 'הובלה', en: 'lead', alt: [] },
+  { he: 'הלבשה על הראש', en: 'hand over the head', alt: [] },
+  { he: 'טוויסט', en: 'twist', alt: ['טוויסת', 'טויסט'] },
+  { he: 'תפנית', en: 'pivot', alt: [] },
+  { he: 'סחיפה', en: 'sweep', alt: [] },
+  { he: 'הטיה', en: 'tilt (cambré)', alt: [] },
+  { he: 'קמברה', en: 'cambré', alt: ['קמבריי', 'קמבראה'] },
+  { he: 'דיפ', en: 'dip', alt: ['דיפּ'] },
+  { he: 'אקסטנשן', en: 'extension', alt: ['אקסטנשיין', 'אקסטנשין'] },
+  { he: 'ספוטינג', en: 'spotting', alt: ['ספוטינק'] },
+  { he: 'אינטרו', en: 'intro', alt: ['אינטרואו'] },
+  { he: 'סינקופה', en: 'syncopation', alt: ['סינקופציה'] },
+  { he: 'סטיילינג', en: 'styling', alt: ['סטיילינק', 'סטיילנג'] },
+  { he: 'שיינס', en: 'shines (solo footwork)', alt: ['שיינז'] },
+  { he: 'דומיניקני', en: 'Dominican style', alt: [] },
+  { he: 'סנסואל', en: 'sensual', alt: ['סנשואל', 'סנסואלי'] },
+  { he: 'אנצ׳ופה', en: 'enchufla (salsa)', alt: ["אנצ'ופלה", 'אנצופה'] },
+  { he: 'דילה קה נו', en: 'dile que no (salsa)', alt: [] }
+];
+function lexiconText(lang) {
+  return LEXICON.map(x => lang === 'he' ? `${x.he} (${x.en})` : `${x.en} (Hebrew: ${x.he})`).join(', ');
+}
+function tagsText(tags, lang) {
+  if (!tags || !tags.length) return '';
+  const lines = tags.map(t => `- ${t.key}: ${t.label}${t.hint ? ' — ' + t.hint : ''}`).join('\n');
+  return lang === 'he'
+    ? `\nתגיות: בחרו אחת או יותר מהקטגוריות הבאות שמתארות במה השיעור עסק (החזירו את המפתח באנגלית בלבד):\n${lines}\n`
+    : `\nTags: choose one or more of these categories for what the lesson worked on (return the key only):\n${lines}\n`;
+}
+function buildPrompt(lang, tags) {
+  const lex = lexiconText(lang);
+  if (lang === 'he') {
+    return 'נתחו את סרטון סיכום שיעור הריקוד הזה. ענו בעברית.\n' +
+      'החזירו: כותרת קצרה (עד 12 מילים) שמונה את הפיגורות או הנושאים שנלמדו; תיאור מפורט שמכסה את הרעיונות המרכזיים, טכניקת התנועה, ' +
+      'טיפים להובלה ולמובלים, תרגילים, והכללים שהמורה הדגיש או הדגישה; 3 עד 8 פרקים כלליים, ' +
+      'לכל אחד זמן התחלה בפורמט MM:SS וכותרת נושא קצרה; ותגיות.\n' +
+      'הכותרת מתארת את תוכן השיעור עצמו, למשל „האמרלוק, שדו רגיל ושדו נגדי”, בלי קידומות כמו „סיכום שיעור” או „שיעור ריקוד”.\n' +
+      'מונחי ריקוד: מורים בישראל אומרים את שמות הפיגורות באנגלית במבטא ישראלי. השתמשו אך ורק באיות הבא כשמונח מהרשימה נשמע בסרטון, ' +
+      'גם אם ההגייה לא ברורה, ואל תמציאו תעתיק אחר: ' + lex + '.\n' +
+      'הסתמכו גם על מה שרואים בסרטון כדי לזהות את הפיגורה (למשל יד מאחורי הגב = האמרלוק; המוביל מאחורי המובלת = שדו). ' +
+      'מונח שלא ברשימה: כתבו אותו כפי שהמורה אומר אותו, ואם הוא באנגלית הוסיפו את המקור באנגלית בסוגריים בפעם הראשונה.\n' +
+      'אל תמציאו תוכן שלא מופיע בסרטון.' + tagsText(tags, 'he');
+  }
+  return 'Analyze this dance lesson recap video. Answer in English.\n' +
+    'Return: a short title (max 12 words) naming the figures or topics taught; a detailed description covering the core concepts, ' +
+    'movement technique, leading and following tips, exercises, and the rules the instructor stressed; ' +
+    '3 to 8 broad chapters, each with a start time in MM:SS and a short topic title; and tags.\n' +
+    'The title names the content itself, for example "Hammerlock, shadow and counter shadow", with no prefix such as "Lesson summary" or "Dance lesson".\n' +
+    'Dance vocabulary: use exactly these spellings whenever one of these terms is heard, even with an accent, and never invent another transcription: ' + lex + '.\n' +
+    'Use what is visible in the video to confirm the figure (an arm folded behind the back = hammerlock; the lead behind the follow = shadow position). ' +
+    'A term not in the list: write it as the instructor says it.\n' +
+    'Do not invent content that is not in the video.' + tagsText(tags, 'en');
+}
 
-const SCHEMA = {
-  type: 'OBJECT',
-  properties: {
-    title: { type: 'STRING', description: 'Short lesson title, at most 8 words' },
-    description: { type: 'STRING', description: 'Detailed description of what the lesson covered' },
-    chapters: {
-      type: 'ARRAY',
-      items: {
-        type: 'OBJECT',
-        properties: {
-          start: { type: 'STRING', description: 'Start time as MM:SS' },
-          title: { type: 'STRING', description: 'Short topic title' }
-        },
-        required: ['start', 'title']
+function buildSchema(tags) {
+  const schema = {
+    type: 'OBJECT',
+    properties: {
+      title: { type: 'STRING', description: 'Short lesson title, at most 12 words, naming the figures or topics' },
+      description: { type: 'STRING', description: 'Detailed description of what the lesson covered' },
+      chapters: {
+        type: 'ARRAY',
+        items: {
+          type: 'OBJECT',
+          properties: {
+            start: { type: 'STRING', description: 'Start time as MM:SS' },
+            title: { type: 'STRING', description: 'Short topic title' }
+          },
+          required: ['start', 'title']
+        }
       }
-    }
-  },
-  required: ['title', 'description', 'chapters']
-};
+    },
+    required: ['title', 'description', 'chapters']
+  };
+  if (tags && tags.length) {
+    schema.properties.tags = { type: 'ARRAY', description: 'One or more category keys that describe what the lesson worked on', items: { type: 'STRING', enum: tags.map(t => t.key) } };
+    schema.required.push('tags');
+  }
+  return schema;
+}
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -167,16 +235,27 @@ function cleanTitle(t) {
   return out ? out.charAt(0).toUpperCase() + out.slice(1) : orig;
 }
 
+// Repairs known misspellings of the canonical terms (whole words only, with an optional ה/ל/ב/ו prefix).
+const TERM_FIXES = LEXICON.filter(x => x.alt.length).map(x => ({
+  re: new RegExp('(^|[^\\u05d0-\\u05ea])([הלבומש]?)(' + x.alt.map(a => a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')(?![\\u05d0-\\u05ea])', 'g'),
+  he: x.he
+}));
+function normalizeTerms(text) {
+  let out = String(text || '');
+  for (const f of TERM_FIXES) out = out.replace(f.re, (m, before, prefix) => before + prefix + (prefix && f.he.startsWith('ה') ? f.he.slice(1) : f.he));
+  return out;
+}
+
 function parseTime(s) {
   const parts = String(s || '').trim().split(':').map(x => parseInt(x, 10));
   if (!parts.length || parts.some(isNaN)) return null;
   return parts.reduce((acc, v) => acc * 60 + v, 0);
 }
 
-async function generate(fileUri, mime, key, model, lang) {
+async function generate(fileUri, mime, key, model, lang, tags) {
   const body = {
-    contents: [{ role: 'user', parts: [{ fileData: { fileUri, mimeType: mime } }, { text: PROMPTS[lang] || PROMPTS.en }] }],
-    generationConfig: { responseMimeType: 'application/json', responseSchema: SCHEMA, temperature: 0.3 }
+    contents: [{ role: 'user', parts: [{ fileData: { fileUri, mimeType: mime } }, { text: buildPrompt(lang, tags) }] }],
+    generationConfig: { responseMimeType: 'application/json', responseSchema: buildSchema(tags), temperature: 0.2 }
   };
   const res = await call(`${BASE}/v1beta/models/${encodeURIComponent(model)}:generateContent`, key, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
@@ -186,23 +265,25 @@ async function generate(fileUri, mime, key, model, lang) {
   const text = cand && cand.content && Array.isArray(cand.content.parts) ? cand.content.parts.map(p => p.text || '').join('') : '';
   let data;
   try { data = JSON.parse(text); } catch (e) { throw new GeminiError('Gemini returned an unreadable answer', 0, 'other'); }
+  const allowed = new Set((tags || []).map(t => t.key));
   return {
-    title: cleanTitle(data.title),
-    desc: String(data.description || '').trim(),
+    title: normalizeTerms(cleanTitle(data.title)),
+    desc: normalizeTerms(String(data.description || '').trim()),
+    tags: [...new Set((Array.isArray(data.tags) ? data.tags : []).map(String).filter(t => allowed.has(t)))],
     chapters: (Array.isArray(data.chapters) ? data.chapters : [])
-      .map(c => ({ name: String(c.title || '').trim(), t: parseTime(c.start) }))
+      .map(c => ({ name: normalizeTerms(String(c.title || '').trim()), t: parseTime(c.start) }))
       .filter(c => c.name && c.t != null)
       .sort((a, b) => a.t - b.t)
   };
 }
 
-async function generateWithRetries(fileUri, mime, key, model, lang, report) {
+async function generateWithRetries(fileUri, mime, key, model, lang, tags, report) {
   const models = [model].concat(FALLBACK_MODELS.filter(m => m !== model));
   let lastErr = null;
   for (let mi = 0; mi < models.length; mi++) {
     for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {
       try {
-        return await generate(fileUri, mime, key, models[mi], lang);
+        return await generate(fileUri, mime, key, models[mi], lang, tags);
       } catch (e) {
         lastErr = e;
         if (e.kind === 'busy' && attempt < RETRY_DELAYS_MS.length) { report('retry', 0, models[mi]); await sleep(RETRY_DELAYS_MS[attempt]); continue; }
@@ -220,7 +301,7 @@ async function deleteFile(fileName, key) {
   try { await call(`${BASE}/v1beta/${fileName}`, key, { method: 'DELETE' }); } catch (e) { /* files expire on their own after 48 hours */ }
 }
 
-async function analyzeVideo(source, { key, model, lang, onProgress } = {}) {
+async function analyzeVideo(source, { key, model, lang, tags, onProgress } = {}) {
   if (!key) throw new GeminiError('Missing API key', 0, 'key');
   const report = (stage, frac, detail) => { if (onProgress) onProgress({ stage, frac, detail }); };
   report('upload', 0);
@@ -229,11 +310,11 @@ async function analyzeVideo(source, { key, model, lang, onProgress } = {}) {
     report('process');
     const active = await waitUntilActive(uploaded.name, key);
     report('analyze');
-    return await generateWithRetries(active.uri, active.mimeType || source.type || 'video/mp4', key, (model || DEFAULT_MODEL).trim(), lang, report);
+    return await generateWithRetries(active.uri, active.mimeType || source.type || 'video/mp4', key, (model || DEFAULT_MODEL).trim(), lang, tags, report);
   } finally {
     deleteFile(uploaded.name, key);
   }
 }
 
-window.GeminiClient = { analyzeVideo, cleanTitle, DEFAULT_MODEL, GeminiError };
+window.GeminiClient = { analyzeVideo, cleanTitle, normalizeTerms, LEXICON, DEFAULT_MODEL, GeminiError };
 })();

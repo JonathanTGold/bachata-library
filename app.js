@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.7.0';
+const APP_VERSION = '2.8.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -28,6 +28,9 @@ const CHUNK = 8 * 1024 * 1024; // resumable upload chunk size, a multiple of 256
 const STYLE_KEYS = ['bachata', 'salsa', 'kizomba', 'zouk'];
 const BASE_STYLES = ['bachata', 'salsa'];
 const DEFAULT_STYLE = 'bachata';
+// General classification of what a lesson works on. Fixed list: shown as chips, editable by hand,
+// and the auto-fill picks one or more of these keys.
+const TAG_KEYS = ['basics', 'footwork', 'turns', 'elements', 'bodymove', 'isolations', 'leadfollow', 'technique', 'musicality', 'styling', 'sensual', 'tricks', 'choreo', 'drills'];
 
 // ---------- strings ----------
 const STR = {
@@ -46,9 +49,9 @@ const STR = {
     figures: 'פרקים', notes: 'הערות', noNotes: 'אין הערות עדיין. אפשר להוסיף דרך העריכה.', figureName: 'שם הפרק', noTime: 'ללא זמן', noChapters: 'אין פרקים עדיין. מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי.',
     title: 'כותרת', titlePh: 'למשל: האמרלוק ויציאה מסומבררו', desc: 'תיאור', descPh: 'מה היה בשיעור: פיגורות, תיקונים, דגשים', deleteArmToast: 'לחיצה נוספת על סל המחזור מוחקת את הסרטון מ‑Drive.',
     repeatA: a => `התחלה סומנה ב‑${a}. לחצו שוב בסוף הקטע.`, repeatOn: (a, b) => `חוזר על ${a}–${b}.`, repeatOff: 'החזרה בוטלה.',
-    ai: 'ניתוח אוטומטי', aiIdle: 'מילוי כותרת, תיאור ופרקים מהסרטון עם Gemini.', aiNeedKey: 'צריך מפתח Gemini API. מוסיפים אותו בהגדרות.', aiDownloading: p => `מוריד את הסרטון מ‑Drive… ${p}%`, aiUploading: p => `מעלה לניתוח… ${p}%`, aiRelay: p => `מעביר את הסרטון מ‑Drive לניתוח… ${p}%`, aiRefreshing: 'מרענן את ההתחברות ל‑Drive לפני הניתוח…', aiProcessing: 'Gemini מעבד את הסרטון…', aiAnalyzing: 'מנתח את השיעור…', aiRetry: 'המודל עמוס, מנסה שוב בעוד רגע…', aiFallback: m => `עובר למודל ${m}…`, aiBusy: 'Gemini עמוס כרגע. מנסים שוב בעוד כמה דקות.', aiDone: 'הכותרת, התיאור והפרקים מולאו. בודקים ושומרים.', aiFailed: 'הניתוח נכשל. ', aiBadKey: 'המפתח לא תקין, או שהוא מוגבל לכתובת אחרת.', aiQuota: 'חרגתם ממכסת Gemini להיום. אפשר לנסות מאוחר יותר.', aiBadModel: 'שם המודל לא נמצא. בודקים את השם בהגדרות.',
+    ai: 'ניתוח אוטומטי', aiIdle: 'מילוי כותרת, תיאור, תגיות ופרקים מהסרטון עם Gemini.', aiNeedKey: 'צריך מפתח Gemini API. מוסיפים אותו בהגדרות.', aiDownloading: p => `מוריד את הסרטון מ‑Drive… ${p}%`, aiUploading: p => `מעלה לניתוח… ${p}%`, aiRelay: p => `מעביר את הסרטון מ‑Drive לניתוח… ${p}%`, aiRefreshing: 'מרענן את ההתחברות ל‑Drive לפני הניתוח…', aiProcessing: 'Gemini מעבד את הסרטון…', aiAnalyzing: 'מנתח את השיעור…', aiRetry: 'המודל עמוס, מנסה שוב בעוד רגע…', aiFallback: m => `עובר למודל ${m}…`, aiBusy: 'Gemini עמוס כרגע. מנסים שוב בעוד כמה דקות.', aiDone: 'הכותרת, התיאור, התגיות והפרקים מולאו. בודקים ושומרים.', aiFailed: 'הניתוח נכשל. ', aiBadKey: 'המפתח לא תקין, או שהוא מוגבל לכתובת אחרת.', aiQuota: 'חרגתם ממכסת Gemini להיום. אפשר לנסות מאוחר יותר.', aiBadModel: 'שם המודל לא נמצא. בודקים את השם בהגדרות.',
     geminiKey: 'מפתח Gemini API', geminiHelp: 'המפתח נשמר בתיקייה שלך ב‑Drive ומסתנכרן בין המכשירים שלך. הסרטון נשלח ל‑Gemini לניתוח ונמחק משם מיד אחרי. בחבילה החינמית Google עשויה להשתמש בתוכן לשיפור המודלים.', geminiModelHint: 'שם המודל. ריק = ברירת המחדל', getKey: 'יצירת מפתח ב‑Google AI Studio', keySaved: 'הגדרות Gemini נשמרו.', badGeminiKey: 'זה לא נראה כמו מפתח Gemini API.',
-    help: 'עזרה', helpItems: [['ai', 'ניתוח אוטומטי', 'עם מפתח Gemini API מההגדרות, הכפתור הנוצץ ממלא כותרת, תיאור ופרקים מתוך הסרטון. בודקים את התוצאה לפני השמירה.'], ['back5', 'דילוג', 'החצים על הסרטון מדלגים 5 שניות אחורה או קדימה. לחיצה על הסרטון מציגה או מסתירה אותם.'], ['repeat', 'חזרה על קטע', 'לחיצה ראשונה מסמנת התחלה (A), שנייה מסמנת סוף (B), והקטע ינוגן שוב ושוב עד ללחיצה שלישית.'], ['mirror', 'מראה', 'הופך את הסרטון אופקית, כמו להסתכל במראה של הסטודיו. נוח כשעומדים מול המורה.'], ['plus', 'פרקים', 'בעמוד השיעור, מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי. לחיצה על פרק קופצת אליו.'], ['pip', 'תמונה בתוך תמונה', 'ממשיך לנגן בחלון קטן מעל אפליקציות אחרות.'], ['fs', 'מסך מלא', 'פותח את הסרטון בנגן של המכשיר. מומלץ לסובב את המכשיר לסרטונים לרוחב.']],
+    help: 'עזרה', helpItems: [['ai', 'ניתוח אוטומטי', 'עם מפתח Gemini API מההגדרות, הכפתור הנוצץ בטופס ממלא כותרת, תיאור, תגיות ופרקים מתוך הסרטון. בודקים את התוצאה לפני השמירה.'], ['back5', 'דילוג', 'החצים על הסרטון מדלגים 5 שניות אחורה או קדימה. לחיצה על הסרטון מציגה או מסתירה אותם.'], ['repeat', 'חזרה על קטע', 'לחיצה ראשונה מסמנת התחלה (A), שנייה מסמנת סוף (B), והקטע ינוגן שוב ושוב עד ללחיצה שלישית.'], ['mirror', 'מראה', 'הופך את הסרטון אופקית, כמו להסתכל במראה של הסטודיו. נוח כשעומדים מול המורה.'], ['plus', 'פרקים', 'בעמוד השיעור, מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי. לחיצה על פרק קופצת אליו.'], ['pip', 'תמונה בתוך תמונה', 'ממשיך לנגן בחלון קטן מעל אפליקציות אחרות.'], ['fs', 'מסך מלא', 'פותח את הסרטון בנגן של המכשיר. מומלץ לסובב את המכשיר לסרטונים לרוחב.']],
     noPip: 'הדפדפן הזה לא תומך בתמונה‑בתוך‑תמונה.', playFirst: 'קודם מתחילים לנגן.',
     chooseVideo: 'בחירת סרטון', fromWhere: 'מהתמונות, מהקבצים או צילום עכשיו', alreadyInDrive: 'כבר ב‑Drive', reading: 'קורא…', previewNA: 'אין תצוגה מקדימה',
     style: 'סגנון', otherStyle: 'אחר…', styleName: 'שם הסגנון', lessonType: 'סוג שיעור', school: 'בית ספר', teacher: 'מורה', newSchool: '+ בית ספר חדש…', newTeacher: '+ מורה חדש…', leaveUntagged: 'להשאיר ללא תיוג בינתיים', name: 'שם',
@@ -64,6 +67,9 @@ const STR = {
     signInAgain: 'צריך להתחבר שוב.', signinCheckFailed: 'בדיקת ההתחברות נכשלה. נסו שוב.', driveNotGranted: 'לא ניתנה גישה ל‑Drive. התחברו שוב והשאירו את תיבת Google Drive מסומנת.',
     recapsN: n => n === 1 ? 'סיכום אחד' : `${n} סיכומים`, schoolsN: n => n === 1 ? 'בית ספר אחד' : `${n} בתי ספר`, teachersN: n => n === 1 ? 'מורה פרטי אחד' : `${n} מורים פרטיים`,
     styles: { bachata: 'באצ׳טה', salsa: 'סלסה', kizomba: 'קיזומבה', zouk: 'זוק' },
+    tagsLabel: 'תגיות',
+    tags: { basics: 'בסיסים', footwork: 'עבודת רגליים', turns: 'סיבובים', elements: 'אלמנטים ווריאציות', bodymove: 'תנועת גוף', isolations: 'איזולציות', leadfollow: 'הובלה ומעקב', technique: 'טכניקה ויציבה', musicality: 'מוזיקליות וקצב', styling: 'סטיילינג', sensual: 'סנסואל', tricks: 'טריקים ודיפים', choreo: 'כוריאוגרפיה', drills: 'תרגילים' },
+    tagHints: { basics: 'צעדי בסיס, טאפים וגיווני בסיס', footwork: 'עבודת רגליים, סינקופות, סגנון דומיניקני, שיינס', turns: 'סיבובים, הכנות לסיבוב, ספוטינג', elements: 'פיגורות ואלמנטים בזוג כמו האמרלוק, סומבררו, שדו, כריכה, קרוס בודי, ווריאציות שלהם וקומבינציות', bodymove: 'גלי גוף, בודי רול, קמברה, תנועות ראש', isolations: 'איזולציות של אגן, חזה, כתפיים', leadfollow: 'הובלה ומעקב, חיבור, קונטרה, אחיזות', technique: 'יציבה, מסגרת, העברת משקל, צעדים קטנים', musicality: 'מוזיקליות, קצב, ספירות, אינטרו, מבנה השיר', styling: 'סטיילינג ידיים, שיער וגוף למובילים ולמובלות', sensual: 'חיבוק צמוד, הטיות, גלים בזוג בסגנון סנסואל', tricks: 'טריקים, דיפים, הרמות', choreo: 'כוריאוגרפיה או רצף להופעה', drills: 'תרגילים לאימון אישי או זוגי' },
     aria: { ai: 'ניתוח אוטומטי עם Gemini', back: 'חזרה', settings: 'הגדרות', add: 'שיעור חדש', close: 'סגירה', edit: 'עריכה', drive: 'פתיחה ב‑Drive', remove: 'הסרה', addFigure: 'סימון פרק בזמן הנוכחי', mirror: 'מראה', repeat: 'חזרה על קטע', fullscreen: 'מסך מלא', pip: 'תמונה בתוך תמונה', play: 'נגן', pause: 'השהיה', back5: 'אחורה 5 שניות', fwd5: 'קדימה 5 שניות', speed: 'מהירות', delete: 'מחיקה', signout: 'התנתקות', rescan: 'סריקה', save: 'שמירה' }
   },
   en: {
@@ -81,9 +87,9 @@ const STR = {
     figures: 'Chapters', notes: 'Notes', noNotes: 'No notes yet. Add some via edit.', figureName: 'Chapter name', noTime: 'no time', noChapters: 'No chapters yet. Play to the moment you want and tap + to mark a chapter at the current time.',
     title: 'Title', titlePh: 'e.g. Hammerlock and sombrero exit', desc: 'Description', descPh: 'What the lesson covered: figures, corrections, focus points', deleteArmToast: 'Tap the trash icon again to delete the video from Drive.',
     repeatA: a => `Start marked at ${a}. Tap again at the end of the section.`, repeatOn: (a, b) => `Repeating ${a}–${b}.`, repeatOff: 'Repeat cleared.',
-    ai: 'Auto-fill', aiIdle: 'Fill title, description and chapters from the video with Gemini.', aiNeedKey: 'A Gemini API key is needed. Add it in Settings.', aiDownloading: p => `Downloading the video from Drive… ${p}%`, aiUploading: p => `Uploading for analysis… ${p}%`, aiRelay: p => `Relaying the video from Drive for analysis… ${p}%`, aiRefreshing: 'Refreshing the Drive sign-in before analysis…', aiProcessing: 'Gemini is processing the video…', aiAnalyzing: 'Analyzing the lesson…', aiRetry: 'The model is busy, retrying in a moment…', aiFallback: m => `Switching to ${m}…`, aiBusy: 'Gemini is overloaded right now. Try again in a few minutes.', aiDone: 'Title, description and chapters filled in. Review and save.', aiFailed: 'Analysis failed. ', aiBadKey: 'The key is invalid, or restricted to another website.', aiQuota: 'Gemini quota exceeded for today. Try again later.', aiBadModel: 'Model name not found. Check it in Settings.',
+    ai: 'Auto-fill', aiIdle: 'Fill title, description, tags and chapters from the video with Gemini.', aiNeedKey: 'A Gemini API key is needed. Add it in Settings.', aiDownloading: p => `Downloading the video from Drive… ${p}%`, aiUploading: p => `Uploading for analysis… ${p}%`, aiRelay: p => `Relaying the video from Drive for analysis… ${p}%`, aiRefreshing: 'Refreshing the Drive sign-in before analysis…', aiProcessing: 'Gemini is processing the video…', aiAnalyzing: 'Analyzing the lesson…', aiRetry: 'The model is busy, retrying in a moment…', aiFallback: m => `Switching to ${m}…`, aiBusy: 'Gemini is overloaded right now. Try again in a few minutes.', aiDone: 'Title, description, tags and chapters filled in. Review and save.', aiFailed: 'Analysis failed. ', aiBadKey: 'The key is invalid, or restricted to another website.', aiQuota: 'Gemini quota exceeded for today. Try again later.', aiBadModel: 'Model name not found. Check it in Settings.',
     geminiKey: 'Gemini API key', geminiHelp: 'The key is stored in your Drive folder and syncs across your devices. The video is sent to Gemini for analysis and deleted there right after. On the free tier Google may use content to improve its models.', geminiModelHint: 'Model name. Empty = default', getKey: 'Create a key in Google AI Studio', keySaved: 'Gemini settings saved.', badGeminiKey: 'That does not look like a Gemini API key.',
-    help: 'Help', helpItems: [['ai', 'Auto-fill', 'With a Gemini API key from Settings, the sparkle button fills the title, description and chapters from the video. Review before saving.'], ['back5', 'Skip', 'The arrows on the video skip 5 seconds back or forward. Tap the video to show or hide them.'], ['repeat', 'Repeat a section', 'First tap marks the start (A), second marks the end (B), and the section loops until a third tap.'], ['mirror', 'Mirror', 'Flips the video horizontally, like watching in the studio mirror. Handy when facing the teacher.'], ['plus', 'Chapters', 'On a lesson, play to the moment you want and tap + to mark a chapter at the current time. Tap a chapter to jump to it.'], ['pip', 'Picture in picture', 'Keeps playing in a small window over other apps.'], ['fs', 'Fullscreen', 'Opens the video in the device player. Rotate the phone for landscape clips.']],
+    help: 'Help', helpItems: [['ai', 'Auto-fill', 'With a Gemini API key from Settings, the sparkle button in the form fills the title, description, tags and chapters from the video. Review before saving.'], ['back5', 'Skip', 'The arrows on the video skip 5 seconds back or forward. Tap the video to show or hide them.'], ['repeat', 'Repeat a section', 'First tap marks the start (A), second marks the end (B), and the section loops until a third tap.'], ['mirror', 'Mirror', 'Flips the video horizontally, like watching in the studio mirror. Handy when facing the teacher.'], ['plus', 'Chapters', 'On a lesson, play to the moment you want and tap + to mark a chapter at the current time. Tap a chapter to jump to it.'], ['pip', 'Picture in picture', 'Keeps playing in a small window over other apps.'], ['fs', 'Fullscreen', 'Opens the video in the device player. Rotate the phone for landscape clips.']],
     noPip: 'This browser does not support picture-in-picture.', playFirst: 'Start playing first.',
     chooseVideo: 'Choose a video', fromWhere: 'Photo Library, Files, or record now', alreadyInDrive: 'already in Drive', reading: 'reading…', previewNA: 'preview unavailable',
     style: 'Style', otherStyle: 'Other…', styleName: 'Style name', lessonType: 'Lesson', school: 'School', teacher: 'Teacher', newSchool: '+ New school…', newTeacher: '+ New teacher…', leaveUntagged: 'Leave untagged for now', name: 'Name',
@@ -99,6 +105,9 @@ const STR = {
     signInAgain: 'Please sign in again.', signinCheckFailed: 'Sign-in check failed. Please try again.', driveNotGranted: 'Drive access was not granted. Sign in again and keep the Google Drive box ticked.',
     recapsN: n => `${n} recap${n === 1 ? '' : 's'}`, schoolsN: n => `${n} school${n === 1 ? '' : 's'}`, teachersN: n => `${n} private teacher${n === 1 ? '' : 's'}`,
     styles: { bachata: 'Bachata', salsa: 'Salsa', kizomba: 'Kizomba', zouk: 'Zouk' },
+    tagsLabel: 'Tags',
+    tags: { basics: 'Basics', footwork: 'Footwork', turns: 'Turns', elements: 'Elements & variations', bodymove: 'Body movement', isolations: 'Isolations', leadfollow: 'Lead & follow', technique: 'Technique & posture', musicality: 'Musicality & rhythm', styling: 'Styling', sensual: 'Sensual', tricks: 'Tricks & dips', choreo: 'Choreography', drills: 'Drills' },
+    tagHints: { basics: 'basic steps, taps and basic variations', footwork: 'footwork, syncopations, Dominican style, shines', turns: 'turns, spins, preps, spotting', elements: 'partner figures such as hammerlock, sombrero, shadow, wrap, cross body lead, their variations and combinations', bodymove: 'body waves, body rolls, cambré, head movement', isolations: 'hip, chest and shoulder isolations', leadfollow: 'leading and following, connection, tension, holds', technique: 'posture, frame, weight transfer, small steps', musicality: 'musicality, rhythm, counting, intros, song structure', styling: 'arm, hair and body styling for leads and follows', sensual: 'close embrace, tilts, partnered waves in sensual style', tricks: 'tricks, dips, lifts', choreo: 'a choreography or performance routine', drills: 'solo or partner practice exercises' },
     aria: { ai: 'Auto-fill with Gemini', back: 'Back', settings: 'Settings', add: 'New lesson', close: 'Close', edit: 'Edit', drive: 'Open in Drive', remove: 'Remove', addFigure: 'Mark a chapter at the current time', mirror: 'Mirror', repeat: 'Repeat a section', fullscreen: 'Fullscreen', pip: 'Picture in picture', play: 'Play', pause: 'Pause', back5: 'Back 5 seconds', fwd5: 'Forward 5 seconds', speed: 'Speed', delete: 'Delete', signout: 'Sign out', rescan: 'Rescan', save: 'Save' }
   }
 };
@@ -125,6 +134,7 @@ let lastSync = 0;
 let video, toastTimer;
 let pendingAi = null;        // last Gemini result waiting to be saved with the form
 let formChapters = [];       // chapters shown in the add/edit form; saved with it
+let formTags = [];           // tag keys selected in the add/edit form
 let aiBusy = false;
 let blobUrl = null;          // object URL when a video was downloaded whole
 let mediaTriedBlob = false;  // fallback already attempted for the current lesson
@@ -145,6 +155,7 @@ const shortErr = e => String((e && e.message) || e).slice(0, 160);
 const hue = id => ['', 't2', 't3'][String(id || '').split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 3];
 const icon = (name, cls = 'i') => `<svg class="${cls}"><use href="#i-${name}"/></svg>`;
 const styleName = s => (s && T.styles[s]) || s || '';
+const tagLabel = k => (T.tags && T.tags[k]) || k;
 const typeLabel = (t, long) => t === 'private' ? (long ? T.privateLesson : T.private) : (long ? T.groupLesson : T.group);
 
 function toast(msg, ms = 3200) {
@@ -169,6 +180,7 @@ function normalize(d) {
       id: String(l.id), thumbId: l.thumbId || null, name: l.name || '', date: l.date || '', source: l.source || null,
       type: l.type === 'private' ? 'private' : (l.type === 'group' ? 'group' : null),
       style: (l.style && String(l.style).trim()) || DEFAULT_STYLE, title, desc: (l.desc == null ? '' : String(l.desc)).trim(), figures,
+      tags: [...new Set((Array.isArray(l.tags) ? l.tags : []).map(String).filter(t => TAG_KEYS.includes(t)))],
       note: l.note || '', duration: l.duration == null ? null : +l.duration, size: l.size == null ? null : +l.size,
       mimeType: l.mimeType || '', createdAt: l.createdAt || null, updatedAt: l.updatedAt || null
     };
@@ -408,7 +420,7 @@ async function syncFiles({ prune = false } = {}) {
       const ap = f.appProperties || {};
       const source = (f.parents || []).map(p => folderNames[p]).find(Boolean) || null;
       const type = ap.type === 'private' ? 'private' : (source ? 'group' : null);
-      lib.lessons.push({ id: f.id, thumbId: null, name: f.name, date: ap.date || (f.createdTime || '').slice(0, 10), source, type, style: ap.style || DEFAULT_STYLE, title: '', desc: '', figures: [], note: '',
+      lib.lessons.push({ id: f.id, thumbId: null, name: f.name, date: ap.date || (f.createdTime || '').slice(0, 10), source, type, style: ap.style || DEFAULT_STYLE, title: '', desc: '', figures: [], tags: [], note: '',
         duration: f.videoMediaMetadata && f.videoMediaMetadata.durationMillis ? Math.round(f.videoMediaMetadata.durationMillis / 1000) : null,
         size: +f.size || null, mimeType: f.mimeType || '', createdAt: f.createdTime || nowIso(), updatedAt: nowIso() });
       if (source) ensureSource(source, type || 'group');
@@ -590,7 +602,7 @@ function visibleLessons() {
   if (filter.kind === 'untagged') items = items.filter(l => !l.source);
   if (filter.kind === 'source') items = items.filter(l => l.source === filter.value);
   const q = query.trim().toLowerCase();
-  if (q) items = items.filter(l => [l.title, l.desc, l.note, ...l.figures.map(f => f.name)].filter(Boolean).some(v => String(v).toLowerCase().includes(q)));
+  if (q) items = items.filter(l => [l.title, l.desc, l.note, ...l.figures.map(f => f.name), ...l.tags.map(tagLabel)].filter(Boolean).some(v => String(v).toLowerCase().includes(q)));
   return items;
 }
 function renderLibrary() {
@@ -605,10 +617,9 @@ function renderLibrary() {
   let h = '', last = '';
   for (const l of items) {
     const m = monthOf(l.date); if (m !== last) { h += `<div class="month">${esc(m)}</div>`; last = m; }
-    const figs = l.figures.map(f => f.name);
     const who = l.source ? `${l.source} · ${typeLabel(l.type)} · ${fmtDate(l.date)}` : `${T.recorded} ${fmtDate(l.date)} · ${T.tapToTag}`;
     const badges = l.source
-      ? (showStyle ? `<span class="stl">${esc(styleName(l.style))}</span>` : '') + figs.slice(0, 2).map(f => `<span class="tag">${esc(f)}</span>`).join('')
+      ? (showStyle ? `<span class="stl">${esc(styleName(l.style))}</span>` : '') + l.tags.slice(0, 3).map(t => `<span class="tag">${esc(tagLabel(t))}</span>`).join('')
       : `<span class="tag">${esc(T.needsTag)}</span>`;
     h += `<button class="card ${l.source ? '' : 'untagged'}" data-id="${esc(l.id)}">
       <div class="thumb ${hue(l.id)}"><img data-thumb="${esc(l.id)}" alt=""><div class="play"></div>${l.duration ? `<div class="dur">${fmtDur(l.duration)}</div>` : ''}</div>
@@ -636,6 +647,7 @@ function renderDetail() {
   $('detail-body').innerHTML = `
     <div class="ttl2">${esc(lessonTitle(l).replace(/\s*\n+\s*/g, ' '))}</div>
     <div class="meta2"><span>${meta}</span><span class="stl">${esc(styleName(l.style))}</span></div>
+    ${l.tags.length ? `<div class="tagrow">${l.tags.map(t => `<span class="tag">${esc(tagLabel(t))}</span>`).join('')}</div>` : ''}
     ${l.desc ? `<div class="desc">${esc(l.desc).replace(/\n/g, '<br>')}</div>` : ''}
     <h3>${esc(T.figures)}</h3>
     ${figs.length ? '' : `<div class="chapters-empty">${esc(T.noChapters)}</div>`}
@@ -804,6 +816,7 @@ function openAdd(id) {
   $('f-title').value = editing ? (editing.title || '') : '';
   $('f-desc').value = editing ? (editing.desc || '') : '';
   formChapters = editing ? editing.figures.map(f => ({ name: f.name, t: f.t })) : []; renderFormChapters();
+  formTags = editing ? editing.tags.slice() : []; renderFormTags();
   $('f-note').value = editing ? editing.note : '';
   $('btn-save').textContent = editing ? T.saveChanges : T.saveUpload;
   $('btn-save').disabled = false;
@@ -895,7 +908,7 @@ async function saveLesson() {
       // Move or rename the file in Drive first; only touch the local record once that succeeded.
       const l = editing;
       const next = { date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, note: form.note };
-      next.figures = formChapters.map(c => ({ name: c.name, t: c.t }));
+      next.figures = formChapters.map(c => ({ name: c.name, t: c.t })); next.tags = formTags.slice();
       const moved = l.source !== next.source || l.date !== next.date;
       if (moved) next.name = await moveLesson(Object.assign({}, l, next));
       if (form.source) ensureSource(form.source, formType);
@@ -909,7 +922,7 @@ async function saveLesson() {
       const parentId = form.source ? await ensureSourceFolder(form.source, formType) : root.id;
       const name = `${form.date} ${form.source || 'Untagged'}.${extOf(f.name)}`;
       const file = await resumableUpload(f, { name, parentId, mime, appProperties: { bachata: 'lesson', date: form.date, type: type || '', style: form.style }, onProgress: setProgress });
-      const l = { id: file.id, thumbId: null, name: file.name || name, date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, figures: formChapters.map(c => ({ name: c.name, t: c.t })), note: form.note,
+      const l = { id: file.id, thumbId: null, name: file.name || name, date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, figures: formChapters.map(c => ({ name: c.name, t: c.t })), tags: formTags.slice(), note: form.note,
         duration: pending.duration != null ? Math.round(pending.duration) : (file.videoMediaMetadata && file.videoMediaMetadata.durationMillis ? Math.round(file.videoMediaMetadata.durationMillis / 1000) : null),
         size: +file.size || f.size, mimeType: file.mimeType || mime, createdAt: nowIso(), updatedAt: nowIso() };
       if (pending.poster) {
@@ -982,6 +995,10 @@ function renderFormChapters() {
   wrap.hidden = !formChapters.length;
   $('f-chapters').innerHTML = formChapters.map((c, i) => `<div class="fig"><span class="fname">${esc(c.name)}</span><span class="tm">${c.t != null ? fmtDur(c.t) : '·'}</span><button type="button" class="x ib" data-remove-chapter="${i}" aria-label="${esc(T.aria.remove)}">${icon('close')}</button></div>`).join('');
 }
+function renderFormTags() {
+  $('f-tags').innerHTML = TAG_KEYS.map(k => `<button type="button" class="chip ${formTags.includes(k) ? 'on' : ''}" data-tag="${k}">${esc(tagLabel(k))}</button>`).join('');
+}
+function toggleFormTag(k) { formTags = formTags.includes(k) ? formTags.filter(t => t !== k) : TAG_KEYS.filter(t => t === k || formTags.includes(t)); renderFormTags(); }
 function setAiBusy(b) { $('btn-ai').classList.toggle('busy', b); }
 function mergeChapters(existing, incoming) {
   const out = existing.slice();
@@ -1025,11 +1042,13 @@ async function runAi() {
     if (remote) source = await driveSource(editing);
     const res = await window.GeminiClient.analyzeVideo(source, {
       key, model: lib.settings.geminiModel || window.GeminiClient.DEFAULT_MODEL, lang,
+      tags: TAG_KEYS.map(k => ({ key: k, label: tagLabel(k), hint: (T.tagHints && T.tagHints[k]) || '' })),
       onProgress: p => { if (p.stage === 'upload') setAiHint((remote ? T.aiRelay : T.aiUploading)(Math.round((p.frac || 0) * 100))); else if (p.stage === 'process') setAiHint(T.aiProcessing); else if (p.stage === 'retry') setAiHint(T.aiRetry); else if (p.stage === 'fallback') setAiHint(T.aiFallback(p.detail || '')); else setAiHint(T.aiAnalyzing); }
     });
     if (res.title) $('f-title').value = res.title;
     if (res.desc) $('f-desc').value = res.desc;
     if (res.chapters.length) { formChapters = editing ? mergeChapters(formChapters, res.chapters) : res.chapters.map(c => ({ name: c.name, t: c.t })); renderFormChapters(); }
+    if (res.tags && res.tags.length) { formTags = TAG_KEYS.filter(k => formTags.includes(k) || res.tags.includes(k)); renderFormTags(); }
     pendingAi = res;
     setAiHint(T.aiDone); toast(T.aiDone, 4000);
   } catch (e) {
@@ -1184,6 +1203,7 @@ function bindEvents() {
   $('f-type').addEventListener('click', e => { const b = e.target.closest('button[data-type]'); if (!b) return; formType = b.dataset.type; setTypeUI(); fillSources(lastSource(formType)); });
   $('f-style').addEventListener('click', e => { const b = e.target.closest('button[data-style]'); if (!b) return; formStyle = b.dataset.style; renderStyleSeg(); if (formStyle === '__new__') setTimeout(() => $('f-style-new').focus(), 50); });
   $('f-source').addEventListener('change', onSourceChange);
+  $('f-tags').addEventListener('click', e => { const b = e.target.closest('[data-tag]'); if (b) toggleFormTag(b.dataset.tag); });
   $('f-chapters').addEventListener('click', e => { const b = e.target.closest('[data-remove-chapter]'); if (!b) return; formChapters.splice(+b.dataset.removeChapter, 1); renderFormChapters(); });
   $('btn-save').addEventListener('click', saveLesson);
   $('btn-ai').addEventListener('click', runAi);

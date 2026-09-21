@@ -11,6 +11,7 @@ and no server that ever sees your videos.
 
 - Hebrew, right-to-left interface by default, with English available in Settings. Apple-style design (system typeface, grouped lists, one yellow tint), dark by default with light and automatic modes, icon-only actions.
 - Each lesson carries a dance style (Bachata, Salsa, or your own). A style switch appears at the top once more than one style is in use.
+- Each lesson also carries **tags** from a fixed classification of what the lesson worked on (basics, footwork, turns, elements & variations, body movement, isolations, lead & follow, technique & posture, musicality & rhythm, styling, sensual, tricks & dips, choreography, drills). Tags are shown in the list and on the lesson page, chosen by hand in the form, and suggested by the auto-fill.
 
 - **Library** grouped by month, filter chips per school and per private teacher, plus an Untagged inbox.
 - **Add lesson**: pick a clip from Photos or Files, date auto-filled from the file, choose Group class

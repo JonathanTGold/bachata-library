@@ -147,6 +147,9 @@ h1{font-size:34px;font-weight:700;margin:0;letter-spacing:.37px;line-height:41px
 .ttl2{font-size:22px;font-weight:700;line-height:1.25;letter-spacing:-.26px;margin:8px 0 4px;word-break:break-word}
 .meta2{display:flex;gap:6px;align-items:center;flex-wrap:wrap;color:var(--label2);font-size:15px}
 .dim{color:var(--label3)}
+.tagrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tagpick{display:flex;gap:8px;flex-wrap:wrap}
+.tagpick .chip{font-size:14px;padding:6px 12px}
 .desc{font-size:17px;line-height:1.45;margin-top:12px;letter-spacing:-.4px;word-break:break-word}
 h3{font-size:13px;font-weight:400;color:var(--label2);margin:22px 16px 6px}
 .chapters-empty{font-size:15px;color:var(--label2);line-height:1.45;background:var(--grp);border-radius:12px 12px 0 0;padding:12px 14px}

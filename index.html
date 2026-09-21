@@ -13,9 +13,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="DanceLab">
-<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.7.0">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.7.0">
-<link rel="stylesheet" href="./styles.css?v=2.7.0">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.8.0">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.8.0">
+<link rel="stylesheet" href="./styles.css?v=2.8.0">
 </head>
 <body>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
@@ -49,7 +49,7 @@
   <!-- SIGN IN -->
   <section class="screen" id="s-auth">
     <div class="auth">
-      <img class="logo" src="./icons/icon-192.png?v=2.7.0" alt="">
+      <img class="logo" src="./icons/icon-192.png?v=2.8.0" alt="">
       <h1>DanceLab</h1>
       <p class="sub" data-t="tagline"></p>
       <button class="primary" id="btn-signin" data-t="signin"></button>
@@ -156,6 +156,9 @@
         <div class="field"><label for="f-desc" data-t="desc"></label>
           <div class="input"><textarea id="f-desc"></textarea></div></div>
 
+        <div class="field"><label data-t="tagsLabel"></label>
+          <div class="tagpick" id="f-tags"></div></div>
+
         <div class="field" id="f-chapters-wrap" hidden><label data-t="figures"></label>
           <div id="f-chapters"></div></div>
 
@@ -196,8 +199,8 @@
     <button class="tab" data-go="schools"><svg class="i"><use href="#i-school"/></svg><span data-t="schools"></span></button>
   </nav>
 </div>
-<script src="./config.js?v=2.7.0"></script>
-<script src="./gemini.js?v=2.7.0"></script>
-<script src="./app.js?v=2.7.0"></script>
+<script src="./config.js?v=2.8.0"></script>
+<script src="./gemini.js?v=2.8.0"></script>
+<script src="./app.js?v=2.8.0"></script>
 </body>
 </html>
