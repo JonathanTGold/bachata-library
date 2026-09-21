@@ -1,6 +1,6 @@
 /* DanceLab service worker: caches the app shell, network-first so updates
  * arrive on the next open. Never touches Google API requests. */
-const VERSION = 'bl-v9';
+const VERSION = 'bl-v10';
 // Same-origin virtual path the app uses for video playback. The service worker turns it into an
 // authenticated Drive request, because a <video> element cannot send an Authorization header and
 // Google no longer accepts the token as a URL parameter.
