@@ -1,6 +1,6 @@
 /* Bachata Library service worker: caches the app shell, network-first so updates
  * arrive on the next open. Never touches Google API requests. */
-const VERSION = 'bl-v6';
+const VERSION = 'bl-v7';
 // Same-origin virtual path the app uses for video playback. The service worker turns it into an
 // authenticated Drive request, because a <video> element cannot send an Authorization header and
 // Google no longer accepts the token as a URL parameter.
@@ -51,11 +51,14 @@ async function proxyMedia(req, url) {
   const range = req.headers.get('range');
   if (range) headers.Range = range;
   try {
-    const res = await fetch('https://www.googleapis.com/drive/v3/files/' + encodeURIComponent(id) + '?alt=media', { headers });
+    // Forward the player's abort signal: when it seeks elsewhere, the old download from Drive
+    // must stop too, or it keeps competing for the phone's bandwidth.
+    const res = await fetch('https://www.googleapis.com/drive/v3/files/' + encodeURIComponent(id) + '?alt=media', { headers, signal: req.signal });
     const h = new Headers();
     const ct = res.headers.get('content-type'); if (ct) h.set('content-type', ct);
     const cl = res.headers.get('content-length'); if (cl) h.set('content-length', cl);
     h.set('accept-ranges', 'bytes');
+    h.set('cache-control', 'no-store');
     if (res.status === 206) {
       let total = +url.searchParams.get('size') || 0;
       if (!total) total = await fileSize(id, token);

@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.6.0';
+const APP_VERSION = '2.6.1';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -55,7 +55,7 @@ const STR = {
     saveUpload: 'שמירה והעלאה ל‑Drive', saveChanges: 'שמירת שינויים', uploading: 'מעלה…', uploadingPct: p => `מעלה… ${p}% · להשאיר את האפליקציה פתוחה`, finishing: 'מסיים…', savedToIndex: 'השינויים נשמרים לאינדקס ב‑Drive שלך.', pickTagDone: 'בוחרים סרטון, מתייגים, וזה עולה ל‑Drive.', skipHint: 'אפשר לדלג על השדות והסרטון יופיע תחת „ללא תיוג”.',
     deleteArm: 'לחיצה נוספת מעבירה את הסרטון לסל המחזור של Drive.', deleteIdle: 'מחיקת הסיכום', deleted: 'הועבר לסל המחזור של Drive.', deleteFailed: 'המחיקה נכשלה. ',
     pickFirst: 'קודם בוחרים סרטון.', typeName: k => `צריך להקליד שם ${k}.`, typeStyle: 'צריך להקליד שם סגנון.', saved: 'נשמר.', uploaded: 'הועלה ל‑Drive.', uploadedUntagged: 'הועלה. מחכה תחת „ללא תיוג”.', saveFailed: 'השמירה נכשלה. ', nothingLost: 'משהו השתבש. שום דבר לא אבד, אפשר לנסות שוב.', waitUpload: 'ההעלאה עדיין רצה. מחכים שתסתיים.',
-    couldNotReach: 'אין גישה ל‑Google Drive. ', couldNotLoadVideo: 'לא ניתן לטעון את הסרטון. ', couldNotPlay: 'לא ניתן לנגן את הסרטון. ייתכן שהפורמט לא נתמך בדפדפן הזה.', loadingVideo: 'טוען סרטון…', loadingPct: p => `טוען סרטון… ${p}%`,
+    couldNotReach: 'אין גישה ל‑Google Drive. ', couldNotLoadVideo: 'לא ניתן לטעון את הסרטון. ', couldNotPlay: 'לא ניתן לנגן את הסרטון. ייתכן שהפורמט לא נתמך בדפדפן הזה.', loadingVideo: 'טוען סרטון…', loadingPct: p => `טוען סרטון… ${p}%`, buffering: 'טוען…',
     marked: (n, t) => `„${n}” סומן ב‑${t}.`, removed: n => `„${n}” הוסר.`, couldNotSave: 'לא ניתן לשמור. ', typeFigure: 'צריך להקליד שם לפרק.',
     schoolsSub: 'מורים פרטיים מופיעים לצד בתי הספר. לחיצה מסננת את הרשימה.', noSchools: 'אין עדיין בתי ספר.', noTeachers: 'אין עדיין מורים פרטיים.', privateTeacher: 'מורה פרטי', groupClasses: 'שיעורים קבוצתיים', addSource: 'הוספה', schoolsAuto: 'בתי ספר ומורים נוספים אוטומטית גם כשמתייגים סיכום.', alreadyListed: 'כבר ברשימה.', added: n => `${n} נוסף.`, removedSource: n => `${n} הוסר.`, moveFirst: 'קודם מעבירים או מוחקים את הסיכומים שלו.', last: 'אחרון',
     signedInAs: e => `מחובר בתור ${e}`, signedIn: 'מחובר', storage: 'אחסון', storageBody: 'הכול נשמר בתיקייה בשם Bachata Library ב‑Google Drive שלך: תת‑תיקייה לכל בית ספר או מורה, הסרטונים, וקובץ אינדקס קטן.', openDrive: 'פתיחת התיקייה ב‑Drive', maintenance: 'תחזוקה', rescan: 'סריקת Drive ותיקון האינדקס', rescanHint: 'מוסיף סיכומים שהועלו ממכשיר אחר או חסרים ברשימה, ומסיר רשומות שהקבצים שלהן נמחקו.', scanning: 'סורק…', rescanDone: (a, r) => `הסתיים. ${a} נוספו, ${r} הוסרו.`, rescanFailed: 'הסריקה נכשלה. ',
@@ -90,7 +90,7 @@ const STR = {
     saveUpload: 'Save & upload to Drive', saveChanges: 'Save changes', uploading: 'Uploading…', uploadingPct: p => `Uploading… ${p}% · keep the app open`, finishing: 'Finishing…', savedToIndex: 'Changes are saved to the index in your Drive.', pickTagDone: 'Pick the recap, tag it, done.', skipHint: 'Skip the fields and it lands under “Untagged”.',
     deleteArm: 'Tap again to move the video to the Drive trash.', deleteIdle: 'Delete this recap', deleted: 'Moved to the Drive trash.', deleteFailed: 'Delete failed. ',
     pickFirst: 'Pick a video first.', typeName: k => `Type the ${k} name.`, typeStyle: 'Type the style name.', saved: 'Saved.', uploaded: 'Uploaded to Drive.', uploadedUntagged: 'Uploaded. It is waiting under Untagged.', saveFailed: 'Save failed. ', nothingLost: 'Something went wrong. Nothing was lost; try again.', waitUpload: 'Upload in progress. Wait for it to finish.',
-    couldNotReach: 'Could not reach Google Drive. ', couldNotLoadVideo: 'Could not load this video. ', couldNotPlay: 'Could not play this video. It may use a format this browser cannot decode.', loadingVideo: 'Loading video…', loadingPct: p => `Loading video… ${p}%`,
+    couldNotReach: 'Could not reach Google Drive. ', couldNotLoadVideo: 'Could not load this video. ', couldNotPlay: 'Could not play this video. It may use a format this browser cannot decode.', loadingVideo: 'Loading video…', loadingPct: p => `Loading video… ${p}%`, buffering: 'Buffering…',
     marked: (n, t) => `“${n}” marked at ${t}.`, removed: n => `Removed “${n}”.`, couldNotSave: 'Could not save. ', typeFigure: 'Type the figure name.',
     schoolsSub: 'Private teachers listed alongside. Tap one to filter.', noSchools: 'No schools yet.', noTeachers: 'No private teachers yet.', privateTeacher: 'Private teacher', groupClasses: 'Group classes', addSource: 'Add', schoolsAuto: 'Schools and teachers also appear automatically when you tag a recap.', alreadyListed: 'Already in the list.', added: n => `Added ${n}.`, removedSource: n => `Removed ${n}.`, moveFirst: 'Move or delete its recaps first.', last: 'last',
     signedInAs: e => `Signed in as ${e}`, signedIn: 'Signed in', storage: 'Storage', storageBody: 'Everything lives in a folder called Bachata Library in your Google Drive: one subfolder per school or teacher, the videos, and a small index file.', openDrive: 'Open the folder in Drive', maintenance: 'Maintenance', rescan: 'Rescan Drive and repair the index', rescanHint: 'Adds recaps uploaded from another device or missing from this list, and removes entries whose files were deleted.', scanning: 'Scanning…', rescanDone: (a, r) => `Done. ${a} added, ${r} removed.`, rescanFailed: 'Rescan failed. ',
@@ -710,7 +710,8 @@ function toggleSpeedMenu(force) { const m = $('speed-menu'); m.hidden = force ==
 function skip(sec) { if (!video.duration) return; video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + sec)); updateTime(); }
 function setPlayIcon(playing) { $('playicon').innerHTML = `<use href="#i-${playing ? 'pause' : 'play'}"/>`; $('bigplay').setAttribute('aria-label', playing ? T.aria.pause : T.aria.play); }
 let fadeTimer;
-function showControls() { $('s-detail').classList.remove('hidectl'); clearTimeout(fadeTimer); if (!video.paused) fadeTimer = setTimeout(() => { if (!video.paused && $('speed-menu').hidden) $('s-detail').classList.add('hidectl'); }, 2600); }
+function showControls() { $('s-detail').classList.remove('hidectl'); clearTimeout(fadeTimer); if (!video.paused) fadeTimer = setTimeout(() => { if (!video.paused && $('speed-menu').hidden) $('s-detail').classList.add('hidectl'); }, 4000); }
+function controlsHidden() { return $('s-detail').classList.contains('hidectl'); }
 function hideControls() { clearTimeout(fadeTimer); $('s-detail').classList.add('hidectl'); toggleSpeedMenu(false); }
 function pct(t) { return video.duration ? (t / video.duration * 100) + '%' : '0%'; }
 function updateTime() {
@@ -1117,7 +1118,20 @@ function bindEvents() {
   $('bigplay').addEventListener('click', () => { if (video.paused) video.play().catch(() => {}); else video.pause(); showControls(); });
   $('btn-back5').addEventListener('click', () => { skip(-SKIP); showControls(); });
   $('btn-fwd5').addEventListener('click', () => { skip(SKIP); showControls(); });
-  video.addEventListener('click', () => { if ($('s-detail').classList.contains('hidectl')) showControls(); else if (!video.paused) hideControls(); });
+  // Tap on the video: when the controls are hidden, the left and right thirds act as skip buttons
+  // straight away (no second tap needed); the middle just brings the controls back.
+  video.addEventListener('click', e => {
+    if (controlsHidden()) {
+      const r = video.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width;
+      if (x < 0.34) skip(-SKIP); else if (x > 0.66) skip(SKIP);
+      showControls(); return;
+    }
+    if (!video.paused) hideControls();
+  });
+  video.addEventListener('waiting', () => { if (video.getAttribute('src') && !mediaTriedBlob) setVideoLoading(T.buffering); else if (video.getAttribute('src') && $('vload').hidden) setVideoLoading(T.buffering); });
+  video.addEventListener('playing', () => { if ($('vload').textContent === T.buffering) setVideoLoading(''); });
+  video.addEventListener('canplay', () => { if ($('vload').textContent === T.buffering) setVideoLoading(''); });
+  video.addEventListener('seeked', () => { if ($('vload').textContent === T.buffering && video.readyState >= 3) setVideoLoading(''); });
   ['btn-loop', 'btn-mirror', 'btn-speed', 'btn-pip', 'btn-fs', 'scrub'].forEach(id => $(id).addEventListener('pointerdown', () => showControls()));
   video.addEventListener('play', () => { setPlayIcon(true); showControls(); });
   video.addEventListener('pause', () => { setPlayIcon(false); showControls(); });
