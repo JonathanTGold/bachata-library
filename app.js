@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.9.0';
+const APP_VERSION = '2.9.1';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -19,7 +19,7 @@ const ROOT_NAME = 'Bachata Library';
 const INDEX_NAME = 'library.json';
 const THUMBS_NAME = '.thumbnails';
 const FOLDER_MIME = 'application/vnd.google-apps.folder';
-const LS = { token: 'bl_token', lib: 'bl_library', clientId: 'bl_client_id', hint: 'bl_login_hint', root: 'bl_root', lang: 'bl_lang', theme: 'bl_theme' };
+const LS = { token: 'bl_token', lib: 'bl_library', clientId: 'bl_client_id', hint: 'bl_login_hint', root: 'bl_root', lang: 'bl_lang', theme: 'bl_theme', filter: 'bl_filter' };
 const THEMES = ['dark', 'light', 'auto'];
 const SS = { state: 'bl_oauth_state', silent: 'bl_silent_tried', needConsent: 'bl_need_consent' };
 const SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5];
@@ -189,6 +189,16 @@ function normalize(d) {
 }
 function sortLessons() { lib.lessons.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt || '').localeCompare(a.createdAt || '')); }
 function sortSources() { lib.sources.sort((a, b) => a.name.localeCompare(b.name, T.locale)); }
+// The chosen filters survive a relaunch; anything that no longer exists falls back to "all".
+function saveFilter() { try { localStorage.setItem(LS.filter, JSON.stringify(filter)); } catch (e) { /* ignore */ } }
+function loadFilter() {
+  try {
+    const f = JSON.parse(localStorage.getItem(LS.filter)); if (!f || typeof f !== 'object') return;
+    const style = f.style && allStyles().includes(f.style) ? f.style : null;
+    const source = f.kind === 'source' && f.value && lib.sources.some(s => s.name === f.value) ? f.value : null;
+    filter = { kind: source ? 'source' : 'all', value: source, style };
+  } catch (e) { /* keep defaults */ }
+}
 function persistLocal() { try { localStorage.setItem(LS.lib, JSON.stringify(lib)); } catch (e) { /* storage full or disabled */ } }
 function allStyles() {
   const set = new Set(BASE_STYLES);
@@ -313,7 +323,7 @@ function saveClientId(v) {
 function signOut() {
   const t = token && token.access_token;
   token = null; root = null; lib = emptyLib(); thumbs = {}; thumbLinks = {}; current = null;
-  [LS.token, LS.lib, LS.root, LS.hint].forEach(k => localStorage.removeItem(k));
+  [LS.token, LS.lib, LS.root, LS.hint, LS.filter].forEach(k => localStorage.removeItem(k)); filter = { kind: 'all', value: null, style: null };
   sessionStorage.removeItem(SS.silent);
   idb.clear();
   if (t) fetch('https://oauth2.googleapis.com/revoke?token=' + encodeURIComponent(t), { method: 'POST' }).catch(() => {});
@@ -623,7 +633,7 @@ function closeSheet() {
 function pickSheet(value) {
   if (sheetKind === 'style') filter.style = value || null;
   else filter = { kind: value ? 'source' : 'all', value: value || null, style: filter.style };
-  closeSheet(); renderLibrary();
+  saveFilter(); closeSheet(); renderLibrary();
 }
 function visibleLessons() {
   let items = lib.lessons.slice();
@@ -1117,7 +1127,7 @@ function onSchoolsClick(e) {
   if (kb) { document.querySelectorAll('#src-kind button').forEach(b => b.classList.toggle('on', b === kb)); return; }
   if (e.target.closest('#src-add')) { addSource(); return; }
   const row = e.target.closest('.trow[data-source]');
-  if (row) { filter = { kind: 'source', value: row.dataset.source, style: filter.style }; show('library'); }
+  if (row) { filter = { kind: 'source', value: row.dataset.source, style: filter.style }; saveFilter(); show('library'); }
 }
 function addSource() {
   const name = ($('src-name').value || '').trim(); if (!name) { toast(T.typeName(T.school)); return; }
@@ -1130,7 +1140,7 @@ function addSource() {
 function removeSource(name) {
   if (lib.lessons.some(l => l.source === name)) { toast(T.moveFirst); return; }
   lib.sources = lib.sources.filter(s => s.name !== name);
-  if (filter.kind === 'source' && filter.value === name) filter = { kind: 'all', value: null, style: filter.style };
+  if (filter.kind === 'source' && filter.value === name) { filter = { kind: 'all', value: null, style: filter.style }; saveFilter(); }
   renderSchools();
   saveLibrary().then(() => toast(T.removedSource(name))).catch(err => toast(T.couldNotSave + shortErr(err)));
 }
@@ -1265,6 +1275,7 @@ async function boot() {
   loadToken();
   try { const cached = JSON.parse(localStorage.getItem(LS.lib)); if (cached && Array.isArray(cached.lessons)) { lib = normalize(cached); sortLessons(); sortSources(); } } catch (e) { /* no cache */ }
   try { root = JSON.parse(localStorage.getItem(LS.root)) || null; } catch (e) { root = null; }
+  loadFilter();
 
   if (tokenValid()) {
     show('library');
