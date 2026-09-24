@@ -13,9 +13,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="DanceLab">
-<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.11.2">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.11.2">
-<link rel="stylesheet" href="./styles.css?v=2.11.2">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.12.0">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.12.0">
+<link rel="stylesheet" href="./styles.css?v=2.12.0">
 </head>
 <body>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
@@ -42,6 +42,7 @@
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
   <symbol id="i-ai" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><rect x="2.5" y="6" width="13.5" height="12" rx="2.5"/><path d="M16 10.5l5.5-3v9l-5.5-3z"/></symbol>
   <symbol id="i-audio" viewBox="0 0 24 24"><path d="M3 10v4M6.75 7v10M10.5 4v16M14.25 8v8M18 5.5v13M21.75 10v4"/></symbol>
   <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 2.5h8l5 5v14H6zM14 2.5v5h5M9 13h6M9 17h6"/></symbol>
   <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
@@ -56,7 +57,7 @@
   <!-- SIGN IN -->
   <section class="screen" id="s-auth">
     <div class="auth">
-      <img class="logo" src="./icons/icon-192.png?v=2.11.2" alt="">
+      <img class="logo" src="./icons/icon-192.png?v=2.12.0" alt="">
       <h1>DanceLab</h1>
       <p class="sub" data-t="tagline"></p>
       <button class="primary" id="btn-signin" data-t="signin"></button>
@@ -130,11 +131,8 @@
     </div>
     <div class="scroll plain">
       <div class="form">
-        <label class="pick" id="pick" for="f-file">
-          <input type="file" id="f-file" class="vh" accept="video/*,audio/*,.mov,.mp4,.m4v,.m4a,.mp3,.wav,.aac,.caf,.aiff,.aif,.ogg,.oga,.opus,.flac,.amr">
-          <div class="txt"><b data-t="chooseVideo"></b><span data-t="fromWhere"></span></div>
-        </label>
-        <div class="pickalt" id="pick-audio-row"><input type="file" id="f-audio" class="vh" accept="audio/*,.m4a,.mp3,.wav,.aac,.caf,.aiff,.aif,.ogg,.oga,.opus,.flac,.amr,audio/x-m4a,audio/mp4,audio/mpeg,audio/wav,audio/aac"><label for="f-audio" class="linkbtn" data-t="pickAudio"></label></div>
+        <label class="pick2" id="pickrow" for="f-file"><input type="file" id="f-file" class="vh" accept="video/*,audio/*,.mov,.mp4,.m4v,.webm,.m4a,.mp3,.wav,.aac,.caf,.aiff,.aif,.ogg,.oga,.opus,.flac,.amr"><span class="icons"><svg class="i"><use href="#i-video"/></svg><svg class="i"><use href="#i-audio"/></svg></span><span data-t="pickVideo"></span></label>
+        <label class="pick" id="pick" for="f-file" hidden><div class="txt"></div></label>
         <div class="airow" id="ai-row" hidden>
           <button class="ib aibtn" id="btn-ai" data-aria="ai"><svg class="i"><use href="#i-ai"/></svg></button>
           <span class="hint" id="ai-hint" data-t="aiIdle"></span>
@@ -217,8 +215,8 @@
     <button class="tab" data-go="schools"><svg class="i"><use href="#i-school"/></svg><span data-t="schools"></span></button>
   </nav>
 </div>
-<script src="./config.js?v=2.11.2"></script>
-<script src="./gemini.js?v=2.11.2"></script>
-<script src="./app.js?v=2.11.2"></script>
+<script src="./config.js?v=2.12.0"></script>
+<script src="./gemini.js?v=2.12.0"></script>
+<script src="./app.js?v=2.12.0"></script>
 </body>
 </html>
