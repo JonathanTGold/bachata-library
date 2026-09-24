@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.10.0';
+const APP_VERSION = '2.11.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -59,6 +59,7 @@ const STR = {
     saveUpload: 'שמירה והעלאה ל‑Drive', saveChanges: 'שמירת שינויים', uploading: 'מעלה…', uploadingPct: p => `מעלה… ${p}% · להשאיר את האפליקציה פתוחה`, finishing: 'מסיים…', savedToIndex: 'השינויים נשמרים לאינדקס ב‑Drive שלך.', pickTagDone: 'בוחרים סרטון, מתייגים, וזה עולה ל‑Drive.', skipHint: 'אפשר לדלג על השדות והסרטון יופיע תחת „ללא תיוג”.',
     deleteArm: 'לחיצה נוספת מעבירה את הסרטון לסל המחזור של Drive.', deleteIdle: 'מחיקת הסיכום', deleted: 'הועבר לסל המחזור של Drive.', deleteFailed: 'המחיקה נכשלה. ',
     pickFirst: 'קודם בוחרים סרטון או הקלטה.', typeName: k => `צריך להקליד שם ${k}.`, typeStyle: 'צריך להקליד שם סגנון.', saved: 'נשמר.', uploaded: 'הועלה ל‑Drive.', uploadedUntagged: 'הועלה. מחכה תחת „ללא תיוג”.', saveFailed: 'השמירה נכשלה. ', nothingLost: 'משהו השתבש. שום דבר לא אבד, אפשר לנסות שוב.', waitUpload: 'ההעלאה עדיין רצה. מחכים שתסתיים.',
+    attachments: 'קבצים מצורפים', attAdd: 'הוספה לשיעור', attCamera: 'צילום תמונה', attPhotos: 'מספריית התמונות', attFile: 'קובץ מהמכשיר', attFileHint: 'PDF, מסמך, כל קובץ', attLink: 'קישור', attLinkHint: 'יוטיוב, אינסטגרם', attLinkPh: 'https://…', attBadLink: 'זה לא נראה כמו קישור.', attUploading: p => `מעלה… ${p}%`, attWait: 'ההעלאה הקודמת עדיין רצה.', attAdded: 'נוסף לשיעור.', attRemoved: 'הוסר.', attRemove: 'הסרה', attRemoveArm: 'לחיצה נוספת מוחקת', attOpen: 'פתיחה', attOpenLink: 'פתיחת הקישור', attOf: (i, n) => `${i} מתוך ${n}`, attFailed: 'ההעלאה נכשלה. ', attLoading: 'טוען…', attLoadFailed: 'לא ניתן לטעון את התמונה.',
     couldNotReach: 'אין גישה ל‑Google Drive. ', couldNotLoadVideo: 'לא ניתן לטעון את הסרטון. ', couldNotPlay: 'לא ניתן לנגן את הסרטון. ייתכן שהפורמט לא נתמך בדפדפן הזה.', loadingVideo: 'טוען סרטון…', loadingPct: p => `טוען סרטון… ${p}%`, buffering: 'טוען…',
     marked: (n, t) => `„${n}” סומן ב‑${t}.`, removed: n => `„${n}” הוסר.`, couldNotSave: 'לא ניתן לשמור. ', typeFigure: 'צריך להקליד שם לפרק.',
     schoolsSub: 'מורים פרטיים מופיעים לצד בתי הספר. לחיצה מסננת את הרשימה.', noSchools: 'אין עדיין בתי ספר.', noTeachers: 'אין עדיין מורים פרטיים.', privateTeacher: 'מורה פרטי', groupClasses: 'שיעורים קבוצתיים', addSource: 'הוספה', schoolsAuto: 'בתי ספר ומורים נוספים אוטומטית גם כשמתייגים סיכום.', alreadyListed: 'כבר ברשימה.', added: n => `${n} נוסף.`, removedSource: n => `${n} הוסר.`, moveFirst: 'קודם מעבירים או מוחקים את הסיכומים שלו.', last: 'אחרון',
@@ -70,7 +71,7 @@ const STR = {
     tagsLabel: 'תגיות',
     tags: { basics: 'בסיסים', footwork: 'עבודת רגליים', turns: 'סיבובים', elements: 'אלמנטים ווריאציות', bodymove: 'תנועת גוף', isolations: 'איזולציות', leadfollow: 'הובלה ומעקב', technique: 'טכניקה ויציבה', musicality: 'מוזיקליות וקצב', styling: 'סטיילינג', sensual: 'סנסואל', tricks: 'טריקים ודיפים', choreo: 'כוריאוגרפיה', drills: 'תרגילים' },
     tagHints: { basics: 'צעדי בסיס, טאפים וגיווני בסיס', footwork: 'עבודת רגליים, סינקופות, סגנון דומיניקני, שיינס', turns: 'סיבובים, הכנות לסיבוב, ספוטינג', elements: 'פיגורות ואלמנטים בזוג כמו האמרלוק, סומבררו, שדו, כריכה, קרוס בודי, ווריאציות שלהם וקומבינציות', bodymove: 'גלי גוף, בודי רול, קמברה, תנועות ראש', isolations: 'איזולציות של אגן, חזה, כתפיים', leadfollow: 'הובלה ומעקב, חיבור, קונטרה, אחיזות', technique: 'יציבה, מסגרת, העברת משקל, צעדים קטנים', musicality: 'מוזיקליות, קצב, ספירות, אינטרו, מבנה השיר', styling: 'סטיילינג ידיים, שיער וגוף למובילים ולמובלות', sensual: 'חיבוק צמוד, הטיות, גלים בזוג בסגנון סנסואל', tricks: 'טריקים, דיפים, הרמות', choreo: 'כוריאוגרפיה או רצף להופעה', drills: 'תרגילים לאימון אישי או זוגי' },
-    aria: { ai: 'ניתוח אוטומטי עם Gemini', back: 'חזרה', settings: 'הגדרות', add: 'שיעור חדש', close: 'סגירה', edit: 'עריכה', drive: 'פתיחה ב‑Drive', remove: 'הסרה', addFigure: 'סימון פרק בזמן הנוכחי', mirror: 'מראה', repeat: 'חזרה על קטע', fullscreen: 'מסך מלא', pip: 'תמונה בתוך תמונה', play: 'נגן', pause: 'השהיה', back5: 'אחורה 5 שניות', fwd5: 'קדימה 5 שניות', speed: 'מהירות', delete: 'מחיקה', signout: 'התנתקות', rescan: 'סריקה', save: 'שמירה' }
+    aria: { attAdd: 'הוספת תמונה, קובץ או קישור לשיעור', share: 'שיתוף', ai: 'ניתוח אוטומטי עם Gemini', back: 'חזרה', settings: 'הגדרות', add: 'שיעור חדש', close: 'סגירה', edit: 'עריכה', drive: 'פתיחה ב‑Drive', remove: 'הסרה', addFigure: 'סימון פרק בזמן הנוכחי', mirror: 'מראה', repeat: 'חזרה על קטע', fullscreen: 'מסך מלא', pip: 'תמונה בתוך תמונה', play: 'נגן', pause: 'השהיה', back5: 'אחורה 5 שניות', fwd5: 'קדימה 5 שניות', speed: 'מהירות', delete: 'מחיקה', signout: 'התנתקות', rescan: 'סריקה', save: 'שמירה' }
   },
   en: {
     dir: 'ltr', locale: 'en-GB',
@@ -97,6 +98,7 @@ const STR = {
     saveUpload: 'Save & upload to Drive', saveChanges: 'Save changes', uploading: 'Uploading…', uploadingPct: p => `Uploading… ${p}% · keep the app open`, finishing: 'Finishing…', savedToIndex: 'Changes are saved to the index in your Drive.', pickTagDone: 'Pick the recap, tag it, done.', skipHint: 'Skip the fields and it lands under “Untagged”.',
     deleteArm: 'Tap again to move the video to the Drive trash.', deleteIdle: 'Delete this recap', deleted: 'Moved to the Drive trash.', deleteFailed: 'Delete failed. ',
     pickFirst: 'Pick a video or recording first.', typeName: k => `Type the ${k} name.`, typeStyle: 'Type the style name.', saved: 'Saved.', uploaded: 'Uploaded to Drive.', uploadedUntagged: 'Uploaded. It is waiting under Untagged.', saveFailed: 'Save failed. ', nothingLost: 'Something went wrong. Nothing was lost; try again.', waitUpload: 'Upload in progress. Wait for it to finish.',
+    attachments: 'Attachments', attAdd: 'Add to lesson', attCamera: 'Take a photo', attPhotos: 'From Photos', attFile: 'File from this device', attFileHint: 'PDF, document, any file', attLink: 'Link', attLinkHint: 'YouTube, Instagram', attLinkPh: 'https://…', attBadLink: 'That does not look like a link.', attUploading: p => `Uploading… ${p}%`, attWait: 'The previous upload is still running.', attAdded: 'Added to the lesson.', attRemoved: 'Removed.', attRemove: 'Remove', attRemoveArm: 'Tap again to delete', attOpen: 'Open', attOpenLink: 'Open link', attOf: (i, n) => `${i} of ${n}`, attFailed: 'Upload failed. ', attLoading: 'Loading…', attLoadFailed: 'Could not load this image.',
     couldNotReach: 'Could not reach Google Drive. ', couldNotLoadVideo: 'Could not load this video. ', couldNotPlay: 'Could not play this video. It may use a format this browser cannot decode.', loadingVideo: 'Loading video…', loadingPct: p => `Loading video… ${p}%`, buffering: 'Buffering…',
     marked: (n, t) => `“${n}” marked at ${t}.`, removed: n => `Removed “${n}”.`, couldNotSave: 'Could not save. ', typeFigure: 'Type the figure name.',
     schoolsSub: 'Private teachers listed alongside. Tap one to filter.', noSchools: 'No schools yet.', noTeachers: 'No private teachers yet.', privateTeacher: 'Private teacher', groupClasses: 'Group classes', addSource: 'Add', schoolsAuto: 'Schools and teachers also appear automatically when you tag a recap.', alreadyListed: 'Already in the list.', added: n => `Added ${n}.`, removedSource: n => `Removed ${n}.`, moveFirst: 'Move or delete its recaps first.', last: 'last',
@@ -108,7 +110,7 @@ const STR = {
     tagsLabel: 'Tags',
     tags: { basics: 'Basics', footwork: 'Footwork', turns: 'Turns', elements: 'Elements & variations', bodymove: 'Body movement', isolations: 'Isolations', leadfollow: 'Lead & follow', technique: 'Technique & posture', musicality: 'Musicality & rhythm', styling: 'Styling', sensual: 'Sensual', tricks: 'Tricks & dips', choreo: 'Choreography', drills: 'Drills' },
     tagHints: { basics: 'basic steps, taps and basic variations', footwork: 'footwork, syncopations, Dominican style, shines', turns: 'turns, spins, preps, spotting', elements: 'partner figures such as hammerlock, sombrero, shadow, wrap, cross body lead, their variations and combinations', bodymove: 'body waves, body rolls, cambré, head movement', isolations: 'hip, chest and shoulder isolations', leadfollow: 'leading and following, connection, tension, holds', technique: 'posture, frame, weight transfer, small steps', musicality: 'musicality, rhythm, counting, intros, song structure', styling: 'arm, hair and body styling for leads and follows', sensual: 'close embrace, tilts, partnered waves in sensual style', tricks: 'tricks, dips, lifts', choreo: 'a choreography or performance routine', drills: 'solo or partner practice exercises' },
-    aria: { ai: 'Auto-fill with Gemini', back: 'Back', settings: 'Settings', add: 'New lesson', close: 'Close', edit: 'Edit', drive: 'Open in Drive', remove: 'Remove', addFigure: 'Mark a chapter at the current time', mirror: 'Mirror', repeat: 'Repeat a section', fullscreen: 'Fullscreen', pip: 'Picture in picture', play: 'Play', pause: 'Pause', back5: 'Back 5 seconds', fwd5: 'Forward 5 seconds', speed: 'Speed', delete: 'Delete', signout: 'Sign out', rescan: 'Rescan', save: 'Save' }
+    aria: { attAdd: 'Add a photo, file or link to the lesson', share: 'Share', ai: 'Auto-fill with Gemini', back: 'Back', settings: 'Settings', add: 'New lesson', close: 'Close', edit: 'Edit', drive: 'Open in Drive', remove: 'Remove', addFigure: 'Mark a chapter at the current time', mirror: 'Mirror', repeat: 'Repeat a section', fullscreen: 'Fullscreen', pip: 'Picture in picture', play: 'Play', pause: 'Pause', back5: 'Back 5 seconds', fwd5: 'Forward 5 seconds', speed: 'Speed', delete: 'Delete', signout: 'Sign out', rescan: 'Rescan', save: 'Save' }
   }
 };
 let lang = localStorage.getItem(LS.lang) || 'he';
@@ -125,6 +127,9 @@ let current = null;          // lesson shown on the detail screen
 let thumbs = {};             // lessonId -> object URL
 let thumbLinks = {};         // lessonId -> Drive thumbnailLink (fallback for imported files)
 let pending = null;          // file picked in the add form
+let attBusy = false, attBusyText = '';   // one attachment upload at a time
+let attFull = {}, attBlob = {};          // attachmentId -> object URL / blob of the full image
+let viewerList = [], viewerIdx = -1, vwArmed = false, sheetAtt = null, sheetArmed = false;
 let editing = null;          // lesson being edited
 let formType = 'group';
 let formStyle = DEFAULT_STYLE;
@@ -152,6 +157,7 @@ const monthOf = iso => { const d = dateOf(iso); return d ? d.toLocaleDateString(
 const fmtDur = s => (s == null || !isFinite(s)) ? '' : `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 const isoDate = d => { const x = new Date(d.getTime() - d.getTimezoneOffset() * 60000); return x.toISOString().slice(0, 10); };
 const shortErr = e => String((e && e.message) || e).slice(0, 160);
+const fmtSize = n => n >= 1048576 ? (n / 1048576).toFixed(n >= 100 * 1048576 ? 0 : 1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
 const hue = id => ['', 't2', 't3'][String(id || '').split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 3];
 const icon = (name, cls = 'i') => `<svg class="${cls}"><use href="#i-${name}"/></svg>`;
 const styleName = s => (s && T.styles[s]) || s || '';
@@ -182,7 +188,8 @@ function normalize(d) {
       style: (l.style && String(l.style).trim()) || DEFAULT_STYLE, title, desc: (l.desc == null ? '' : String(l.desc)).trim(), figures,
       tags: [...new Set((Array.isArray(l.tags) ? l.tags : []).map(String).filter(t => TAG_KEYS.includes(t)))],
       note: l.note || '', duration: l.duration == null ? null : +l.duration, size: l.size == null ? null : +l.size,
-      mimeType: l.mimeType || '', createdAt: l.createdAt || null, updatedAt: l.updatedAt || null
+      mimeType: l.mimeType || '', createdAt: l.createdAt || null, updatedAt: l.updatedAt || null,
+      attachments: (Array.isArray(l.attachments) ? l.attachments : []).filter(a => a && a.id && (a.kind !== 'link' || a.url)).map(a => ({ id: String(a.id), kind: a.kind === 'image' || a.kind === 'link' ? a.kind : 'file', name: String(a.name || ''), url: a.url ? String(a.url) : '', mime: a.mime || '', size: a.size == null ? null : +a.size, thumbId: a.thumbId || null, createdAt: a.createdAt || null }))
     };
   });
   return out;
@@ -430,7 +437,7 @@ async function syncFiles({ prune = false } = {}) {
       const ap = f.appProperties || {};
       const source = (f.parents || []).map(p => folderNames[p]).find(Boolean) || null;
       const type = ap.type === 'private' ? 'private' : (source ? 'group' : null);
-      lib.lessons.push({ id: f.id, thumbId: null, name: f.name, date: ap.date || (f.createdTime || '').slice(0, 10), source, type, style: ap.style || DEFAULT_STYLE, title: '', desc: '', figures: [], tags: [], note: '',
+      lib.lessons.push({ id: f.id, thumbId: null, name: f.name, date: ap.date || (f.createdTime || '').slice(0, 10), source, type, style: ap.style || DEFAULT_STYLE, title: '', desc: '', figures: [], tags: [], note: '', attachments: [],
         duration: f.videoMediaMetadata && f.videoMediaMetadata.durationMillis ? Math.round(f.videoMediaMetadata.durationMillis / 1000) : null,
         size: +f.size || null, mimeType: f.mimeType || '', createdAt: f.createdTime || nowIso(), updatedAt: nowIso() });
       if (source) ensureSource(source, type || 'group');
@@ -575,6 +582,7 @@ function show(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.go === name));
   $('tabbar').style.display = (name === 'library' || name === 'schools') ? '' : 'none';
   if (name !== 'library') closeSheet();
+  if (name !== 'detail') closeViewer();
   if (name !== 'detail' && video && !video.paused) video.pause();
   if (name === 'auth') renderAuth();
   if (name === 'library') renderLibrary();
@@ -624,13 +632,16 @@ function openSheet(kind) {
     if (schools.length) h += `<div class="shead">${esc(T.schools)}</div><div class="orows">${schools.map(s => row(s.name, s.name, filter.kind === 'source' && filter.value === s.name, cnt(s.name))).join('')}</div>`;
     if (priv.length) h += `<div class="shead">${esc(T.privateTeachers)}</div><div class="orows">${priv.map(s => row(s.name, s.name, filter.kind === 'source' && filter.value === s.name, cnt(s.name), 'priv')).join('')}</div>`;
   }
-  $('sheet-body').innerHTML = h;
+  showSheet($('sheet-title').textContent, h, { reset: true });
+}
+function showSheet(title, html, { reset = false } = {}) {
+  $('sheet-title').textContent = title; $('sheet-reset').hidden = !reset; $('sheet-body').innerHTML = html;
   const w = $('sheet'); w.hidden = false; w.querySelector('.sheet').scrollTop = 0;
   requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('open')));
 }
 function closeSheet() {
   const w = $('sheet'); if (w.hidden) return;
-  w.classList.remove('open'); sheetKind = null;
+  w.classList.remove('open'); sheetKind = null; sheetAtt = null; sheetArmed = false;
   setTimeout(() => { if (!w.classList.contains('open')) w.hidden = true; }, 320);
 }
 function pickSheet(value) {
@@ -644,7 +655,7 @@ function visibleLessons() {
   if (filter.kind === 'untagged') items = items.filter(l => !l.source);
   if (filter.kind === 'source') items = items.filter(l => l.source === filter.value);
   const q = query.trim().toLowerCase();
-  if (q) items = items.filter(l => [l.title, l.desc, l.note, ...l.figures.map(f => f.name), ...l.tags.map(tagLabel)].filter(Boolean).some(v => String(v).toLowerCase().includes(q)));
+  if (q) items = items.filter(l => [l.title, l.desc, l.note, ...l.figures.map(f => f.name), ...l.tags.map(tagLabel), ...(l.attachments || []).map(a => a.name)].filter(Boolean).some(v => String(v).toLowerCase().includes(q)));
   return items;
 }
 function renderLibrary() {
@@ -675,6 +686,7 @@ function renderLibrary() {
 // Lesson detail
 async function openDetail(id) {
   const l = lib.lessons.find(x => x.id === id); if (!l) return;
+  closeViewer(); closeSheet();
   current = l; loopReset(); setRate(1); toggleSpeedMenu(false); setPlayIcon(false); $('s-detail').classList.remove('hidectl');
   video.classList.remove('mirror'); $('btn-mirror').classList.remove('on');
   $('btn-drive').href = `https://drive.google.com/file/d/${encodeURIComponent(l.id)}/view`;
@@ -698,12 +710,17 @@ function renderDetail() {
     ${figs.map((f, i) => `<div class="fig" data-fig="${i}" role="button"><span class="fname">${esc(f.name)}</span><span class="tm">${f.t != null ? fmtDur(f.t) : '·'}</span><button class="x ib" data-remove="${i}" aria-label="${esc(T.aria.remove)}">${icon('close')}</button></div>`).join('')}
     <button class="fig add" id="mark-row" aria-label="${esc(T.aria.addFigure)}" title="${esc(T.aria.addFigure)}">${icon('plus')}</button>
     <div class="markwrap" id="mark-wrap" hidden><div class="input"><input id="mark-name" placeholder="${esc(T.figureName)}" list="fig-names" autocomplete="off"><button class="mini" id="mark-add" aria-label="${esc(T.aria.save)}">${icon('check')}</button></div><datalist id="fig-names">${allFigureNames().map(n => `<option value="${esc(n)}">`).join('')}</datalist></div>
-    ${l.note ? `<h3>${esc(T.notes)}</h3><div class="note">${esc(l.note).replace(/\n/g, '<br>')}</div>` : ''}`;
+    ${l.note ? `<h3>${esc(T.notes)}</h3><div class="note">${esc(l.note).replace(/\n/g, '<br>')}</div>` : ''}
+    ${renderAttachments(l)}`;
+  document.querySelectorAll('#att-strip img[data-attthumb]').forEach(img => { const a = findAtt(img.dataset.attthumb); if (a) loadAttThumb(a, img); });
 }
 function onDetailClick(e) {
   if (!current) return;
   const rm = e.target.closest('[data-remove]');
   if (rm) { e.stopPropagation(); const i = +rm.dataset.remove; const f = current.figures[i]; if (!f) return; current.figures.splice(i, 1); current.updatedAt = nowIso(); renderDetail(); saveLibrary().then(() => toast(T.removed(f.name))).catch(err => toast(T.couldNotSave + shortErr(err))); return; }
+  if (e.target.closest('#att-add')) { openAttachSheet(); return; }
+  const tile = e.target.closest('[data-att]');
+  if (tile) { const a = findAtt(tile.dataset.att); if (!a) return; if (a.kind === 'image') openViewer(a); else openAttachActions(a); return; }
   if (e.target.closest('#mark-row')) { $('mark-wrap').hidden = false; $('mark-name').focus(); if (!video.paused) video.pause(); return; }
   if (e.target.closest('#mark-add')) { submitMark(); return; }
   const row = e.target.closest('[data-fig]');
@@ -970,7 +987,7 @@ async function saveLesson() {
       const parentId = form.source ? await ensureSourceFolder(form.source, formType) : root.id;
       const name = `${form.date} ${form.source || 'Untagged'}.${extOf(f.name)}`;
       const file = await resumableUpload(f, { name, parentId, mime, appProperties: { bachata: 'lesson', date: form.date, type: type || '', style: form.style }, onProgress: setProgress });
-      const l = { id: file.id, thumbId: null, name: file.name || name, date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, figures: formChapters.map(c => ({ name: c.name, t: c.t })), tags: formTags.slice(), note: form.note,
+      const l = { id: file.id, thumbId: null, name: file.name || name, date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, figures: formChapters.map(c => ({ name: c.name, t: c.t })), tags: formTags.slice(), note: form.note, attachments: [],
         duration: pending.duration != null ? Math.round(pending.duration) : (file.videoMediaMetadata && file.videoMediaMetadata.durationMillis ? Math.round(file.videoMediaMetadata.durationMillis / 1000) : null),
         size: +file.size || f.size, mimeType: file.mimeType || mime, createdAt: nowIso(), updatedAt: nowIso() };
       if (pending.poster) {
@@ -997,11 +1014,17 @@ async function moveLesson(l) {
   const oldParents = (cur.parents || []).filter(p => p !== newParent);
   const newName = `${l.date} ${l.source || 'Untagged'}.${extOf(l.name || cur.name)}`;
   const upd = await api(`/files/${l.id}`, { method: 'PATCH', query: { addParents: newParent, removeParents: oldParents.join(','), fields: 'id,name' }, body: { name: newName, appProperties: { bachata: 'lesson', date: l.date, type: l.type || '', style: l.style || DEFAULT_STYLE } } });
+  for (const a of (l.attachments || [])) {
+    if (a.kind === 'link') continue;
+    try { const c = await api(`/files/${a.id}`, { query: { fields: 'parents' } }); const old = (c.parents || []).filter(p => p !== newParent); if (old.length) await api(`/files/${a.id}`, { method: 'PATCH', query: { addParents: newParent, removeParents: old.join(','), fields: 'id' } }); }
+    catch (e) { console.warn('attachment move failed', e); }
+  }
   return (upd && upd.name) || newName;
 }
 async function performDelete(l) {
   await api(`/files/${l.id}`, { method: 'PATCH', body: { trashed: true } });
   if (l.thumbId) api(`/files/${l.thumbId}`, { method: 'PATCH', body: { trashed: true } }).catch(() => {});
+  (l.attachments || []).forEach(a => { if (a.kind === 'link') return; api(`/files/${a.id}`, { method: 'PATCH', body: { trashed: true } }).catch(() => {}); if (a.thumbId) api(`/files/${a.thumbId}`, { method: 'PATCH', body: { trashed: true } }).catch(() => {}); });
   lib.lessons = lib.lessons.filter(x => x.id !== l.id);
   await saveLibrary(); idb.del(l.id); delete thumbs[l.id];
 }
@@ -1106,6 +1129,174 @@ async function runAi() {
     setAiHint(kind === 'key' ? T.aiBadKey : kind === 'quota' ? T.aiQuota : kind === 'busy' ? T.aiBusy : kind === 'model' ? T.aiBadModel : T.aiFailed + shortErr(e));
   } finally { aiBusy = false; setAiBusy(false); keepAwake(false); }
 }
+// ---------- attachments (photos, files and links on a lesson) ----------
+function findAtt(id) { return current && (current.attachments || []).find(a => a.id === id); }
+function linkHost(u) { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return u; } }
+function attTile(a) {
+  if (a.kind === 'link') return `<button class="tile link" data-att="${esc(a.id)}">${icon('link')}<span dir="auto">${esc(a.name || linkHost(a.url))}</span></button>`;
+  if (a.kind === 'image') return `<button class="tile img" data-att="${esc(a.id)}"><img data-attthumb="${esc(a.id)}" alt=""><div class="cap" dir="auto">${esc(a.name)}</div></button>`;
+  return `<button class="tile doc" data-att="${esc(a.id)}">${icon('file')}<span dir="auto">${esc(a.name)}</span></button>`;
+}
+function renderAttachments(l) {
+  const atts = l.attachments || [];
+  return `<h3>${esc(T.attachments)}${atts.length ? `<span class="cnt">${atts.length}</span>` : ''}</h3>
+    <div class="strip" id="att-strip">${atts.map(attTile).join('')}${attBusy ? `<div class="tile busy" id="att-busy">${esc(attBusyText)}</div>` : ''}<button class="tile add" id="att-add" aria-label="${esc(T.aria.attAdd)}" title="${esc(T.aria.attAdd)}">${icon('plus')}</button></div>`;
+}
+function loadAttThumb(a, img) {
+  const key = 'att:' + a.id;
+  if (thumbs[key]) { img.src = thumbs[key]; img.classList.add('ok'); return; }
+  (async () => {
+    try {
+      let blob = await idb.get(key);
+      if (!blob) {
+        const res = await api(`/files/${a.thumbId || a.id}`, { query: { alt: 'media' }, raw: true }); blob = await res.blob();
+        if (blob && blob.size && a.thumbId) await idb.put(key, blob);
+      }
+      if (blob && blob.size) { thumbs[key] = URL.createObjectURL(blob); img.src = thumbs[key]; img.classList.add('ok'); }
+    } catch (e) { /* the tile keeps its plain background */ }
+  })();
+}
+function openAttachSheet() {
+  if (!current) return;
+  if (attBusy) { toast(T.attWait); return; }
+  sheetKind = 'attach';
+  const row = (act, ic, label, hint) => `<button class="orow" data-act="${act}">${icon(ic, 'i li')}<span class="n">${esc(label)}</span>${hint ? `<span class="hint">${esc(hint)}</span>` : ''}</button>`;
+  showSheet(T.attAdd, `<div class="orows">${row('camera', 'camera', T.attCamera)}${row('photo', 'photo', T.attPhotos)}${row('file', 'file', T.attFile, T.attFileHint)}${row('link', 'link', T.attLink, T.attLinkHint)}</div>`);
+}
+function onAttachPick(act) {
+  if (act === 'link') {
+    $('sheet-body').innerHTML = `<div class="input linkrow"><input id="att-url" type="url" inputmode="url" placeholder="${esc(T.attLinkPh)}" autocomplete="off" autocapitalize="off"><button class="mini" id="att-url-save" aria-label="${esc(T.aria.save)}">${icon('check')}</button></div>`;
+    $('att-url').focus();
+    return;
+  }
+  closeSheet();
+  const input = $(act === 'camera' ? 'att-camera' : act === 'photo' ? 'att-photo' : 'att-file');
+  if (input) input.click();
+}
+function submitLink() {
+  const el = $('att-url'); if (!el || !current) return;
+  let url = (el.value || '').trim(); if (!url) return;
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  try { const u = new URL(url); if (!u.hostname.includes('.')) throw new Error('host'); } catch (e) { toast(T.attBadLink); return; }
+  const a = { id: 'link-' + Date.now().toString(36), kind: 'link', name: linkHost(url), url, mime: '', size: null, thumbId: null, createdAt: nowIso() };
+  current.attachments.push(a); current.updatedAt = nowIso();
+  closeSheet(); renderDetail();
+  saveLibrary().then(() => toast(T.attAdded)).catch(err => toast(T.couldNotSave + shortErr(err)));
+}
+function openAttachActions(a) {
+  sheetKind = 'attact'; sheetAtt = a; sheetArmed = false;
+  const row = (act, ic, label, cls = '') => `<button class="orow ${cls}" data-act="${act}">${icon(ic, 'i li')}<span class="n">${esc(label)}</span></button>`;
+  const isLink = a.kind === 'link';
+  showSheet(a.name || '', `<div class="orows">${row('open', isLink ? 'link' : 'open', isLink ? T.attOpenLink : T.attOpen)}${row('remove', 'trash', T.attRemove, 'danger')}</div>`);
+}
+function onAttachAction(btn, act) {
+  const a = sheetAtt; if (!a) return;
+  if (act === 'open') {
+    const url = a.kind === 'link' ? a.url : `https://drive.google.com/file/d/${encodeURIComponent(a.id)}/view`;
+    window.open(url, '_blank', 'noopener'); closeSheet(); return;
+  }
+  if (act === 'remove') {
+    if (!sheetArmed) { sheetArmed = true; btn.querySelector('.n').textContent = T.attRemoveArm; return; }
+    removeAttachment(a);
+  }
+}
+async function removeAttachment(a) {
+  const l = current; if (!l) return;
+  closeSheet(); closeViewer();
+  try {
+    if (a.kind !== 'link') {
+      await api(`/files/${a.id}`, { method: 'PATCH', body: { trashed: true } });
+      if (a.thumbId) api(`/files/${a.thumbId}`, { method: 'PATCH', body: { trashed: true } }).catch(() => {});
+    }
+    l.attachments = l.attachments.filter(x => x.id !== a.id); l.updatedAt = nowIso();
+    if (current === l) renderDetail();
+    await saveLibrary(); toast(T.attRemoved);
+    idb.del('att:' + a.id);
+    if (thumbs['att:' + a.id]) { URL.revokeObjectURL(thumbs['att:' + a.id]); delete thumbs['att:' + a.id]; }
+    if (attFull[a.id]) { URL.revokeObjectURL(attFull[a.id]); delete attFull[a.id]; delete attBlob[a.id]; }
+  } catch (e) { console.error(e); if (e.message !== 'signed out') toast(T.couldNotSave + shortErr(e)); }
+}
+function imageThumb(file, max) {
+  return new Promise(res => {
+    const url = URL.createObjectURL(file); const im = new Image();
+    im.onload = () => {
+      try {
+        const r = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight));
+        const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(im.naturalWidth * r)); c.height = Math.max(1, Math.round(im.naturalHeight * r));
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+        c.toBlob(b => { URL.revokeObjectURL(url); res(b); }, 'image/jpeg', 0.8);
+      } catch (e) { URL.revokeObjectURL(url); res(null); }
+    };
+    im.onerror = () => { URL.revokeObjectURL(url); res(null); };
+    im.src = url;
+  });
+}
+async function addAttachmentFile(file, hint) {
+  const l = current; if (!l || !file) return;
+  if (attBusy) { toast(T.attWait); return; }
+  const isImg = /^image\//i.test(file.type) || (hint === 'image' && !file.type);
+  attBusy = true; attBusyText = T.attUploading(0); renderDetail(); keepAwake(true);
+  try {
+    await ensureRoot();
+    const parentId = l.source ? await ensureSourceFolder(l.source, l.type || 'group') : root.id;
+    const base = (l.name || '').replace(/\.[a-z0-9]+$/i, '') || l.date;
+    const fname = file.name || (isImg ? 'photo.jpg' : 'file');
+    const mime = file.type || (isImg ? 'image/jpeg' : 'application/octet-stream');
+    const up = await resumableUpload(file, { name: `${base} · ${fname}`, parentId, mime, appProperties: { bachata: 'attachment', lesson: l.id },
+      onProgress: f => { attBusyText = T.attUploading(Math.round(f * 100)); const b = $('att-busy'); if (b) b.textContent = attBusyText; } });
+    const a = { id: up.id, kind: isImg ? 'image' : 'file', name: fname, url: '', mime: up.mimeType || mime, size: +up.size || file.size || null, thumbId: null, createdAt: nowIso() };
+    if (isImg) {
+      try {
+        const th = await imageThumb(file, 480);
+        if (th) { const t = await uploadBlob(root.thumbsId, `${up.id}.jpg`, th, { bachata: 'thumb', attachment: up.id }); a.thumbId = t.id; idb.put('att:' + a.id, th); thumbs['att:' + a.id] = URL.createObjectURL(th); }
+      } catch (e) { console.warn('attachment thumbnail failed', e); }
+    }
+    l.attachments.push(a); l.updatedAt = nowIso();
+    await saveLibrary(); toast(T.attAdded);
+  } catch (e) {
+    console.error(e);
+    if (e.message !== 'signed out') toast(T.attFailed + shortErr(e), 6000);
+  } finally { attBusy = false; keepAwake(false); if (current === l) renderDetail(); }
+}
+// Full-screen viewer for image attachments: swipe or arrow keys between images.
+function openViewer(a) {
+  const l = current; if (!l) return;
+  viewerList = l.attachments.filter(x => x.kind === 'image'); viewerIdx = viewerList.findIndex(x => x.id === a.id);
+  if (viewerIdx < 0) return;
+  vwArmed = false; $('vw-delete').classList.remove('armed');
+  $('vw-share').hidden = !(navigator.share && navigator.canShare);
+  $('viewer').hidden = false;
+  showViewerImage();
+}
+function closeViewer() { const v = $('viewer'); if (!v || v.hidden) return; v.hidden = true; $('vw-pic').removeAttribute('src'); viewerIdx = -1; viewerList = []; }
+function viewerStep(d) { if (!viewerList.length) return; viewerIdx = (viewerIdx + d + viewerList.length) % viewerList.length; vwArmed = false; $('vw-delete').classList.remove('armed'); showViewerImage(); }
+function showViewerImage() {
+  const a = viewerList[viewerIdx]; if (!a) { closeViewer(); return; }
+  $('vw-count').textContent = viewerList.length > 1 ? T.attOf(viewerIdx + 1, viewerList.length) : '';
+  $('vw-name').textContent = a.name + (a.size ? ' · ' + fmtSize(a.size) : '');
+  $('vw-drive').href = `https://drive.google.com/file/d/${encodeURIComponent(a.id)}/view`;
+  const pic = $('vw-pic'), load = $('vw-load');
+  if (attFull[a.id]) { pic.src = attFull[a.id]; pic.style.opacity = 1; load.hidden = true; return; }
+  if (thumbs['att:' + a.id]) pic.src = thumbs['att:' + a.id]; else pic.removeAttribute('src');
+  pic.style.opacity = .6; load.hidden = false; load.textContent = T.attLoading;
+  (async () => {
+    try {
+      const res = await api(`/files/${a.id}`, { query: { alt: 'media' }, raw: true }); const b = await res.blob();
+      attBlob[a.id] = b; attFull[a.id] = URL.createObjectURL(b);
+      if (viewerList[viewerIdx] === a && !$('viewer').hidden) { pic.src = attFull[a.id]; pic.style.opacity = 1; load.hidden = true; }
+    } catch (e) { if (viewerList[viewerIdx] === a) load.textContent = T.attLoadFailed; }
+  })();
+}
+async function shareViewerImage() {
+  const a = viewerList[viewerIdx]; if (!a) return;
+  try {
+    const b = attBlob[a.id]; if (!b) return;
+    const f = new File([b], a.name || 'photo.jpg', { type: b.type || 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) await navigator.share({ files: [f] });
+    else window.open($('vw-drive').href, '_blank', 'noopener');
+  } catch (e) { /* the share sheet was dismissed */ }
+}
+
 function saveGeminiSettings() {
   const key = ($('set-gemini-key').value || '').trim();
   const model = ($('set-gemini-model').value || '').trim();
@@ -1199,7 +1390,22 @@ function bindEvents() {
   $('flt-source').addEventListener('click', () => openSheet('source'));
   $('sheet-dim').addEventListener('click', closeSheet);
   $('sheet-reset').addEventListener('click', () => pickSheet(null));
-  $('sheet-body').addEventListener('click', e => { const b = e.target.closest('.orow'); if (b) pickSheet(b.dataset.value || null); });
+  $('sheet-body').addEventListener('click', e => {
+    if (e.target.closest('#att-url-save')) { submitLink(); return; }
+    const b = e.target.closest('.orow'); if (!b) return;
+    if (sheetKind === 'attach') onAttachPick(b.dataset.act);
+    else if (sheetKind === 'attact') onAttachAction(b, b.dataset.act);
+    else pickSheet(b.dataset.value || null);
+  });
+  $('sheet-body').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'att-url') { e.preventDefault(); submitLink(); } });
+  ['att-camera', 'att-photo', 'att-file'].forEach(id => $(id).addEventListener('change', e => { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (f) addAttachmentFile(f, id === 'att-file' ? null : 'image'); }));
+  $('vw-close').addEventListener('click', closeViewer);
+  $('vw-delete').addEventListener('click', () => { const a = viewerList[viewerIdx]; if (!a) return; if (!vwArmed) { vwArmed = true; $('vw-delete').classList.add('armed'); toast(T.attRemoveArm); setTimeout(() => { vwArmed = false; $('vw-delete').classList.remove('armed'); }, 4000); return; } removeAttachment(a); });
+  $('vw-share').addEventListener('click', shareViewerImage);
+  let swipeX = null;
+  $('vw-img').addEventListener('touchstart', e => { swipeX = e.touches[0].clientX; }, { passive: true });
+  $('vw-img').addEventListener('touchend', e => { if (swipeX == null) return; const dx = e.changedTouches[0].clientX - swipeX; swipeX = null; if (Math.abs(dx) < 50) return; const rtl = document.documentElement.dir === 'rtl'; viewerStep((dx < 0) === !rtl ? 1 : -1); }, { passive: true });
+  document.addEventListener('keydown', e => { if ($('viewer').hidden) return; if (e.key === 'Escape') closeViewer(); else if (e.key === 'ArrowLeft') viewerStep(-1); else if (e.key === 'ArrowRight') viewerStep(1); });
   $('list').addEventListener('click', e => { const card = e.target.closest('.card'); if (!card) return; const l = lib.lessons.find(x => x.id === card.dataset.id); if (!l) return; if (!l.source) openAdd(l.id); else openDetail(l.id); });
 
   // player
