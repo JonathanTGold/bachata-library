@@ -17,6 +17,7 @@ and no server that ever sees your videos.
 - **Add lesson**: pick a clip from Photos or Files, date auto-filled from the file, choose Group class
   (school) or Private (teacher name), type the figures covered, optional notes. Uploads to Drive in
   resumable chunks with a progress bar.
+- **Audio lessons**: a voice recording (m4a, mp3, wav and similar) can be added just like a video. It shows a waveform instead of a frame, plays in the same player with the same chapters, and the auto-fill understands it as a sound-only recording.
 - **Lesson player**: custom controls streaming straight from Drive. Speed 1x / 0.75x / 0.5x / 0.25x,
   mirror flip, fullscreen, picture-in-picture, and a section repeat: tap once to mark A, again to
   mark B, and the section loops with both marks drawn on the scrubber. Tap a figure to jump to its

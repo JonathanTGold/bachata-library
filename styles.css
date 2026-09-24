@@ -254,3 +254,13 @@ h3+.fig,#f-chapters .fig:first-child{border-radius:12px 12px 0 0}
 .setup li{margin-bottom:6px}
 .setup code{background:var(--fill);padding:1px 6px;border-radius:6px;font-size:12px;word-break:break-all;direction:ltr;display:inline-block}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* audio-only lessons: waveform in place of a frame, shorter player, no mirror/fullscreen/pip */
+.thumb.audio{display:grid;place-items:center}
+.thumb.audio .aud{width:34px;height:34px;color:#ffd60a;stroke-width:1.9;opacity:.9}
+.pick .aud{width:30px;height:30px;color:var(--tint);margin-bottom:2px}
+.audioart{position:absolute;inset:var(--sat) 0 0 0;display:none;place-items:center;background:radial-gradient(circle at 50% 45%,#2c2c2e,#000 75%);z-index:0}
+.audioart .i{width:72px;height:72px;color:#ffd60a;opacity:.85;stroke-width:1.6}
+#s-detail.audio .audioart{display:grid}
+#s-detail.audio .player video{height:min(30vh,250px)}
+#s-detail.audio #btn-mirror,#s-detail.audio #btn-pip,#s-detail.audio #btn-fs{display:none}

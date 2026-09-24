@@ -13,9 +13,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="DanceLab">
-<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.9.2">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.9.2">
-<link rel="stylesheet" href="./styles.css?v=2.9.2">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.10.0">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.10.0">
+<link rel="stylesheet" href="./styles.css?v=2.10.0">
 </head>
 <body>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
@@ -42,6 +42,7 @@
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
   <symbol id="i-ai" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z"/></symbol>
+  <symbol id="i-audio" viewBox="0 0 24 24"><path d="M3 10v4M6.75 7v10M10.5 4v16M14.25 8v8M18 5.5v13M21.75 10v4"/></symbol>
   <symbol id="i-upload" viewBox="0 0 24 24"><path d="M16 16l-4-4-4 4M12 12v9M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></symbol>
 </svg>
 
@@ -50,7 +51,7 @@
   <!-- SIGN IN -->
   <section class="screen" id="s-auth">
     <div class="auth">
-      <img class="logo" src="./icons/icon-192.png?v=2.9.2" alt="">
+      <img class="logo" src="./icons/icon-192.png?v=2.10.0" alt="">
       <h1>DanceLab</h1>
       <p class="sub" data-t="tagline"></p>
       <button class="primary" id="btn-signin" data-t="signin"></button>
@@ -94,6 +95,7 @@
     </div>
     <div class="player" id="player">
       <video id="video" playsinline preload="auto"></video>
+      <div class="audioart" id="audioart"><svg class="i"><use href="#i-audio"/></svg></div>
       <div class="center" id="center">
         <button class="skip" id="btn-back5" data-aria="back5"><svg class="i"><use href="#i-back5"/></svg><b>5</b></button>
         <button class="bigplay" id="bigplay" data-aria="play"><svg class="i" id="playicon"><use href="#i-play"/></svg></button>
@@ -124,7 +126,7 @@
     <div class="scroll plain">
       <div class="form">
         <label class="pick" id="pick" for="f-file">
-          <input type="file" id="f-file" class="vh" accept="video/*">
+          <input type="file" id="f-file" class="vh" accept="video/*,audio/*">
           <div class="txt"><b data-t="chooseVideo"></b><span data-t="fromWhere"></span></div>
         </label>
         <div class="airow" id="ai-row" hidden>
@@ -201,8 +203,8 @@
     <button class="tab" data-go="schools"><svg class="i"><use href="#i-school"/></svg><span data-t="schools"></span></button>
   </nav>
 </div>
-<script src="./config.js?v=2.9.2"></script>
-<script src="./gemini.js?v=2.9.2"></script>
-<script src="./app.js?v=2.9.2"></script>
+<script src="./config.js?v=2.10.0"></script>
+<script src="./gemini.js?v=2.10.0"></script>
+<script src="./app.js?v=2.10.0"></script>
 </body>
 </html>

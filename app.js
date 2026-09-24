@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.9.2';
+const APP_VERSION = '2.10.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -53,12 +53,12 @@ const STR = {
     geminiKey: 'מפתח Gemini API', geminiHelp: 'המפתח נשמר בתיקייה שלך ב‑Drive ומסתנכרן בין המכשירים שלך. הסרטון נשלח ל‑Gemini לניתוח ונמחק משם מיד אחרי. בחבילה החינמית Google עשויה להשתמש בתוכן לשיפור המודלים.', geminiModelHint: 'שם המודל. ריק = ברירת המחדל', getKey: 'יצירת מפתח ב‑Google AI Studio', keySaved: 'הגדרות Gemini נשמרו.', badGeminiKey: 'זה לא נראה כמו מפתח Gemini API.',
     help: 'עזרה', helpItems: [['ai', 'ניתוח אוטומטי', 'עם מפתח Gemini API מההגדרות, הכפתור הנוצץ בטופס ממלא כותרת, תיאור, תגיות ופרקים מתוך הסרטון. בודקים את התוצאה לפני השמירה.'], ['back5', 'דילוג', 'החצים על הסרטון מדלגים 5 שניות אחורה או קדימה. לחיצה על הסרטון מציגה או מסתירה אותם.'], ['repeat', 'חזרה על קטע', 'לחיצה ראשונה מסמנת התחלה (A), שנייה מסמנת סוף (B), והקטע ינוגן שוב ושוב עד ללחיצה שלישית.'], ['mirror', 'מראה', 'הופך את הסרטון אופקית, כמו להסתכל במראה של הסטודיו. נוח כשעומדים מול המורה.'], ['plus', 'פרקים', 'בעמוד השיעור, מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי. לחיצה על פרק קופצת אליו.'], ['pip', 'תמונה בתוך תמונה', 'ממשיך לנגן בחלון קטן מעל אפליקציות אחרות.'], ['fs', 'מסך מלא', 'פותח את הסרטון בנגן של המכשיר. מומלץ לסובב את המכשיר לסרטונים לרוחב.']],
     noPip: 'הדפדפן הזה לא תומך בתמונה‑בתוך‑תמונה.', playFirst: 'קודם מתחילים לנגן.',
-    chooseVideo: 'בחירת סרטון', fromWhere: 'מהתמונות, מהקבצים או צילום עכשיו', alreadyInDrive: 'כבר ב‑Drive', reading: 'קורא…', previewNA: 'אין תצוגה מקדימה',
+    chooseVideo: 'בחירת סרטון או הקלטה', fromWhere: 'מהתמונות, מהקבצים, צילום או הקלטת קול', audioLesson: 'הקלטת שמע', alreadyInDrive: 'כבר ב‑Drive', reading: 'קורא…', previewNA: 'אין תצוגה מקדימה',
     style: 'סגנון', otherStyle: 'אחר…', styleName: 'שם הסגנון', lessonType: 'סוג שיעור', school: 'בית ספר', teacher: 'מורה', newSchool: '+ בית ספר חדש…', newTeacher: '+ מורה חדש…', leaveUntagged: 'להשאיר ללא תיוג בינתיים', name: 'שם',
     privateHint: 'שיעורים פרטיים נשמרים תחת שם המורה במקום בית ספר.', date: 'תאריך', figuresCovered: 'פיגורות שנלמדו', figuresPh: 'סומבררו, האמרלוק, בודי רול', notesOptional: 'הערות', notesPh: 'מה לתרגל, תיקונים, שיעורי בית',
     saveUpload: 'שמירה והעלאה ל‑Drive', saveChanges: 'שמירת שינויים', uploading: 'מעלה…', uploadingPct: p => `מעלה… ${p}% · להשאיר את האפליקציה פתוחה`, finishing: 'מסיים…', savedToIndex: 'השינויים נשמרים לאינדקס ב‑Drive שלך.', pickTagDone: 'בוחרים סרטון, מתייגים, וזה עולה ל‑Drive.', skipHint: 'אפשר לדלג על השדות והסרטון יופיע תחת „ללא תיוג”.',
     deleteArm: 'לחיצה נוספת מעבירה את הסרטון לסל המחזור של Drive.', deleteIdle: 'מחיקת הסיכום', deleted: 'הועבר לסל המחזור של Drive.', deleteFailed: 'המחיקה נכשלה. ',
-    pickFirst: 'קודם בוחרים סרטון.', typeName: k => `צריך להקליד שם ${k}.`, typeStyle: 'צריך להקליד שם סגנון.', saved: 'נשמר.', uploaded: 'הועלה ל‑Drive.', uploadedUntagged: 'הועלה. מחכה תחת „ללא תיוג”.', saveFailed: 'השמירה נכשלה. ', nothingLost: 'משהו השתבש. שום דבר לא אבד, אפשר לנסות שוב.', waitUpload: 'ההעלאה עדיין רצה. מחכים שתסתיים.',
+    pickFirst: 'קודם בוחרים סרטון או הקלטה.', typeName: k => `צריך להקליד שם ${k}.`, typeStyle: 'צריך להקליד שם סגנון.', saved: 'נשמר.', uploaded: 'הועלה ל‑Drive.', uploadedUntagged: 'הועלה. מחכה תחת „ללא תיוג”.', saveFailed: 'השמירה נכשלה. ', nothingLost: 'משהו השתבש. שום דבר לא אבד, אפשר לנסות שוב.', waitUpload: 'ההעלאה עדיין רצה. מחכים שתסתיים.',
     couldNotReach: 'אין גישה ל‑Google Drive. ', couldNotLoadVideo: 'לא ניתן לטעון את הסרטון. ', couldNotPlay: 'לא ניתן לנגן את הסרטון. ייתכן שהפורמט לא נתמך בדפדפן הזה.', loadingVideo: 'טוען סרטון…', loadingPct: p => `טוען סרטון… ${p}%`, buffering: 'טוען…',
     marked: (n, t) => `„${n}” סומן ב‑${t}.`, removed: n => `„${n}” הוסר.`, couldNotSave: 'לא ניתן לשמור. ', typeFigure: 'צריך להקליד שם לפרק.',
     schoolsSub: 'מורים פרטיים מופיעים לצד בתי הספר. לחיצה מסננת את הרשימה.', noSchools: 'אין עדיין בתי ספר.', noTeachers: 'אין עדיין מורים פרטיים.', privateTeacher: 'מורה פרטי', groupClasses: 'שיעורים קבוצתיים', addSource: 'הוספה', schoolsAuto: 'בתי ספר ומורים נוספים אוטומטית גם כשמתייגים סיכום.', alreadyListed: 'כבר ברשימה.', added: n => `${n} נוסף.`, removedSource: n => `${n} הוסר.`, moveFirst: 'קודם מעבירים או מוחקים את הסיכומים שלו.', last: 'אחרון',
@@ -91,12 +91,12 @@ const STR = {
     geminiKey: 'Gemini API key', geminiHelp: 'The key is stored in your Drive folder and syncs across your devices. The video is sent to Gemini for analysis and deleted there right after. On the free tier Google may use content to improve its models.', geminiModelHint: 'Model name. Empty = default', getKey: 'Create a key in Google AI Studio', keySaved: 'Gemini settings saved.', badGeminiKey: 'That does not look like a Gemini API key.',
     help: 'Help', helpItems: [['ai', 'Auto-fill', 'With a Gemini API key from Settings, the sparkle button in the form fills the title, description, tags and chapters from the video. Review before saving.'], ['back5', 'Skip', 'The arrows on the video skip 5 seconds back or forward. Tap the video to show or hide them.'], ['repeat', 'Repeat a section', 'First tap marks the start (A), second marks the end (B), and the section loops until a third tap.'], ['mirror', 'Mirror', 'Flips the video horizontally, like watching in the studio mirror. Handy when facing the teacher.'], ['plus', 'Chapters', 'On a lesson, play to the moment you want and tap + to mark a chapter at the current time. Tap a chapter to jump to it.'], ['pip', 'Picture in picture', 'Keeps playing in a small window over other apps.'], ['fs', 'Fullscreen', 'Opens the video in the device player. Rotate the phone for landscape clips.']],
     noPip: 'This browser does not support picture-in-picture.', playFirst: 'Start playing first.',
-    chooseVideo: 'Choose a video', fromWhere: 'Photo Library, Files, or record now', alreadyInDrive: 'already in Drive', reading: 'reading…', previewNA: 'preview unavailable',
+    chooseVideo: 'Choose a video or recording', fromWhere: 'Photo Library, Files, camera or voice recording', audioLesson: 'Audio recording', alreadyInDrive: 'already in Drive', reading: 'reading…', previewNA: 'preview unavailable',
     style: 'Style', otherStyle: 'Other…', styleName: 'Style name', lessonType: 'Lesson', school: 'School', teacher: 'Teacher', newSchool: '+ New school…', newTeacher: '+ New teacher…', leaveUntagged: 'Leave untagged for now', name: 'Name',
     privateHint: 'Private lessons are filed under the teacher’s name instead of a school.', date: 'Date', figuresCovered: 'Figures covered', figuresPh: 'Sombrero, hammerlock exit, body roll', notesOptional: 'Notes', notesPh: 'What to practice, corrections, homework',
     saveUpload: 'Save & upload to Drive', saveChanges: 'Save changes', uploading: 'Uploading…', uploadingPct: p => `Uploading… ${p}% · keep the app open`, finishing: 'Finishing…', savedToIndex: 'Changes are saved to the index in your Drive.', pickTagDone: 'Pick the recap, tag it, done.', skipHint: 'Skip the fields and it lands under “Untagged”.',
     deleteArm: 'Tap again to move the video to the Drive trash.', deleteIdle: 'Delete this recap', deleted: 'Moved to the Drive trash.', deleteFailed: 'Delete failed. ',
-    pickFirst: 'Pick a video first.', typeName: k => `Type the ${k} name.`, typeStyle: 'Type the style name.', saved: 'Saved.', uploaded: 'Uploaded to Drive.', uploadedUntagged: 'Uploaded. It is waiting under Untagged.', saveFailed: 'Save failed. ', nothingLost: 'Something went wrong. Nothing was lost; try again.', waitUpload: 'Upload in progress. Wait for it to finish.',
+    pickFirst: 'Pick a video or recording first.', typeName: k => `Type the ${k} name.`, typeStyle: 'Type the style name.', saved: 'Saved.', uploaded: 'Uploaded to Drive.', uploadedUntagged: 'Uploaded. It is waiting under Untagged.', saveFailed: 'Save failed. ', nothingLost: 'Something went wrong. Nothing was lost; try again.', waitUpload: 'Upload in progress. Wait for it to finish.',
     couldNotReach: 'Could not reach Google Drive. ', couldNotLoadVideo: 'Could not load this video. ', couldNotPlay: 'Could not play this video. It may use a format this browser cannot decode.', loadingVideo: 'Loading video…', loadingPct: p => `Loading video… ${p}%`, buffering: 'Buffering…',
     marked: (n, t) => `“${n}” marked at ${t}.`, removed: n => `Removed “${n}”.`, couldNotSave: 'Could not save. ', typeFigure: 'Type the figure name.',
     schoolsSub: 'Private teachers listed alongside. Tap one to filter.', noSchools: 'No schools yet.', noTeachers: 'No private teachers yet.', privateTeacher: 'Private teacher', groupClasses: 'Group classes', addSource: 'Add', schoolsAuto: 'Schools and teachers also appear automatically when you tag a recap.', alreadyListed: 'Already in the list.', added: n => `Added ${n}.`, removedSource: n => `Removed ${n}.`, moveFirst: 'Move or delete its recaps first.', last: 'last',
@@ -479,7 +479,10 @@ function loadThumbs(container) {
 
 // ---------- upload ----------
 function extOf(n) { const m = /\.([a-z0-9]+)$/i.exec(n || ''); return m ? m[1].toLowerCase() : 'mp4'; }
-function mimeOf(f) { if (f.type) return f.type; return { mov: 'video/quicktime', mp4: 'video/mp4', m4v: 'video/x-m4v', webm: 'video/webm', mkv: 'video/x-matroska' }[extOf(f.name)] || 'video/mp4'; }
+const AUDIO_EXT = { m4a: 'audio/mp4', mp3: 'audio/mpeg', wav: 'audio/wav', aac: 'audio/aac', ogg: 'audio/ogg', oga: 'audio/ogg', opus: 'audio/ogg', flac: 'audio/flac', caf: 'audio/x-caf', aif: 'audio/aiff', aiff: 'audio/aiff', amr: 'audio/amr' };
+function mimeOf(f) { if (f.type) return f.type; const ext = extOf(f.name); return AUDIO_EXT[ext] || { mov: 'video/quicktime', mp4: 'video/mp4', m4v: 'video/x-m4v', webm: 'video/webm', mkv: 'video/x-matroska' }[ext] || 'video/mp4'; }
+// A lesson recorded as sound only (voice memo, phone recording). Same player, shown with a waveform instead of a frame.
+function isAudio(x) { const m = (x && (x.mimeType || x.type)) || ''; if (m) return /^audio\//i.test(m); return !!AUDIO_EXT[extOf(x && x.name)]; }
 
 function putChunk(session, chunk, start, end, total, onProgress) {
   return new Promise(resolve => {
@@ -660,8 +663,9 @@ function renderLibrary() {
     const badges = l.source
       ? (showStyle ? `<span class="stl">${esc(styleName(l.style))}</span>` : '') + l.tags.slice(0, 3).map(t => `<span class="tag">${esc(tagLabel(t))}</span>`).join('')
       : `<span class="tag">${esc(T.needsTag)}</span>`;
+    const aud = isAudio(l);
     h += `<button class="card ${l.source ? '' : 'untagged'}" data-id="${esc(l.id)}">
-      <div class="thumb ${hue(l.id)}"><img data-thumb="${esc(l.id)}" alt=""><div class="play"></div>${l.duration ? `<div class="dur">${fmtDur(l.duration)}</div>` : ''}</div>
+      <div class="thumb ${hue(l.id)}${aud ? ' audio' : ''}">${aud ? icon('audio', 'i aud') : `<img data-thumb="${esc(l.id)}" alt="">`}<div class="play"></div>${l.duration ? `<div class="dur">${fmtDur(l.duration)}</div>` : ''}</div>
       <div class="meta"><div class="title">${esc(lessonTitle(l).replace(/\s*\n+\s*/g, ' '))}</div><div class="who">${esc(who)}</div><div class="badges">${badges}</div></div></button>`;
   }
   $('list').innerHTML = h;
@@ -675,6 +679,7 @@ async function openDetail(id) {
   video.classList.remove('mirror'); $('btn-mirror').classList.remove('on');
   $('btn-drive').href = `https://drive.google.com/file/d/${encodeURIComponent(l.id)}/view`;
   const dd = $('detail-delete'); dd.dataset.armed = ''; dd.classList.remove('armed'); dd.disabled = false;
+  $('s-detail').classList.toggle('audio', isAudio(l));
   show('detail'); renderDetail();
   $('detail-scroll').scrollTop = 0;
   loadMedia(l);
@@ -776,7 +781,7 @@ function toggleSpeedMenu(force) { const m = $('speed-menu'); m.hidden = force ==
 function skip(sec) { if (!video.duration) return; video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + sec)); updateTime(); }
 function setPlayIcon(playing) { $('playicon').innerHTML = `<use href="#i-${playing ? 'pause' : 'play'}"/>`; $('bigplay').setAttribute('aria-label', playing ? T.aria.pause : T.aria.play); }
 let fadeTimer;
-function showControls() { $('s-detail').classList.remove('hidectl'); clearTimeout(fadeTimer); if (!video.paused) fadeTimer = setTimeout(() => { if (!video.paused && $('speed-menu').hidden) $('s-detail').classList.add('hidectl'); }, 4000); }
+function showControls() { $('s-detail').classList.remove('hidectl'); clearTimeout(fadeTimer); if (!video.paused && !(current && isAudio(current))) fadeTimer = setTimeout(() => { if (!video.paused && $('speed-menu').hidden) $('s-detail').classList.add('hidectl'); }, 4000); }
 function controlsHidden() { return $('s-detail').classList.contains('hidectl'); }
 function hideControls() { clearTimeout(fadeTimer); $('s-detail').classList.add('hidectl'); toggleSpeedMenu(false); }
 function pct(t) { return video.duration ? (t / video.duration * 100) + '%' : '0%'; }
@@ -841,10 +846,12 @@ function openAdd(id) {
   const pick = $('pick');
   pick.classList.toggle('picked', !!editing); pick.classList.toggle('locked', !!editing);
   pick.querySelectorAll('img').forEach(i => i.remove());
+  const editAudio = !!(editing && isAudio(editing));
+  pick.classList.toggle('audio', editAudio);
   pick.querySelector('.txt').innerHTML = editing
-    ? `<b>${esc(editing.name)}</b><span>${editing.duration ? fmtDur(editing.duration) + ' · ' : ''}${esc(T.alreadyInDrive)}</span>`
+    ? `${editAudio ? icon('audio', 'i aud') : ''}<b>${esc(editing.name)}</b><span>${editing.duration ? fmtDur(editing.duration) + ' · ' : ''}${editAudio ? esc(T.audioLesson) + ' · ' : ''}${esc(T.alreadyInDrive)}</span>`
     : `<b>${esc(T.chooseVideo)}</b><span>${esc(T.fromWhere)}</span>`;
-  if (editing && thumbs[editing.id]) { const img = document.createElement('img'); img.src = thumbs[editing.id]; img.alt = ''; pick.prepend(img); }
+  if (editing && !editAudio && thumbs[editing.id]) { const img = document.createElement('img'); img.src = thumbs[editing.id]; img.alt = ''; pick.prepend(img); }
   $('add-title').textContent = editing ? (editing.source ? T.editLesson : T.tagLesson) : T.addLesson;
   $('add-sub').textContent = editing ? T.savedToIndex : T.pickTagDone;
   $('f-date').value = editing && editing.date ? editing.date : isoDate(new Date());
@@ -897,17 +904,19 @@ function fileChosen(input) {
   const when = new Date(f.lastModified || Date.now());
   pending = { file: f, url, when, duration: null, poster: null };
   const mb = (f.size / 1048576).toFixed(f.size > 100 * 1048576 ? 0 : 1);
-  const pick = $('pick'); pick.classList.add('picked'); pick.querySelectorAll('img').forEach(i => i.remove());
-  pick.querySelector('.txt').innerHTML = `<b>${esc(f.name)}</b><span>${mb} MB · ${esc(T.reading)}</span>`;
+  const audio = isAudio(f), glyph = audio ? icon('audio', 'i aud') : '';
+  const pick = $('pick'); pick.classList.add('picked'); pick.classList.toggle('audio', audio); pick.querySelectorAll('img').forEach(i => i.remove());
+  pick.querySelector('.txt').innerHTML = `${glyph}<b>${esc(f.name)}</b><span dir="auto">${mb} MB · ${esc(T.reading)}</span>`;
   if (!editing) $('f-date').value = isoDate(when);
   pendingAi = null; $('ai-row').hidden = false; setAiHint(T.aiIdle);
-  const v = document.createElement('video'); v.preload = 'metadata'; v.muted = true; v.playsInline = true; v.src = url;
+  const v = document.createElement(audio ? 'audio' : 'video'); v.preload = 'metadata'; v.muted = true; if (!audio) v.playsInline = true; v.src = url;
   v.onloadedmetadata = () => {
     pending.duration = isFinite(v.duration) ? v.duration : null;
-    pick.querySelector('.txt').innerHTML = `<b>${esc(f.name)}</b><span>${mb} MB${pending.duration ? ' · ' + fmtDur(pending.duration) : ''}</span>`;
-    try { v.currentTime = Math.min(1, (v.duration || 2) / 2); } catch (e) { /* no seek */ }
+    pick.querySelector('.txt').innerHTML = `${glyph}<b>${esc(f.name)}</b><span dir="auto">${mb} MB${pending.duration ? ' · ' + fmtDur(pending.duration) : ''}</span>`;
+    if (!audio) try { v.currentTime = Math.min(1, (v.duration || 2) / 2); } catch (e) { /* no seek */ }
   };
   v.onseeked = () => {
+    if (audio) return;
     try {
       const max = 640, r = Math.min(1, max / Math.max(v.videoWidth, v.videoHeight));
       const c = document.createElement('canvas'); c.width = Math.round(v.videoWidth * r); c.height = Math.round(v.videoHeight * r);
@@ -915,7 +924,7 @@ function fileChosen(input) {
       c.toBlob(b => { if (b && pending && pending.file === f) { pending.poster = b; const img = document.createElement('img'); img.src = URL.createObjectURL(b); img.alt = ''; pick.prepend(img); } }, 'image/jpeg', 0.72);
     } catch (e) { /* no poster */ }
   };
-  v.onerror = () => { pick.querySelector('.txt').innerHTML = `<b>${esc(f.name)}</b><span>${mb} MB · ${esc(T.previewNA)}</span>`; };
+  v.onerror = () => { pick.querySelector('.txt').innerHTML = `${glyph}<b>${esc(f.name)}</b><span dir="auto">${mb} MB · ${esc(T.previewNA)}</span>`; };
 }
 
 function readForm() {
@@ -1049,7 +1058,7 @@ function mergeChapters(existing, incoming) {
 async function driveSource(l) {
   if (!l.size) { const meta = await api(`/files/${encodeURIComponent(l.id)}`, { query: { fields: 'size,mimeType' } }); l.size = +meta.size || 0; if (!l.mimeType && meta.mimeType) l.mimeType = meta.mimeType; }
   return {
-    size: l.size, type: l.mimeType || 'video/mp4', name: l.name || 'lesson.mp4',
+    size: l.size, type: l.mimeType || mimeOf({ name: l.name }), name: l.name || 'lesson.mp4',
     async fetchRange(start, end) {
       const at = await ensureToken();
       const r = await fetch(`${API}/files/${encodeURIComponent(l.id)}?alt=media`, { headers: { Authorization: 'Bearer ' + at, Range: `bytes=${start}-${end}` } });
@@ -1220,6 +1229,7 @@ function bindEvents() {
   document.addEventListener('click', e => { if (!e.target.closest('.speedwrap')) toggleSpeedMenu(false); });
   video.addEventListener('timeupdate', () => { if (loopB !== null && video.currentTime >= loopB) video.currentTime = loopA; updateTime(); });
   video.addEventListener('loadedmetadata', updateTime);
+  video.addEventListener('loadedmetadata', () => { if (current && !current.duration && isFinite(video.duration) && video.duration > 0) { current.duration = Math.round(video.duration); current.updatedAt = nowIso(); saveLibrary().catch(() => {}); } });
   video.addEventListener('durationchange', updateTime);
   video.addEventListener('error', () => {
     if (!current) return;

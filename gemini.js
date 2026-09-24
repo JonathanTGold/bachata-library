@@ -61,7 +61,13 @@ const LEXICON = [
   { he: 'דומיניקני', en: 'Dominican style', alt: [] },
   { he: 'סנסואל', en: 'sensual', alt: ['סנשואל', 'סנסואלי'] },
   { he: 'אנצ׳ופה', en: 'enchufla (salsa)', alt: ["אנצ'ופלה", 'אנצופה'] },
-  { he: 'דילה קה נו', en: 'dile que no (salsa)', alt: [] }
+  { he: 'דילה קה נו', en: 'dile que no (salsa)', alt: [] },
+  { he: 'גואירה', en: 'güira (instrument)', alt: ['גווירה', 'גוירה', 'גואירא'] },
+  { he: 'בונגו', en: 'bongo', alt: ['בונגוס'] },
+  { he: 'דרצ׳ו', en: 'derecho (bachata song section)', alt: ["דרצ'ו", 'דרצו'] },
+  { he: 'מחאו', en: 'majao (bachata song section)', alt: ['מאחאו', "מג'או", 'מג׳או', "מאג'או", 'מאג׳או', 'מאז׳או'] },
+  { he: 'ממבו', en: 'mambo (bachata song section)', alt: ['מאמבו'] },
+  { he: 'ברייק', en: 'break (musical break)', alt: ['ברק', 'בריק'] }
 ];
 function lexiconText(lang) {
   return LEXICON.map(x => lang === 'he' ? `${x.he} (${x.en})` : `${x.en} (Hebrew: ${x.he})`).join(', ');
@@ -73,9 +79,19 @@ function tagsText(tags, lang) {
     ? `\nתגיות: בחרו אחת או יותר מהקטגוריות הבאות שמתארות במה השיעור עסק (החזירו את המפתח באנגלית בלבד):\n${lines}\n`
     : `\nTags: choose one or more of these categories for what the lesson worked on (return the key only):\n${lines}\n`;
 }
-function buildPrompt(lang, tags) {
+function buildPrompt(lang, tags, audio) {
   const lex = lexiconText(lang);
   if (lang === 'he') {
+    if (audio) return 'נתחו את הקלטת השמע הזאת של שיעור ריקוד (קול בלבד, בלי תמונה: המורה מסביר או מסכם, לפעמים על רקע מוזיקה). ענו בעברית.\n' +
+      'החזירו: כותרת קצרה (עד 12 מילים) שמונה את הפיגורות או הנושאים שנלמדו; תיאור מפורט שמכסה את הרעיונות המרכזיים, טכניקת התנועה, ' +
+      'טיפים להובלה ולמובלים, תרגילים, והכללים שהמורה הדגיש או הדגישה; 3 עד 8 פרקים כלליים, ' +
+      'לכל אחד זמן התחלה בפורמט MM:SS וכותרת נושא קצרה; ותגיות.\n' +
+      'הכותרת מתארת את תוכן השיעור עצמו, למשל „מוזיקליות: ספירות, אקסנטים וכלי הנגינה”, בלי קידומות כמו „סיכום שיעור” או „שיעור ריקוד”.\n' +
+      'מונחי ריקוד: מורים בישראל אומרים את שמות הפיגורות באנגלית במבטא ישראלי. השתמשו אך ורק באיות הבא כשמונח מהרשימה נשמע בהקלטה, ' +
+      'גם אם ההגייה לא ברורה, ואל תמציאו תעתיק אחר: ' + lex + '.\n' +
+      'זו הקלטת קול בלבד: זהו את הנושאים לפי מה שנאמר, לפי הספירות, הקצב והמוזיקה שנשמעים. אם המורה מתייחס למוזיקה, ציינו מה נאמר על הספירה, על האקסנטים ועל כלי הנגינה. ' +
+      'מונח שלא ברשימה: כתבו אותו כפי שהמורה אומר אותו, ואם הוא באנגלית הוסיפו את המקור באנגלית בסוגריים בפעם הראשונה.\n' +
+      'אל תמציאו תוכן שלא נשמע בהקלטה.' + tagsText(tags, 'he');
     return 'נתחו את סרטון סיכום שיעור הריקוד הזה. ענו בעברית.\n' +
       'החזירו: כותרת קצרה (עד 12 מילים) שמונה את הפיגורות או הנושאים שנלמדו; תיאור מפורט שמכסה את הרעיונות המרכזיים, טכניקת התנועה, ' +
       'טיפים להובלה ולמובלים, תרגילים, והכללים שהמורה הדגיש או הדגישה; 3 עד 8 פרקים כלליים, ' +
@@ -87,6 +103,15 @@ function buildPrompt(lang, tags) {
       'מונח שלא ברשימה: כתבו אותו כפי שהמורה אומר אותו, ואם הוא באנגלית הוסיפו את המקור באנגלית בסוגריים בפעם הראשונה.\n' +
       'אל תמציאו תוכן שלא מופיע בסרטון.' + tagsText(tags, 'he');
   }
+  if (audio) return 'Analyze this audio recording of a dance lesson (sound only, no picture: the instructor explaining or recapping, sometimes over music). Answer in English.\n' +
+    'Return: a short title (max 12 words) naming the figures or topics taught; a detailed description covering the core concepts, ' +
+    'movement technique, leading and following tips, exercises, and the rules the instructor stressed; ' +
+    '3 to 8 broad chapters, each with a start time in MM:SS and a short topic title; and tags.\n' +
+    'The title names the content itself, for example "Musicality: counts, accents and instruments", with no prefix such as "Lesson summary" or "Dance lesson".\n' +
+    'Dance vocabulary: use exactly these spellings whenever one of these terms is heard, even with an accent, and never invent another transcription: ' + lex + '.\n' +
+    'This is sound only: identify the topics from what is said and from the counts, rhythm and music that can be heard. When the instructor talks about the music, note what is said about the count, the accents and the instruments. ' +
+    'A term not in the list: write it as the instructor says it.\n' +
+    'Do not invent content that is not in the recording.' + tagsText(tags, 'en');
   return 'Analyze this dance lesson recap video. Answer in English.\n' +
     'Return: a short title (max 12 words) naming the figures or topics taught; a detailed description covering the core concepts, ' +
     'movement technique, leading and following tips, exercises, and the rules the instructor stressed; ' +
@@ -126,6 +151,10 @@ function buildSchema(tags) {
 }
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+// Browsers report m4a as audio/x-m4a and similar vendor names; Gemini's file service wants the canonical types.
+const MIME_ALIASES = { 'audio/x-m4a': 'audio/mp4', 'audio/m4a': 'audio/mp4', 'audio/x-wav': 'audio/wav', 'audio/wave': 'audio/wav', 'audio/x-aiff': 'audio/aiff', 'audio/x-flac': 'audio/flac', 'video/x-m4v': 'video/mp4' };
+function geminiMime(type) { const t = String(type || '').toLowerCase() || 'video/mp4'; return MIME_ALIASES[t] || t; }
+const isAudio = mime => /^audio\//i.test(mime || '');
 
 class GeminiError extends Error {
   constructor(message, status, kind) { super(message); this.status = status; this.kind = kind; }
@@ -194,8 +223,8 @@ function sendChunk(uploadUrl, key, offset, chunk, isLast, onProgress) {
 }
 async function uploadSource(source, key, onProgress) {
   const size = source.size;
-  if (!size) throw new GeminiError('Video size unknown', 0, 'other');
-  const mime = source.type || 'video/mp4';
+  if (!size) throw new GeminiError('File size unknown', 0, 'other');
+  const mime = geminiMime(source.type);
   const uploadUrl = await startUploadSession(size, mime, source.name, key);
   const getChunk = (start, end) => typeof source.slice === 'function' ? Promise.resolve(source.slice(start, end)) : source.fetchRange(start, end - 1);
   // Two-stage pipeline: while one chunk is being sent, the next one is already being fetched,
@@ -219,10 +248,10 @@ async function waitUntilActive(fileName, key) {
   for (let i = 0; i < PROCESS_MAX_POLLS; i++) {
     const f = await (await call(`${BASE}/v1beta/${fileName}`, key)).json();
     if (f.state === 'ACTIVE') return f;
-    if (f.state === 'FAILED') throw new GeminiError('Gemini could not process this video', 0, 'other');
+    if (f.state === 'FAILED') throw new GeminiError('Gemini could not process this file', 0, 'other');
     await sleep(PROCESS_POLL_MS);
   }
-  throw new GeminiError('Video processing timed out', 0, 'other');
+  throw new GeminiError('Processing timed out', 0, 'other');
 }
 
 // Models like to open titles with "lesson summary"; the app's list already says what it is.
@@ -254,7 +283,7 @@ function parseTime(s) {
 
 async function generate(fileUri, mime, key, model, lang, tags) {
   const body = {
-    contents: [{ role: 'user', parts: [{ fileData: { fileUri, mimeType: mime } }, { text: buildPrompt(lang, tags) }] }],
+    contents: [{ role: 'user', parts: [{ fileData: { fileUri, mimeType: mime } }, { text: buildPrompt(lang, tags, isAudio(mime)) }] }],
     generationConfig: { responseMimeType: 'application/json', responseSchema: buildSchema(tags), temperature: 0.2 }
   };
   const res = await call(`${BASE}/v1beta/models/${encodeURIComponent(model)}:generateContent`, key, {
@@ -310,7 +339,7 @@ async function analyzeVideo(source, { key, model, lang, tags, onProgress } = {})
     report('process');
     const active = await waitUntilActive(uploaded.name, key);
     report('analyze');
-    return await generateWithRetries(active.uri, active.mimeType || source.type || 'video/mp4', key, (model || DEFAULT_MODEL).trim(), lang, tags, report);
+    return await generateWithRetries(active.uri, active.mimeType || geminiMime(source.type), key, (model || DEFAULT_MODEL).trim(), lang, tags, report);
   } finally {
     deleteFile(uploaded.name, key);
   }
