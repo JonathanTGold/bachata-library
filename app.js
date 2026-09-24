@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.11.1';
+const APP_VERSION = '2.11.2';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -53,7 +53,7 @@ const STR = {
     geminiKey: 'מפתח Gemini API', geminiHelp: 'המפתח נשמר בתיקייה שלך ב‑Drive ומסתנכרן בין המכשירים שלך. הסרטון נשלח ל‑Gemini לניתוח ונמחק משם מיד אחרי. בחבילה החינמית Google עשויה להשתמש בתוכן לשיפור המודלים.', geminiModelHint: 'שם המודל. ריק = ברירת המחדל', getKey: 'יצירת מפתח ב‑Google AI Studio', keySaved: 'הגדרות Gemini נשמרו.', badGeminiKey: 'זה לא נראה כמו מפתח Gemini API.',
     help: 'עזרה', helpItems: [['ai', 'ניתוח אוטומטי', 'עם מפתח Gemini API מההגדרות, הכפתור הנוצץ בטופס ממלא כותרת, תיאור, תגיות ופרקים מתוך הסרטון. בודקים את התוצאה לפני השמירה.'], ['back5', 'דילוג', 'החצים על הסרטון מדלגים 5 שניות אחורה או קדימה. לחיצה על הסרטון מציגה או מסתירה אותם.'], ['repeat', 'חזרה על קטע', 'לחיצה ראשונה מסמנת התחלה (A), שנייה מסמנת סוף (B), והקטע ינוגן שוב ושוב עד ללחיצה שלישית.'], ['mirror', 'מראה', 'הופך את הסרטון אופקית, כמו להסתכל במראה של הסטודיו. נוח כשעומדים מול המורה.'], ['plus', 'פרקים', 'בעמוד השיעור, מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי. לחיצה על פרק קופצת אליו.'], ['pip', 'תמונה בתוך תמונה', 'ממשיך לנגן בחלון קטן מעל אפליקציות אחרות.'], ['fs', 'מסך מלא', 'פותח את הסרטון בנגן של המכשיר. מומלץ לסובב את המכשיר לסרטונים לרוחב.']],
     noPip: 'הדפדפן הזה לא תומך בתמונה‑בתוך‑תמונה.', playFirst: 'קודם מתחילים לנגן.',
-    chooseVideo: 'בחירת סרטון או הקלטה', fromWhere: 'מהתמונות, מהקבצים, צילום או הקלטת קול', audioLesson: 'הקלטת שמע', alreadyInDrive: 'כבר ב‑Drive', reading: 'קורא…', previewNA: 'אין תצוגה מקדימה',
+    chooseVideo: 'בחירת סרטון או הקלטה', fromWhere: 'מהתמונות, מהקבצים, צילום או הקלטת קול', audioLesson: 'הקלטת שמע', pickAudio: 'הקלטת שמע במקום סרטון? בחירת קובץ שמע', alreadyInDrive: 'כבר ב‑Drive', reading: 'קורא…', previewNA: 'אין תצוגה מקדימה',
     style: 'סגנון', otherStyle: 'אחר…', styleName: 'שם הסגנון', lessonType: 'סוג שיעור', school: 'בית ספר', teacher: 'מורה', newSchool: '+ בית ספר חדש…', newTeacher: '+ מורה חדש…', leaveUntagged: 'להשאיר ללא תיוג בינתיים', name: 'שם',
     privateHint: 'שיעורים פרטיים נשמרים תחת שם המורה במקום בית ספר.', date: 'תאריך', figuresCovered: 'פיגורות שנלמדו', figuresPh: 'סומבררו, האמרלוק, בודי רול', notesOptional: 'הערות', notesPh: 'מה לתרגל, תיקונים, שיעורי בית',
     saveUpload: 'שמירה והעלאה ל‑Drive', saveChanges: 'שמירת שינויים', uploading: 'מעלה…', uploadingPct: p => `מעלה… ${p}% · להשאיר את האפליקציה פתוחה`, finishing: 'מסיים…', savedToIndex: 'השינויים נשמרים לאינדקס ב‑Drive שלך.', pickTagDone: 'בוחרים סרטון, מתייגים, וזה עולה ל‑Drive.', skipHint: 'אפשר לדלג על השדות והסרטון יופיע תחת „ללא תיוג”.',
@@ -92,7 +92,7 @@ const STR = {
     geminiKey: 'Gemini API key', geminiHelp: 'The key is stored in your Drive folder and syncs across your devices. The video is sent to Gemini for analysis and deleted there right after. On the free tier Google may use content to improve its models.', geminiModelHint: 'Model name. Empty = default', getKey: 'Create a key in Google AI Studio', keySaved: 'Gemini settings saved.', badGeminiKey: 'That does not look like a Gemini API key.',
     help: 'Help', helpItems: [['ai', 'Auto-fill', 'With a Gemini API key from Settings, the sparkle button in the form fills the title, description, tags and chapters from the video. Review before saving.'], ['back5', 'Skip', 'The arrows on the video skip 5 seconds back or forward. Tap the video to show or hide them.'], ['repeat', 'Repeat a section', 'First tap marks the start (A), second marks the end (B), and the section loops until a third tap.'], ['mirror', 'Mirror', 'Flips the video horizontally, like watching in the studio mirror. Handy when facing the teacher.'], ['plus', 'Chapters', 'On a lesson, play to the moment you want and tap + to mark a chapter at the current time. Tap a chapter to jump to it.'], ['pip', 'Picture in picture', 'Keeps playing in a small window over other apps.'], ['fs', 'Fullscreen', 'Opens the video in the device player. Rotate the phone for landscape clips.']],
     noPip: 'This browser does not support picture-in-picture.', playFirst: 'Start playing first.',
-    chooseVideo: 'Choose a video or recording', fromWhere: 'Photo Library, Files, camera or voice recording', audioLesson: 'Audio recording', alreadyInDrive: 'already in Drive', reading: 'reading…', previewNA: 'preview unavailable',
+    chooseVideo: 'Choose a video or recording', fromWhere: 'Photo Library, Files, camera or voice recording', audioLesson: 'Audio recording', pickAudio: 'Have a recording instead of a video? Choose an audio file', alreadyInDrive: 'already in Drive', reading: 'reading…', previewNA: 'preview unavailable',
     style: 'Style', otherStyle: 'Other…', styleName: 'Style name', lessonType: 'Lesson', school: 'School', teacher: 'Teacher', newSchool: '+ New school…', newTeacher: '+ New teacher…', leaveUntagged: 'Leave untagged for now', name: 'Name',
     privateHint: 'Private lessons are filed under the teacher’s name instead of a school.', date: 'Date', figuresCovered: 'Figures covered', figuresPh: 'Sombrero, hammerlock exit, body roll', notesOptional: 'Notes', notesPh: 'What to practice, corrections, homework',
     saveUpload: 'Save & upload to Drive', saveChanges: 'Save changes', uploading: 'Uploading…', uploadingPct: p => `Uploading… ${p}% · keep the app open`, finishing: 'Finishing…', savedToIndex: 'Changes are saved to the index in your Drive.', pickTagDone: 'Pick the recap, tag it, done.', skipHint: 'Skip the fields and it lands under “Untagged”.',
@@ -859,7 +859,7 @@ function openAdd(id) {
   if (uploading) { toast(T.waitUpload); return; }
   editing = id ? (lib.lessons.find(l => l.id === id) || null) : null;
   if (pending && pending.url) URL.revokeObjectURL(pending.url);
-  pending = null; $('f-file').value = ''; $('f-file').disabled = !!editing;
+  pending = null; $('f-file').value = ''; $('f-file').disabled = !!editing; $('f-audio').value = ''; $('pick-audio-row').hidden = !!editing;
   const pick = $('pick');
   pick.classList.toggle('picked', !!editing); pick.classList.toggle('locked', !!editing);
   pick.querySelectorAll('img').forEach(i => i.remove());
@@ -1007,7 +1007,7 @@ async function saveLesson() {
     $('btn-save').textContent = editing ? T.saveChanges : T.saveUpload;
   }
 }
-function resetForm() { if (pending && pending.url) URL.revokeObjectURL(pending.url); pending = null; editing = null; pendingAi = null; $('f-file').value = ''; }
+function resetForm() { if (pending && pending.url) URL.revokeObjectURL(pending.url); pending = null; editing = null; pendingAi = null; $('f-file').value = ''; $('f-audio').value = ''; }
 async function moveLesson(l) {
   const newParent = l.source ? await ensureSourceFolder(l.source, l.type || 'group') : root.id;
   const cur = await api(`/files/${l.id}`, { query: { fields: 'parents,name' } });
@@ -1458,6 +1458,7 @@ function bindEvents() {
 
   // form
   $('f-file').addEventListener('change', e => fileChosen(e.target));
+  $('f-audio').addEventListener('change', e => fileChosen(e.target));
   $('f-type').addEventListener('click', e => { const b = e.target.closest('button[data-type]'); if (!b) return; formType = b.dataset.type; setTypeUI(); fillSources(lastSource(formType)); });
   $('f-style').addEventListener('click', e => { const b = e.target.closest('button[data-style]'); if (!b) return; formStyle = b.dataset.style; renderStyleSeg(); if (formStyle === '__new__') setTimeout(() => $('f-style-new').focus(), 50); });
   $('f-source').addEventListener('change', onSourceChange);

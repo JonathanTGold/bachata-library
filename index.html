@@ -13,9 +13,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="DanceLab">
-<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.11.1">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.11.1">
-<link rel="stylesheet" href="./styles.css?v=2.11.1">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.11.2">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.11.2">
+<link rel="stylesheet" href="./styles.css?v=2.11.2">
 </head>
 <body>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
@@ -56,7 +56,7 @@
   <!-- SIGN IN -->
   <section class="screen" id="s-auth">
     <div class="auth">
-      <img class="logo" src="./icons/icon-192.png?v=2.11.1" alt="">
+      <img class="logo" src="./icons/icon-192.png?v=2.11.2" alt="">
       <h1>DanceLab</h1>
       <p class="sub" data-t="tagline"></p>
       <button class="primary" id="btn-signin" data-t="signin"></button>
@@ -131,9 +131,10 @@
     <div class="scroll plain">
       <div class="form">
         <label class="pick" id="pick" for="f-file">
-          <input type="file" id="f-file" class="vh" accept="video/*,audio/*">
+          <input type="file" id="f-file" class="vh" accept="video/*,audio/*,.mov,.mp4,.m4v,.m4a,.mp3,.wav,.aac,.caf,.aiff,.aif,.ogg,.oga,.opus,.flac,.amr">
           <div class="txt"><b data-t="chooseVideo"></b><span data-t="fromWhere"></span></div>
         </label>
+        <div class="pickalt" id="pick-audio-row"><input type="file" id="f-audio" class="vh" accept="audio/*,.m4a,.mp3,.wav,.aac,.caf,.aiff,.aif,.ogg,.oga,.opus,.flac,.amr,audio/x-m4a,audio/mp4,audio/mpeg,audio/wav,audio/aac"><label for="f-audio" class="linkbtn" data-t="pickAudio"></label></div>
         <div class="airow" id="ai-row" hidden>
           <button class="ib aibtn" id="btn-ai" data-aria="ai"><svg class="i"><use href="#i-ai"/></svg></button>
           <span class="hint" id="ai-hint" data-t="aiIdle"></span>
@@ -216,8 +217,8 @@
     <button class="tab" data-go="schools"><svg class="i"><use href="#i-school"/></svg><span data-t="schools"></span></button>
   </nav>
 </div>
-<script src="./config.js?v=2.11.1"></script>
-<script src="./gemini.js?v=2.11.1"></script>
-<script src="./app.js?v=2.11.1"></script>
+<script src="./config.js?v=2.11.2"></script>
+<script src="./gemini.js?v=2.11.2"></script>
+<script src="./app.js?v=2.11.2"></script>
 </body>
 </html>
