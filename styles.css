@@ -89,7 +89,7 @@ h1{font-size:34px;font-weight:700;margin:0;letter-spacing:.37px;line-height:41px
 .tab{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;font-weight:500;color:var(--label2);width:96px;letter-spacing:.1px;height:100%;justify-content:center;border-radius:999px}
 .tab.on{color:var(--tint)}
 .tab .i{width:26px;height:26px;stroke-width:1.7}
-.fab{width:50px;height:50px;border-radius:50%;color:var(--tint);display:grid;place-items:center}
+.fab{width:50px;height:50px;border-radius:50%;color:var(--label2);display:grid;place-items:center}
 .fab .i{width:28px;height:28px;stroke-width:2.4}
 
 /* ---- player (always dark: it sits on the video) ---- */
