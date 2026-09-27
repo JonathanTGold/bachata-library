@@ -11,6 +11,7 @@ and no server that ever sees your videos.
 
 - Hebrew, right-to-left interface by default, with English available in Settings. Apple-style design (system typeface, grouped lists, one yellow tint), dark by default with light and automatic modes, icon-only actions.
 - Each lesson carries a dance style (Bachata, Salsa, or your own). A style switch appears at the top once more than one style is in use.
+- **Auto-fill** sends only the recording's audio track to Gemini: the AAC track is pulled out of the MOV/MP4 container in the browser without decoding (a tenth of the tokens, a fraction of the upload), and the whole video is sent only when the container is unusual. The description it returns is a full, sectioned recap in the teacher's words. The Gemini key is asked for in a sheet with a paste button the first time; the steps sit collapsed in Settings.
 - Each lesson also carries **tags** from a fixed list of nine (basics, elements, combinations, body movement, technique, choreography, footwork, musicality, styling). Tags are shown on the lesson page, chosen by hand in the form, and suggested by the auto-fill.
 
 - **Library** of glass cards grouped by month, one filter sheet (style, school or private teacher) next to the search box, plus an Untagged inbox.

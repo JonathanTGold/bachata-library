@@ -3,11 +3,14 @@
  * API key. Uploads the clip to Gemini's file storage, waits for processing, asks for a title,
  * a description and chapters as structured JSON, then deletes the uploaded copy.
  *
- * Exposes window.GeminiClient = { analyzeVideo(source, opts), DEFAULT_MODEL, GeminiError }.
+ * Exposes window.GeminiClient = { analyzeVideo(source, opts), extractAudio(source), DEFAULT_MODEL, GeminiError }.
  *   source: a File/Blob, or a remote descriptor { size, type, name, fetchRange(start, end) -> Blob }
  *           (the video is relayed in chunks, so a large clip never sits in memory as a whole)
- *   opts: { key, model, lang, tags: [{ key, label, hint }], onProgress({ stage, frac, detail }) }
- *         stage is one of 'upload' | 'process' | 'analyze' | 'retry' | 'fallback'
+ *   opts: { key, model, lang, tags: [{ key, label, hint }], audioOnly (default true), onProgress({ stage, frac, detail }) }
+ *         stage is one of 'extract' | 'upload' | 'process' | 'analyze' | 'retry' | 'fallback'
+ *   With audioOnly, a video's AAC track is pulled out of the container (no decoding) and only that
+ *   is sent: a tenth of the tokens and a fraction of the upload. Falls back to the full video when
+ *   the container or codec is not the usual phone recording.
  *   resolves: { title, desc, tags: [key], chapters: [{ name, t }] }   (t in seconds)
  */
 (function () {
@@ -70,7 +73,7 @@ const LEXICON = [
   { he: 'ברייק', en: 'break (musical break)', alt: ['ברק', 'בריק'] }
 ];
 function lexiconText(lang) {
-  return LEXICON.map(x => lang === 'he' ? `${x.he} (${x.en})` : `${x.en} (Hebrew: ${x.he})`).join(', ');
+  return LEXICON.map(x => lang === 'he' ? `${x.en} → ${x.he}` : `${x.en} (Hebrew: ${x.he})`).join(', ');
 }
 function tagsText(tags, lang) {
   if (!tags || !tags.length) return '';
@@ -79,48 +82,55 @@ function tagsText(tags, lang) {
     ? `\nתגיות: בחרו אחת או יותר מהקטגוריות הבאות שמתארות במה השיעור עסק (החזירו את המפתח באנגלית בלבד):\n${lines}\n`
     : `\nTags: choose one or more of these categories for what the lesson worked on (return the key only):\n${lines}\n`;
 }
-function buildPrompt(lang, tags, audio) {
+function buildPrompt(lang, tags, mode) {
   const lex = lexiconText(lang);
+  const audio = mode === 'audio', track = mode === 'track';
   if (lang === 'he') {
     if (audio) return 'נתחו את הקלטת השמע הזאת של שיעור ריקוד (קול בלבד, בלי תמונה: המורה מסביר או מסכם, לפעמים על רקע מוזיקה). ענו בעברית.\n' +
-      'החזירו: כותרת קצרה (עד 12 מילים) שמונה את הפיגורות או הנושאים שנלמדו; תיאור מפורט שמכסה את הרעיונות המרכזיים, טכניקת התנועה, ' +
-      'טיפים להובלה ולמובלים, תרגילים, והכללים שהמורה הדגיש או הדגישה; 3 עד 8 פרקים כלליים, ' +
+      'החזירו: כותרת קצרה (עד 12 מילים) שמונה את הפיגורות או הנושאים שנלמדו; תיאור מלא ומסודר של כל מה שנאמר בשיעור, לפי סדר הדברים, מחולק לנושאים עם כותרת משנה קצרה לכל נושא: ' +
+      'ההסברים, התיקונים, הטיפים להובלה ולמובלים, התרגילים והכללים, במילים של המורה. לא תקציר קצר: כל נקודה שנאמרה נכנסת. ' +
+      'בלי פרשנות, בלי מושגים או מילים שלא נאמרו, ובלי להשלים ידע מבחוץ; 3 עד 8 פרקים כלליים, ' +
       'לכל אחד זמן התחלה בפורמט MM:SS וכותרת נושא קצרה; ותגיות.\n' +
       'הכותרת מתארת את תוכן השיעור עצמו, למשל „מוזיקליות: ספירות, אקסנטים וכלי הנגינה”, בלי קידומות כמו „סיכום שיעור” או „שיעור ריקוד”.\n' +
       'מונחי ריקוד: מורים בישראל אומרים את שמות הפיגורות באנגלית במבטא ישראלי. השתמשו אך ורק באיות הבא כשמונח מהרשימה נשמע בהקלטה, ' +
       'גם אם ההגייה לא ברורה, ואל תמציאו תעתיק אחר: ' + lex + '.\n' +
       'זו הקלטת קול בלבד: זהו את הנושאים לפי מה שנאמר, לפי הספירות, הקצב והמוזיקה שנשמעים. אם המורה מתייחס למוזיקה, ציינו מה נאמר על הספירה, על האקסנטים ועל כלי הנגינה. ' +
-      'מונח שלא ברשימה: כתבו אותו כפי שהמורה אומר אותו, ואם הוא באנגלית הוסיפו את המקור באנגלית בסוגריים בפעם הראשונה.\n' +
+      'מונח מהרשימה נכתב רק באיות העברי שלו, בלי האנגלית ובלי סוגריים. מונח שלא ברשימה: כתבו אותו כפי שהמורה אומר אותו, ואם הוא באנגלית הוסיפו את המקור באנגלית בסוגריים בפעם הראשונה בלבד.\n' +
       'אל תמציאו תוכן שלא נשמע בהקלטה.' + tagsText(tags, 'he');
     return 'נתחו את סרטון סיכום שיעור הריקוד הזה. ענו בעברית.\n' +
-      'החזירו: כותרת קצרה (עד 12 מילים) שמונה את הפיגורות או הנושאים שנלמדו; תיאור מפורט שמכסה את הרעיונות המרכזיים, טכניקת התנועה, ' +
-      'טיפים להובלה ולמובלים, תרגילים, והכללים שהמורה הדגיש או הדגישה; 3 עד 8 פרקים כלליים, ' +
+      'החזירו: כותרת קצרה (עד 12 מילים) שמונה את הפיגורות או הנושאים שנלמדו; תיאור מלא ומסודר של כל מה שנאמר בשיעור, לפי סדר הדברים, מחולק לנושאים עם כותרת משנה קצרה לכל נושא: ' +
+      'ההסברים, התיקונים, הטיפים להובלה ולמובלים, התרגילים והכללים, במילים של המורה. לא תקציר קצר: כל נקודה שנאמרה נכנסת. ' +
+      'בלי פרשנות, בלי מושגים או מילים שלא נאמרו, ובלי להשלים ידע מבחוץ; 3 עד 8 פרקים כלליים, ' +
       'לכל אחד זמן התחלה בפורמט MM:SS וכותרת נושא קצרה; ותגיות.\n' +
       'הכותרת מתארת את תוכן השיעור עצמו, למשל „האמרלוק, שדו רגיל ושדו נגדי”, בלי קידומות כמו „סיכום שיעור” או „שיעור ריקוד”.\n' +
       'מונחי ריקוד: מורים בישראל אומרים את שמות הפיגורות באנגלית במבטא ישראלי. השתמשו אך ורק באיות הבא כשמונח מהרשימה נשמע בסרטון, ' +
       'גם אם ההגייה לא ברורה, ואל תמציאו תעתיק אחר: ' + lex + '.\n' +
-      'הסתמכו גם על מה שרואים בסרטון כדי לזהות את הפיגורה (למשל יד מאחורי הגב = האמרלוק; המוביל מאחורי המובלת = שדו). ' +
-      'מונח שלא ברשימה: כתבו אותו כפי שהמורה אומר אותו, ואם הוא באנגלית הוסיפו את המקור באנגלית בסוגריים בפעם הראשונה.\n' +
-      'אל תמציאו תוכן שלא מופיע בסרטון.' + tagsText(tags, 'he');
+      (track ? 'זה פסקול השיעור בלבד (השמע של הסרטון, בלי תמונה): זהו את הפיגורות והנושאים לפי מה שהמורה אומר, לפי הספירות ולפי המוזיקה. '
+        : 'הסתמכו גם על מה שרואים בסרטון כדי לזהות את הפיגורה (למשל יד מאחורי הגב = האמרלוק; המוביל מאחורי המובלת = שדו). ') +
+      'מונח מהרשימה נכתב רק באיות העברי שלו, בלי האנגלית ובלי סוגריים. מונח שלא ברשימה: כתבו אותו כפי שהמורה אומר אותו, ואם הוא באנגלית הוסיפו את המקור באנגלית בסוגריים בפעם הראשונה בלבד.\n' +
+      (track ? 'אל תמציאו תוכן שלא נשמע בהקלטה.' : 'אל תמציאו תוכן שלא מופיע בסרטון.') + tagsText(tags, 'he');
   }
   if (audio) return 'Analyze this audio recording of a dance lesson (sound only, no picture: the instructor explaining or recapping, sometimes over music). Answer in English.\n' +
-    'Return: a short title (max 12 words) naming the figures or topics taught; a detailed description covering the core concepts, ' +
-    'movement technique, leading and following tips, exercises, and the rules the instructor stressed; ' +
+    'Return: a short title (max 12 words) naming the figures or topics taught; a full, ordered write-up of everything said in the lesson, split into topics with a short subheading each: ' +
+    'the explanations, corrections, leading and following tips, exercises and rules, in the instructor\'s own words. Not a short summary: every point made goes in. ' +
+    'No interpretation, no terms or words that were not said, no outside knowledge; ' +
     '3 to 8 broad chapters, each with a start time in MM:SS and a short topic title; and tags.\n' +
     'The title names the content itself, for example "Musicality: counts, accents and instruments", with no prefix such as "Lesson summary" or "Dance lesson".\n' +
     'Dance vocabulary: use exactly these spellings whenever one of these terms is heard, even with an accent, and never invent another transcription: ' + lex + '.\n' +
     'This is sound only: identify the topics from what is said and from the counts, rhythm and music that can be heard. When the instructor talks about the music, note what is said about the count, the accents and the instruments. ' +
-    'A term not in the list: write it as the instructor says it.\n' +
+    'A listed term is written in its listed English form only, without extra brackets. A term not in the list: write it as the instructor says it.\n' +
     'Do not invent content that is not in the recording.' + tagsText(tags, 'en');
   return 'Analyze this dance lesson recap video. Answer in English.\n' +
-    'Return: a short title (max 12 words) naming the figures or topics taught; a detailed description covering the core concepts, ' +
-    'movement technique, leading and following tips, exercises, and the rules the instructor stressed; ' +
+    'Return: a short title (max 12 words) naming the figures or topics taught; a full, ordered write-up of everything said in the lesson, split into topics with a short subheading each: ' +
+    'the explanations, corrections, leading and following tips, exercises and rules, in the instructor\'s own words. Not a short summary: every point made goes in. ' +
+    'No interpretation, no terms or words that were not said, no outside knowledge; ' +
     '3 to 8 broad chapters, each with a start time in MM:SS and a short topic title; and tags.\n' +
     'The title names the content itself, for example "Hammerlock, shadow and counter shadow", with no prefix such as "Lesson summary" or "Dance lesson".\n' +
     'Dance vocabulary: use exactly these spellings whenever one of these terms is heard, even with an accent, and never invent another transcription: ' + lex + '.\n' +
-    'Use what is visible in the video to confirm the figure (an arm folded behind the back = hammerlock; the lead behind the follow = shadow position). ' +
-    'A term not in the list: write it as the instructor says it.\n' +
-    'Do not invent content that is not in the video.' + tagsText(tags, 'en');
+    (track ? 'This is only the soundtrack of the lesson video (no picture): identify the figures and topics from what the instructor says, the counts and the music. '
+      : 'Use what is visible in the video to confirm the figure (an arm folded behind the back = hammerlock; the lead behind the follow = shadow position). ') +
+    'A listed term is written in its listed English form only, without extra brackets. A term not in the list: write it as the instructor says it.\n' +
+    (track ? 'Do not invent content that is not in the recording.' : 'Do not invent content that is not in the video.') + tagsText(tags, 'en');
 }
 
 function buildSchema(tags) {
@@ -128,7 +138,7 @@ function buildSchema(tags) {
     type: 'OBJECT',
     properties: {
       title: { type: 'STRING', description: 'Short lesson title, at most 12 words, naming the figures or topics' },
-      description: { type: 'STRING', description: 'Detailed description of what the lesson covered' },
+      description: { type: 'STRING', description: 'Full, ordered write-up of everything said in the lesson, split into topics with short subheadings, in the instructor\'s words' },
       chapters: {
         type: 'ARRAY',
         items: {
@@ -221,11 +231,11 @@ function sendChunk(uploadUrl, key, offset, chunk, isLast, onProgress) {
     xhr.send(chunk);
   });
 }
-async function uploadSource(source, key, onProgress) {
+async function uploadSource(source, key, onProgress, name) {
   const size = source.size;
   if (!size) throw new GeminiError('File size unknown', 0, 'other');
   const mime = geminiMime(source.type);
-  const uploadUrl = await startUploadSession(size, mime, source.name, key);
+  const uploadUrl = await startUploadSession(size, mime, name || source.name, key);
   const getChunk = (start, end) => typeof source.slice === 'function' ? Promise.resolve(source.slice(start, end)) : source.fetchRange(start, end - 1);
   // Two-stage pipeline: while one chunk is being sent, the next one is already being fetched,
   // so a relay from Drive overlaps its download and upload instead of doing them in turn.
@@ -281,10 +291,10 @@ function parseTime(s) {
   return parts.reduce((acc, v) => acc * 60 + v, 0);
 }
 
-async function generate(fileUri, mime, key, model, lang, tags) {
+async function generate(fileUri, mime, key, model, lang, tags, mode) {
   const body = {
-    contents: [{ role: 'user', parts: [{ fileData: { fileUri, mimeType: mime } }, { text: buildPrompt(lang, tags, isAudio(mime)) }] }],
-    generationConfig: { responseMimeType: 'application/json', responseSchema: buildSchema(tags), temperature: 0.2 }
+    contents: [{ role: 'user', parts: [{ fileData: { fileUri, mimeType: mime } }, { text: buildPrompt(lang, tags, mode) }] }],
+    generationConfig: { responseMimeType: 'application/json', responseSchema: buildSchema(tags), temperature: 0.1, maxOutputTokens: 8192 }
   };
   const res = await call(`${BASE}/v1beta/models/${encodeURIComponent(model)}:generateContent`, key, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
@@ -306,13 +316,13 @@ async function generate(fileUri, mime, key, model, lang, tags) {
   };
 }
 
-async function generateWithRetries(fileUri, mime, key, model, lang, tags, report) {
+async function generateWithRetries(fileUri, mime, key, model, lang, tags, mode, report) {
   const models = [model].concat(FALLBACK_MODELS.filter(m => m !== model));
   let lastErr = null;
   for (let mi = 0; mi < models.length; mi++) {
     for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {
       try {
-        return await generate(fileUri, mime, key, models[mi], lang, tags);
+        return await generate(fileUri, mime, key, models[mi], lang, tags, mode);
       } catch (e) {
         lastErr = e;
         if (e.kind === 'busy' && attempt < RETRY_DELAYS_MS.length) { report('retry', 0, models[mi]); await sleep(RETRY_DELAYS_MS[attempt]); continue; }
@@ -330,20 +340,142 @@ async function deleteFile(fileName, key) {
   try { await call(`${BASE}/v1beta/${fileName}`, key, { method: 'DELETE' }); } catch (e) { /* files expire on their own after 48 hours */ }
 }
 
-async function analyzeVideo(source, { key, model, lang, tags, onProgress } = {}) {
+// ---- Audio track extraction (MP4/MOV → ADTS AAC), no decoding ----
+// A phone recording carries a small AAC track interleaved with a large video track. The sample
+// tables in the moov box give the byte range of every audio frame; each one is copied out with a
+// 7-byte ADTS header in front. Nothing is decoded, so an hour of video becomes a ~30 MB file in
+// seconds from a local file (a Drive file still has to be read through once).
+const be32 = (b, o) => ((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0;
+const be64 = (b, o) => be32(b, o) * 4294967296 + be32(b, o + 4);
+const fourcc = (b, o) => String.fromCharCode(b[o], b[o + 1], b[o + 2], b[o + 3]);
+function boxes(b, start, end) {
+  const out = []; let p = start;
+  while (p + 8 <= end) {
+    let size = be32(b, p), hdr = 8;
+    if (size === 1) { size = be64(b, p + 8); hdr = 16; } else if (size === 0) size = end - p;
+    if (size < hdr || p + size > end) break;
+    out.push({ type: fourcc(b, p + 4), start: p + hdr, end: p + size });
+    p += size;
+  }
+  return out;
+}
+const box = (list, type) => list.find(x => x.type === type);
+async function findMoov(read, fileSize) {
+  let p = 0;
+  while (p + 8 <= fileSize) {
+    const h = await read(p, Math.min(16, fileSize - p));
+    let size = be32(h, 0), hdr = 8;
+    if (size === 1) { if (h.length < 16) return null; size = be64(h, 8); hdr = 16; } else if (size === 0) size = fileSize - p;
+    if (size < hdr) return null;
+    if (fourcc(h, 4) === 'moov') { if (size > 96 * 1024 * 1024) return null; return { data: await read(p, size), start: hdr }; }
+    p += size;
+  }
+  return null;
+}
+// The MPEG-4 AudioSpecificConfig sits in the esds descriptor chain of the mp4a sample entry.
+function findAsc(m, from, to) {
+  for (let q = from; q + 4 <= to; q++) {
+    if (m[q] !== 0x65 || m[q + 1] !== 0x73 || m[q + 2] !== 0x64 || m[q + 3] !== 0x73) continue;
+    let p = q + 8;
+    const len = () => { let n = 0; for (let i = 0; i < 4; i++) { const c = m[p++]; n = (n << 7) | (c & 0x7f); if (!(c & 0x80)) break; } return n; };
+    if (m[p++] !== 0x03) return null; len(); p += 2; const flags = m[p++];
+    if (flags & 0x80) p += 2; if (flags & 0x40) p += m[p] + 1; if (flags & 0x20) p += 2;
+    if (m[p++] !== 0x04) return null; len(); p += 13;
+    if (m[p++] !== 0x05) return null; if (len() < 2) return null;
+    return { aot: m[p] >> 3, freqIdx: ((m[p] & 7) << 1) | (m[p + 1] >> 7), chan: (m[p + 1] >> 3) & 0x0f };
+  }
+  return null;
+}
+function parseAudioTrack(m, start) {
+  for (const trak of boxes(m, start, m.length).filter(x => x.type === 'trak')) {
+    const mdia = box(boxes(m, trak.start, trak.end), 'mdia'); if (!mdia) continue;
+    const md = boxes(m, mdia.start, mdia.end);
+    const hdlr = box(md, 'hdlr'); if (!hdlr || fourcc(m, hdlr.start + 8) !== 'soun') continue;
+    const mdhd = box(md, 'mdhd'); let duration = 0;
+    if (mdhd) duration = m[mdhd.start] === 1 ? be64(m, mdhd.start + 24) / be32(m, mdhd.start + 20) : be32(m, mdhd.start + 16) / be32(m, mdhd.start + 12);
+    const minf = box(md, 'minf'); if (!minf) continue;
+    const stbl = box(boxes(m, minf.start, minf.end), 'stbl'); if (!stbl) continue;
+    const st = boxes(m, stbl.start, stbl.end);
+    const stsd = box(st, 'stsd'), stsz = box(st, 'stsz'), stsc = box(st, 'stsc'), stco = box(st, 'stco') || box(st, 'co64');
+    if (!stsd || !stsz || !stsc || !stco) continue;
+    if (fourcc(m, stsd.start + 12) !== 'mp4a') continue;
+    const asc = findAsc(m, stsd.start + 16, stsd.end);
+    if (!asc || asc.aot !== 2 || asc.freqIdx > 12 || asc.chan < 1 || asc.chan > 7) continue; // AAC-LC only
+    const fixed = be32(m, stsz.start + 4), count = be32(m, stsz.start + 8);
+    if (!count) continue;
+    const sizes = new Uint32Array(count);
+    for (let i = 0; i < count; i++) sizes[i] = fixed || be32(m, stsz.start + 12 + i * 4);
+    const nsc = be32(m, stsc.start + 4), sc = [];
+    for (let i = 0; i < nsc; i++) { const o = stsc.start + 8 + i * 12; sc.push({ first: be32(m, o), per: be32(m, o + 4) }); }
+    const nco = be32(m, stco.start + 4), is64 = stco.type === 'co64';
+    const offs = new Float64Array(count); let idx = 0;
+    for (let c = 0; c < nco && idx < count; c++) {
+      let off = is64 ? be64(m, stco.start + 8 + c * 8) : be32(m, stco.start + 8 + c * 4);
+      let per = 0; for (const e of sc) { if (e.first <= c + 1) per = e.per; else break; }
+      for (let j = 0; j < per && idx < count; j++) { offs[idx] = off; off += sizes[idx]; idx++; }
+    }
+    return { offs, sizes, count: idx, asc, duration, sampleRate: [96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350][asc.freqIdx] };
+  }
+  return null;
+}
+async function extractAudio(source, onProgress) {
+  const local = typeof source.slice === 'function';
+  const size = source.size; if (!size) return null;
+  const read = async (off, len) => { const b = local ? source.slice(off, off + len) : await source.fetchRange(off, off + len - 1); return new Uint8Array(await b.arrayBuffer()); };
+  const moov = await findMoov(read, size); if (!moov) return null;
+  const tr = parseAudioTrack(moov.data, moov.start); if (!tr || !tr.count) return null;
+  const { offs, sizes, count, asc } = tr;
+  // Frames are copied window by window: a local file is read only around the audio chunks, a
+  // remote one in long contiguous runs so it takes few requests.
+  const MAXWIN = 8 * 1024 * 1024, GAP = local ? 64 * 1024 : MAXWIN;
+  const parts = []; let i = 0;
+  while (i < count) {
+    const wStart = offs[i]; let j = i, wEnd = offs[i] + sizes[i], bytes = 7 + sizes[i];
+    while (j + 1 < count) {
+      const nStart = offs[j + 1], nEnd = nStart + sizes[j + 1];
+      if (nStart < wEnd || nEnd - wStart > MAXWIN || nStart - wEnd > GAP) break;
+      wEnd = nEnd; bytes += 7 + sizes[j + 1]; j++;
+    }
+    const buf = await read(wStart, wEnd - wStart);
+    const out = new Uint8Array(bytes); let o = 0;
+    for (let k = i; k <= j; k++) {
+      const n = sizes[k], len = n + 7, at = offs[k] - wStart;
+      out[o] = 0xFF; out[o + 1] = 0xF1;
+      out[o + 2] = ((asc.aot - 1) << 6) | (asc.freqIdx << 2) | (asc.chan >> 2);
+      out[o + 3] = ((asc.chan & 3) << 6) | ((len >> 11) & 3);
+      out[o + 4] = (len >> 3) & 0xFF; out[o + 5] = ((len & 7) << 5) | 0x1F; out[o + 6] = 0xFC;
+      out.set(buf.subarray(at, at + n), o + 7); o += len;
+    }
+    parts.push(out); i = j + 1;
+    if (onProgress) onProgress(Math.min(1, wEnd / size));
+  }
+  const blob = new Blob(parts, { type: 'audio/aac' });
+  blob.duration = tr.duration || (count * 1024 / tr.sampleRate);
+  return blob;
+}
+
+async function analyzeVideo(source, { key, model, lang, tags, onProgress, audioOnly = true } = {}) {
   if (!key) throw new GeminiError('Missing API key', 0, 'key');
   const report = (stage, frac, detail) => { if (onProgress) onProgress({ stage, frac, detail }); };
+  let src = source, name = source.name, mode = isAudio(geminiMime(source.type)) ? 'audio' : 'video';
+  if (mode === 'video' && audioOnly) {
+    try {
+      report('extract', 0);
+      const a = await extractAudio(source, frac => report('extract', frac));
+      if (a && a.size > 4096) { src = a; name = String(name || 'lesson').replace(/\.[a-z0-9]+$/i, '') + '.aac'; mode = 'track'; }
+    } catch (e) { /* not a plain phone recording: send the whole video */ }
+  }
   report('upload', 0);
-  const uploaded = await uploadSource(source, key, frac => report('upload', frac));
+  const uploaded = await uploadSource(src, key, frac => report('upload', frac), name);
   try {
     report('process');
     const active = await waitUntilActive(uploaded.name, key);
     report('analyze');
-    return await generateWithRetries(active.uri, active.mimeType || geminiMime(source.type), key, (model || DEFAULT_MODEL).trim(), lang, tags, report);
+    return await generateWithRetries(active.uri, active.mimeType || geminiMime(src.type), key, (model || DEFAULT_MODEL).trim(), lang, tags, mode, report);
   } finally {
     deleteFile(uploaded.name, key);
   }
 }
 
-window.GeminiClient = { analyzeVideo, cleanTitle, normalizeTerms, LEXICON, DEFAULT_MODEL, GeminiError };
+window.GeminiClient = { analyzeVideo, extractAudio, cleanTitle, normalizeTerms, LEXICON, DEFAULT_MODEL, GeminiError };
 })();

@@ -293,6 +293,15 @@ h3 .cnt{color:var(--label3);margin-inline-start:4px}
 .orow .hint{font-size:12px;color:var(--label2);flex:none}
 .orow.danger,.orow.danger .li{color:var(--red)}
 .linkrow{margin:2px 0 6px}
+/* collapsed how-to (Gemini key): closed by default, one tap opens the steps */
+.steps{background:var(--grp);border-radius:var(--r);margin-top:8px;font-size:15px;line-height:1.45}
+.steps summary{list-style:none;display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;color:var(--tint);font-weight:500}
+.steps summary::-webkit-details-marker{display:none}
+.steps summary .i{width:16px;height:16px;color:var(--label3);stroke-width:2.4;transition:transform .2s}
+.steps[open] summary .i{transform:rotate(180deg)}
+.steps ol{margin:0;padding:0 14px 6px;padding-inline-start:32px;color:var(--label)}
+.steps li{margin-bottom:6px}
+.steps p{margin:0;padding:0 14px 12px;color:var(--label2);font-size:13px}
 /* full-screen image viewer */
 .viewer{position:absolute;inset:0;z-index:30;background:#000;display:flex;flex-direction:column;color:#fff}
 .viewer .vtop{display:flex;justify-content:space-between;align-items:center;padding:calc(var(--sat) + 6px) 10px 0}
