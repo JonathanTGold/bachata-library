@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.12.0';
+const APP_VERSION = '2.13.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -30,7 +30,9 @@ const BASE_STYLES = ['bachata', 'salsa'];
 const DEFAULT_STYLE = 'bachata';
 // General classification of what a lesson works on. Fixed list: shown as chips, editable by hand,
 // and the auto-fill picks one or more of these keys.
-const TAG_KEYS = ['basics', 'footwork', 'turns', 'elements', 'bodymove', 'isolations', 'leadfollow', 'technique', 'musicality', 'styling', 'sensual', 'tricks', 'choreo', 'drills'];
+const TAG_KEYS = ['basics', 'elements', 'combos', 'bodymove', 'technique', 'choreo', 'footwork', 'musicality', 'styling'];
+// Tags from earlier versions fold into the closest current one when the index is loaded.
+const TAG_ALIASES = { turns: 'elements', tricks: 'elements', isolations: 'bodymove', sensual: 'bodymove', leadfollow: 'technique', drills: 'technique' };
 
 // ---------- strings ----------
 const STR = {
@@ -42,7 +44,7 @@ const STR = {
     setupTitle: 'הגדרה חד‑פעמית', setupBody: 'לעותק הזה של האפליקציה אין עדיין מזהה לקוח של Google. יוצרים אחד ב‑Google Cloud Console ומדביקים למטה.',
     setupStep1: 'יוצרים פרויקט ומפעילים את Google Drive API.', setupStep2: 'ב‑Google Auth Platform מגדירים מיתוג, בוחרים קהל External, מוסיפים את ההרשאה drive.file ומפרסמים.', setupStep3: 'יוצרים לקוח OAuth מסוג Web application עם:', origin: 'מקור JavaScript מורשה', redirect: 'כתובת הפניה מורשית',
     pasteClient: 'הדבקת מזהה לקוח (מסתיים ב‑.apps.googleusercontent.com)', saveSignin: 'שמירה והתחברות',
-    all: 'הכול', untagged: 'ללא תיוג', search: 'חיפוש פיגורה, בית ספר, הערה', allSchools: 'כל בתי הספר', allStylesLabel: 'כל הסגנונות', privateTeachers: 'מורים פרטיים', reset: 'איפוס', pickSource: 'צריך לבחור בית ספר או מורה.',
+    all: 'הכול', untagged: 'ללא תיוג', search: 'חיפוש', allSchools: 'כל בתי הספר', allStylesLabel: 'כל הסגנונות', privateTeachers: 'מורים פרטיים', reset: 'איפוס', filters: 'סינון', done: 'סיום', pickSource: 'צריך לבחור בית ספר או מורה.',
     noRecaps: 'אין עדיין סיכומים', emptyTitle: 'אין עדיין סיכומים.', emptyBody: 'לחיצה על + מוסיפה את הראשון. הוא עולה לתיקייה „Bachata Library” ב‑Google Drive שלך.', nothingMatches: 'אין תוצאות לסינון הזה.',
     group: 'קבוצתי', private: 'פרטי', groupLesson: 'שיעור קבוצתי', privateLesson: 'שיעור פרטי',
     untaggedRecap: 'סיכום ללא תיוג', tapToTag: 'לחיצה לתיוג', needsTag: 'חסרים בית ספר ופיגורות', recap: 'סיכום', recorded: 'הוקלט',
@@ -54,7 +56,7 @@ const STR = {
     help: 'עזרה', helpItems: [['ai', 'ניתוח אוטומטי', 'עם מפתח Gemini API מההגדרות, הכפתור הנוצץ בטופס ממלא כותרת, תיאור, תגיות ופרקים מתוך הסרטון. בודקים את התוצאה לפני השמירה.'], ['back5', 'דילוג', 'החצים על הסרטון מדלגים 5 שניות אחורה או קדימה. לחיצה על הסרטון מציגה או מסתירה אותם.'], ['repeat', 'חזרה על קטע', 'לחיצה ראשונה מסמנת התחלה (A), שנייה מסמנת סוף (B), והקטע ינוגן שוב ושוב עד ללחיצה שלישית.'], ['mirror', 'מראה', 'הופך את הסרטון אופקית, כמו להסתכל במראה של הסטודיו. נוח כשעומדים מול המורה.'], ['plus', 'פרקים', 'בעמוד השיעור, מנגנים עד הרגע הרצוי ולוחצים על + כדי לסמן פרק בזמן הנוכחי. לחיצה על פרק קופצת אליו.'], ['pip', 'תמונה בתוך תמונה', 'ממשיך לנגן בחלון קטן מעל אפליקציות אחרות.'], ['fs', 'מסך מלא', 'פותח את הסרטון בנגן של המכשיר. מומלץ לסובב את המכשיר לסרטונים לרוחב.']],
     noPip: 'הדפדפן הזה לא תומך בתמונה‑בתוך‑תמונה.', playFirst: 'קודם מתחילים לנגן.',
     audioLesson: 'הקלטת שמע', pickVideo: 'סרטון או הקלטה', alreadyInDrive: 'כבר ב‑Drive', reading: 'קורא…', previewNA: 'אין תצוגה מקדימה',
-    style: 'סגנון', otherStyle: 'אחר…', styleName: 'שם הסגנון', lessonType: 'סוג שיעור', school: 'בית ספר', teacher: 'מורה', newSchool: '+ בית ספר חדש…', newTeacher: '+ מורה חדש…', leaveUntagged: 'להשאיר ללא תיוג בינתיים', name: 'שם',
+    style: 'סגנון', otherStyle: 'אחר…', styleName: 'שם הסגנון', lessonType: 'סוג שיעור', school: 'בית ספר', teacher: 'מורה', newSchool: 'בית ספר חדש…', newTeacher: 'מורה חדש…', leaveUntagged: 'להשאיר ללא תיוג בינתיים', name: 'שם',
     privateHint: 'שיעורים פרטיים נשמרים תחת שם המורה במקום בית ספר.', date: 'תאריך', figuresCovered: 'פיגורות שנלמדו', figuresPh: 'סומבררו, האמרלוק, בודי רול', notesOptional: 'הערות', notesPh: 'מה לתרגל, תיקונים, שיעורי בית',
     saveUpload: 'שמירה והעלאה ל‑Drive', saveChanges: 'שמירת שינויים', uploading: 'מעלה…', uploadingPct: p => `מעלה… ${p}% · להשאיר את האפליקציה פתוחה`, finishing: 'מסיים…', savedToIndex: 'השינויים נשמרים לאינדקס ב‑Drive שלך.', pickTagDone: 'בוחרים סרטון, מתייגים, וזה עולה ל‑Drive.', skipHint: 'אפשר לדלג על השדות והסרטון יופיע תחת „ללא תיוג”.',
     deleteArm: 'לחיצה נוספת מעבירה את הסרטון לסל המחזור של Drive.', deleteIdle: 'מחיקת הסיכום', deleted: 'הועבר לסל המחזור של Drive.', deleteFailed: 'המחיקה נכשלה. ',
@@ -69,9 +71,9 @@ const STR = {
     recapsN: n => n === 1 ? 'סיכום אחד' : `${n} סיכומים`, schoolsN: n => n === 1 ? 'בית ספר אחד' : `${n} בתי ספר`, teachersN: n => n === 1 ? 'מורה פרטי אחד' : `${n} מורים פרטיים`,
     styles: { bachata: 'באצ׳טה', salsa: 'סלסה', kizomba: 'קיזומבה', zouk: 'זוק' },
     tagsLabel: 'תגיות',
-    tags: { basics: 'בסיסים', footwork: 'עבודת רגליים', turns: 'סיבובים', elements: 'אלמנטים ווריאציות', bodymove: 'תנועת גוף', isolations: 'איזולציות', leadfollow: 'הובלה ומעקב', technique: 'טכניקה ויציבה', musicality: 'מוזיקליות וקצב', styling: 'סטיילינג', sensual: 'סנסואל', tricks: 'טריקים ודיפים', choreo: 'כוריאוגרפיה', drills: 'תרגילים' },
-    tagHints: { basics: 'צעדי בסיס, טאפים וגיווני בסיס', footwork: 'עבודת רגליים, סינקופות, סגנון דומיניקני, שיינס', turns: 'סיבובים, הכנות לסיבוב, ספוטינג', elements: 'פיגורות ואלמנטים בזוג כמו האמרלוק, סומבררו, שדו, כריכה, קרוס בודי, ווריאציות שלהם וקומבינציות', bodymove: 'גלי גוף, בודי רול, קמברה, תנועות ראש', isolations: 'איזולציות של אגן, חזה, כתפיים', leadfollow: 'הובלה ומעקב, חיבור, קונטרה, אחיזות', technique: 'יציבה, מסגרת, העברת משקל, צעדים קטנים', musicality: 'מוזיקליות, קצב, ספירות, אינטרו, מבנה השיר', styling: 'סטיילינג ידיים, שיער וגוף למובילים ולמובלות', sensual: 'חיבוק צמוד, הטיות, גלים בזוג בסגנון סנסואל', tricks: 'טריקים, דיפים, הרמות', choreo: 'כוריאוגרפיה או רצף להופעה', drills: 'תרגילים לאימון אישי או זוגי' },
-    aria: { attAdd: 'הוספת תמונה, קובץ או קישור לשיעור', share: 'שיתוף', ai: 'ניתוח אוטומטי עם Gemini', back: 'חזרה', settings: 'הגדרות', add: 'שיעור חדש', close: 'סגירה', edit: 'עריכה', drive: 'פתיחה ב‑Drive', remove: 'הסרה', addFigure: 'סימון פרק בזמן הנוכחי', mirror: 'מראה', repeat: 'חזרה על קטע', fullscreen: 'מסך מלא', pip: 'תמונה בתוך תמונה', play: 'נגן', pause: 'השהיה', back5: 'אחורה 5 שניות', fwd5: 'קדימה 5 שניות', speed: 'מהירות', delete: 'מחיקה', signout: 'התנתקות', rescan: 'סריקה', save: 'שמירה' }
+    tags: { basics: 'בסיסים', elements: 'אלמנטים', combos: 'קומבינציות', bodymove: 'תנועתיות', technique: 'טכניקה', choreo: 'כוריאוגרפיה', footwork: 'עבודת רגליים', musicality: 'מוזיקליות', styling: 'סטיילינג' },
+    tagHints: { basics: 'צעדי בסיס, טאפים וגיווני בסיס', elements: 'פיגורות ואלמנטים בזוג כמו האמרלוק, סומבררו, שדו, כריכה, קרוס בודי, סיבובים', combos: 'קומבינציות ורצפים של כמה אלמנטים', bodymove: 'גלי גוף, בודי רול, קמברה, איזולציות של אגן וחזה, תנועות ראש, סנסואל', technique: 'יציבה, מסגרת, העברת משקל, הובלה ומעקב, חיבור, תרגילים', choreo: 'כוריאוגרפיה או רצף להופעה', footwork: 'עבודת רגליים, סינקופות, סגנון דומיניקני, שיינס', musicality: 'מוזיקליות, קצב, ספירות, אינטרו, מבנה השיר', styling: 'סטיילינג ידיים, שיער וגוף למובילים ולמובלות' },
+    aria: { filter: 'סינון', attAdd: 'הוספת תמונה, קובץ או קישור לשיעור', share: 'שיתוף', ai: 'ניתוח אוטומטי עם Gemini', back: 'חזרה', settings: 'הגדרות', add: 'שיעור חדש', close: 'סגירה', edit: 'עריכה', drive: 'פתיחה ב‑Drive', remove: 'הסרה', addFigure: 'סימון פרק בזמן הנוכחי', mirror: 'מראה', repeat: 'חזרה על קטע', fullscreen: 'מסך מלא', pip: 'תמונה בתוך תמונה', play: 'נגן', pause: 'השהיה', back5: 'אחורה 5 שניות', fwd5: 'קדימה 5 שניות', speed: 'מהירות', delete: 'מחיקה', signout: 'התנתקות', rescan: 'סריקה', save: 'שמירה' }
   },
   en: {
     dir: 'ltr', locale: 'en-GB',
@@ -81,7 +83,7 @@ const STR = {
     setupTitle: 'One-time setup', setupBody: 'This copy of the app has no Google client ID yet. Create one in the Google Cloud console, then paste it below.',
     setupStep1: 'Create a project and enable the Google Drive API.', setupStep2: 'Under Google Auth Platform set up branding, choose audience External, add the drive.file scope, and publish.', setupStep3: 'Create an OAuth client of type Web application with:', origin: 'Authorized JavaScript origin', redirect: 'Authorized redirect URI',
     pasteClient: 'Paste client ID (ends with .apps.googleusercontent.com)', saveSignin: 'Save and sign in',
-    all: 'All', untagged: 'Untagged', search: 'Search figures, schools, notes', allSchools: 'All schools', allStylesLabel: 'All styles', privateTeachers: 'Private teachers', reset: 'Reset', pickSource: 'Choose a school or teacher.',
+    all: 'All', untagged: 'Untagged', search: 'Search', allSchools: 'All schools', allStylesLabel: 'All styles', privateTeachers: 'Private teachers', reset: 'Reset', filters: 'Filters', done: 'Done', pickSource: 'Choose a school or teacher.',
     noRecaps: 'No recaps yet', emptyTitle: 'No recaps yet.', emptyBody: 'Tap + to add the first one. It uploads to a “Bachata Library” folder in your Google Drive.', nothingMatches: 'Nothing matches this filter.',
     group: 'Group', private: 'Private', groupLesson: 'Group class', privateLesson: 'Private',
     untaggedRecap: 'Untagged recap', tapToTag: 'tap to tag', needsTag: 'Needs school & figures', recap: 'recap', recorded: 'Recorded',
@@ -93,7 +95,7 @@ const STR = {
     help: 'Help', helpItems: [['ai', 'Auto-fill', 'With a Gemini API key from Settings, the sparkle button in the form fills the title, description, tags and chapters from the video. Review before saving.'], ['back5', 'Skip', 'The arrows on the video skip 5 seconds back or forward. Tap the video to show or hide them.'], ['repeat', 'Repeat a section', 'First tap marks the start (A), second marks the end (B), and the section loops until a third tap.'], ['mirror', 'Mirror', 'Flips the video horizontally, like watching in the studio mirror. Handy when facing the teacher.'], ['plus', 'Chapters', 'On a lesson, play to the moment you want and tap + to mark a chapter at the current time. Tap a chapter to jump to it.'], ['pip', 'Picture in picture', 'Keeps playing in a small window over other apps.'], ['fs', 'Fullscreen', 'Opens the video in the device player. Rotate the phone for landscape clips.']],
     noPip: 'This browser does not support picture-in-picture.', playFirst: 'Start playing first.',
     audioLesson: 'Audio recording', pickVideo: 'Video or recording', alreadyInDrive: 'already in Drive', reading: 'reading…', previewNA: 'preview unavailable',
-    style: 'Style', otherStyle: 'Other…', styleName: 'Style name', lessonType: 'Lesson', school: 'School', teacher: 'Teacher', newSchool: '+ New school…', newTeacher: '+ New teacher…', leaveUntagged: 'Leave untagged for now', name: 'Name',
+    style: 'Style', otherStyle: 'Other…', styleName: 'Style name', lessonType: 'Lesson', school: 'School', teacher: 'Teacher', newSchool: 'New school…', newTeacher: 'New teacher…', leaveUntagged: 'Leave untagged for now', name: 'Name',
     privateHint: 'Private lessons are filed under the teacher’s name instead of a school.', date: 'Date', figuresCovered: 'Figures covered', figuresPh: 'Sombrero, hammerlock exit, body roll', notesOptional: 'Notes', notesPh: 'What to practice, corrections, homework',
     saveUpload: 'Save & upload to Drive', saveChanges: 'Save changes', uploading: 'Uploading…', uploadingPct: p => `Uploading… ${p}% · keep the app open`, finishing: 'Finishing…', savedToIndex: 'Changes are saved to the index in your Drive.', pickTagDone: 'Pick the recap, tag it, done.', skipHint: 'Skip the fields and it lands under “Untagged”.',
     deleteArm: 'Tap again to move the video to the Drive trash.', deleteIdle: 'Delete this recap', deleted: 'Moved to the Drive trash.', deleteFailed: 'Delete failed. ',
@@ -108,9 +110,9 @@ const STR = {
     recapsN: n => `${n} recap${n === 1 ? '' : 's'}`, schoolsN: n => `${n} school${n === 1 ? '' : 's'}`, teachersN: n => `${n} private teacher${n === 1 ? '' : 's'}`,
     styles: { bachata: 'Bachata', salsa: 'Salsa', kizomba: 'Kizomba', zouk: 'Zouk' },
     tagsLabel: 'Tags',
-    tags: { basics: 'Basics', footwork: 'Footwork', turns: 'Turns', elements: 'Elements & variations', bodymove: 'Body movement', isolations: 'Isolations', leadfollow: 'Lead & follow', technique: 'Technique & posture', musicality: 'Musicality & rhythm', styling: 'Styling', sensual: 'Sensual', tricks: 'Tricks & dips', choreo: 'Choreography', drills: 'Drills' },
-    tagHints: { basics: 'basic steps, taps and basic variations', footwork: 'footwork, syncopations, Dominican style, shines', turns: 'turns, spins, preps, spotting', elements: 'partner figures such as hammerlock, sombrero, shadow, wrap, cross body lead, their variations and combinations', bodymove: 'body waves, body rolls, cambré, head movement', isolations: 'hip, chest and shoulder isolations', leadfollow: 'leading and following, connection, tension, holds', technique: 'posture, frame, weight transfer, small steps', musicality: 'musicality, rhythm, counting, intros, song structure', styling: 'arm, hair and body styling for leads and follows', sensual: 'close embrace, tilts, partnered waves in sensual style', tricks: 'tricks, dips, lifts', choreo: 'a choreography or performance routine', drills: 'solo or partner practice exercises' },
-    aria: { attAdd: 'Add a photo, file or link to the lesson', share: 'Share', ai: 'Auto-fill with Gemini', back: 'Back', settings: 'Settings', add: 'New lesson', close: 'Close', edit: 'Edit', drive: 'Open in Drive', remove: 'Remove', addFigure: 'Mark a chapter at the current time', mirror: 'Mirror', repeat: 'Repeat a section', fullscreen: 'Fullscreen', pip: 'Picture in picture', play: 'Play', pause: 'Pause', back5: 'Back 5 seconds', fwd5: 'Forward 5 seconds', speed: 'Speed', delete: 'Delete', signout: 'Sign out', rescan: 'Rescan', save: 'Save' }
+    tags: { basics: 'Basics', elements: 'Elements', combos: 'Combinations', bodymove: 'Body movement', technique: 'Technique', choreo: 'Choreography', footwork: 'Footwork', musicality: 'Musicality', styling: 'Styling' },
+    tagHints: { basics: 'basic steps, taps and basic variations', elements: 'partner figures such as hammerlock, sombrero, shadow, wrap, cross body lead, turns', combos: 'combinations and sequences of several elements', bodymove: 'body waves, body rolls, cambré, hip and chest isolations, head movement, sensual style', technique: 'posture, frame, weight transfer, leading and following, connection, drills', choreo: 'a choreography or performance routine', footwork: 'footwork, syncopations, Dominican style, shines', musicality: 'musicality, rhythm, counting, intros, song structure', styling: 'arm, hair and body styling for leads and follows' },
+    aria: { filter: 'Filters', attAdd: 'Add a photo, file or link to the lesson', share: 'Share', ai: 'Auto-fill with Gemini', back: 'Back', settings: 'Settings', add: 'New lesson', close: 'Close', edit: 'Edit', drive: 'Open in Drive', remove: 'Remove', addFigure: 'Mark a chapter at the current time', mirror: 'Mirror', repeat: 'Repeat a section', fullscreen: 'Fullscreen', pip: 'Picture in picture', play: 'Play', pause: 'Pause', back5: 'Back 5 seconds', fwd5: 'Forward 5 seconds', speed: 'Speed', delete: 'Delete', signout: 'Sign out', rescan: 'Rescan', save: 'Save' }
   }
 };
 let lang = localStorage.getItem(LS.lang) || 'he';
@@ -127,10 +129,11 @@ let current = null;          // lesson shown on the detail screen
 let thumbs = {};             // lessonId -> object URL
 let thumbLinks = {};         // lessonId -> Drive thumbnailLink (fallback for imported files)
 let pending = null;          // file picked in the add form
-let attBusy = false, attBusyText = '';   // one attachment upload at a time
+let attBusy = false, attBusyText = '', attBusyLesson = null;   // one attachment upload at a time
 let attFull = {}, attBlob = {};          // attachmentId -> object URL / blob of the full image
 let viewerList = [], viewerIdx = -1, vwArmed = false, sheetAtt = null, sheetArmed = false;
 let editing = null;          // lesson being edited
+let formSource = null;       // school or teacher chosen in the form, or '__new__'
 let formType = 'group';
 let formStyle = DEFAULT_STYLE;
 let uploading = false;
@@ -152,6 +155,7 @@ const qesc = s => String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 const nowIso = () => new Date().toISOString();
 const dateOf = iso => { const d = new Date(iso + 'T12:00:00'); return isNaN(d) ? null : d; };
 const fmtDate = iso => { const d = dateOf(iso); return d ? d.toLocaleDateString(T.locale, { day: 'numeric', month: 'short' }) : (iso || ''); };
+const fmtDateFull = iso => { const d = dateOf(iso); return d ? d.toLocaleDateString(T.locale, { day: 'numeric', month: 'long', year: 'numeric' }) : (iso || ''); };
 const fmtDateLong = iso => { const d = dateOf(iso); return d ? d.toLocaleDateString(T.locale, { weekday: 'long', day: 'numeric', month: 'long' }) : (iso || ''); };
 const monthOf = iso => { const d = dateOf(iso); return d ? d.toLocaleDateString(T.locale, { month: 'long', year: 'numeric' }) : '—'; };
 const fmtDur = s => (s == null || !isFinite(s)) ? '' : `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
@@ -186,7 +190,7 @@ function normalize(d) {
       id: String(l.id), thumbId: l.thumbId || null, name: l.name || '', date: l.date || '', source: l.source || null,
       type: l.type === 'private' ? 'private' : (l.type === 'group' ? 'group' : null),
       style: (l.style && String(l.style).trim()) || DEFAULT_STYLE, title, desc: (l.desc == null ? '' : String(l.desc)).trim(), figures,
-      tags: [...new Set((Array.isArray(l.tags) ? l.tags : []).map(String).filter(t => TAG_KEYS.includes(t)))],
+      tags: [...new Set((Array.isArray(l.tags) ? l.tags : []).map(t => TAG_ALIASES[String(t)] || String(t)).filter(t => TAG_KEYS.includes(t)))],
       note: l.note || '', duration: l.duration == null ? null : +l.duration, size: l.size == null ? null : +l.size,
       mimeType: l.mimeType || '', createdAt: l.createdAt || null, updatedAt: l.updatedAt || null,
       attachments: (Array.isArray(l.attachments) ? l.attachments : []).filter(a => a && a.id && (a.kind !== 'link' || a.url)).map(a => ({ id: String(a.id), kind: a.kind === 'image' || a.kind === 'link' ? a.kind : 'file', name: String(a.name || ''), url: a.url ? String(a.url) : '', mime: a.mime || '', size: a.size == null ? null : +a.size, thumbId: a.thumbId || null, createdAt: a.createdAt || null }))
@@ -213,7 +217,6 @@ function allStyles() {
   lib.lessons.forEach(l => { if (l.style) set.add(l.style); });
   return [...set];
 }
-function usedStyles() { const set = new Set(); lib.lessons.forEach(l => set.add(l.style || DEFAULT_STYLE)); return [...set]; }
 
 // ---------- tiny IndexedDB cache for thumbnails ----------
 const idb = (() => {
@@ -604,38 +607,45 @@ function renderAuth() {
 }
 
 // Library
-// Two filter buttons (style, school/teacher). Each opens a bottom sheet listing the options with
-// the number of lessons behind each one, counted with the other filter already applied.
+// One filter button next to the search box. Its sheet holds both filters (style, then school or
+// teacher), each option with the number of lessons behind it counted with the other filter
+// applied. A tap applies at once; the active filters show as chips under the search box.
 function renderFilters() {
-  const sb = $('flt-style'), ob = $('flt-source');
   const styleOn = !!filter.style, srcOn = filter.kind === 'source' && !!filter.value;
-  sb.classList.toggle('on', styleOn); sb.innerHTML = `<span>${esc(styleOn ? styleName(filter.style) : T.style)}</span>${icon('down')}`;
-  ob.classList.toggle('on', srcOn); ob.innerHTML = `<span>${esc(srcOn ? filter.value : T.school)}</span>${icon('down')}`;
+  $('btn-filter').classList.toggle('on', styleOn || srcOn);
+  const chip = (fk, label) => `<button type="button" data-fk="${fk}" aria-label="${esc(T.reset)}"><span>${esc(label)}</span>${icon('close')}</button>`;
+  const h = (styleOn ? chip('style', styleName(filter.style)) : '') + (srcOn ? chip('source', filter.value) : '');
+  const el = $('flt-active'); el.innerHTML = h; el.hidden = !h;
 }
 let sheetKind = null;
-function openSheet(kind) {
-  sheetKind = kind;
+function openFilterSheet() { sheetKind = 'filter'; renderFilterSheet(true); }
+function renderFilterSheet(first) {
   const byStyle = l => !filter.style || (l.style || DEFAULT_STYLE) === filter.style;
   const bySource = l => filter.kind !== 'source' || l.source === filter.value;
-  const row = (label, value, on, count, cls = '') => `<button class="orow" data-value="${esc(value == null ? '' : value)}">${cls ? '<span class="dot"></span>' : ''}<span class="n">${esc(label)}</span><span class="c">${count}</span>${on ? icon('check', 'i ck') : ''}</button>`;
+  const row = (fk, label, value, on, count, cls = '') => `<button class="orow" data-fk="${fk}" data-value="${esc(value == null ? '' : value)}">${cls ? '<span class="dot"></span>' : ''}<span class="n">${esc(label)}</span><span class="c">${count}</span>${on ? icon('check', 'i ck') : ''}</button>`;
   let h = '';
-  if (kind === 'style') {
+  const styles = allStyles();
+  if (styles.length > 1 || filter.style) {
     const base = lib.lessons.filter(bySource);
-    $('sheet-title').textContent = T.style;
-    h = `<div class="orows">${row(T.allStylesLabel, null, !filter.style, base.length)}${allStyles().map(s => row(styleName(s), s, filter.style === s, base.filter(l => (l.style || DEFAULT_STYLE) === s).length)).join('')}</div>`;
-  } else {
-    const base = lib.lessons.filter(byStyle);
-    const cnt = name => base.filter(l => l.source === name).length;
-    const schools = lib.sources.filter(s => s.kind === 'school'), priv = lib.sources.filter(s => s.kind === 'private');
-    $('sheet-title').textContent = T.school;
-    h = `<div class="orows">${row(T.allSchools, null, filter.kind !== 'source', base.length)}</div>`;
-    if (schools.length) h += `<div class="shead">${esc(T.schools)}</div><div class="orows">${schools.map(s => row(s.name, s.name, filter.kind === 'source' && filter.value === s.name, cnt(s.name))).join('')}</div>`;
-    if (priv.length) h += `<div class="shead">${esc(T.privateTeachers)}</div><div class="orows">${priv.map(s => row(s.name, s.name, filter.kind === 'source' && filter.value === s.name, cnt(s.name), 'priv')).join('')}</div>`;
+    h += `<div class="shead">${esc(T.style)}</div><div class="orows">${row('style', T.allStylesLabel, null, !filter.style, base.length)}${styles.map(s => row('style', styleName(s), s, filter.style === s, base.filter(l => (l.style || DEFAULT_STYLE) === s).length)).join('')}</div>`;
   }
-  showSheet($('sheet-title').textContent, h, { reset: true });
+  const base = lib.lessons.filter(byStyle);
+  const cnt = name => base.filter(l => l.source === name).length;
+  const on = name => filter.kind === 'source' && filter.value === name;
+  const schools = lib.sources.filter(s => s.kind === 'school'), priv = lib.sources.filter(s => s.kind === 'private');
+  h += `<div class="shead">${esc(T.school)}</div><div class="orows">${row('source', T.allSchools, null, filter.kind !== 'source', base.length)}${schools.map(s => row('source', s.name, s.name, on(s.name), cnt(s.name))).join('')}</div>`;
+  if (priv.length) h += `<div class="shead">${esc(T.privateTeachers)}</div><div class="orows">${priv.map(s => row('source', s.name, s.name, on(s.name), cnt(s.name), 'priv')).join('')}</div>`;
+  if (first) showSheet(T.filters, h, { reset: true, done: true }); else $('sheet-body').innerHTML = h;
 }
-function showSheet(title, html, { reset = false } = {}) {
-  $('sheet-title').textContent = title; $('sheet-reset').hidden = !reset; $('sheet-body').innerHTML = html;
+function setFilter(fk, value) {
+  if (fk === 'style') filter.style = value || null;
+  else if (fk === 'source') filter = { kind: value ? 'source' : 'all', value: value || null, style: filter.style };
+  else filter = { kind: 'all', value: null, style: null };
+  saveFilter(); renderLibrary();
+  if (sheetKind === 'filter') renderFilterSheet(false);
+}
+function showSheet(title, html, { reset = false, done = false } = {}) {
+  $('sheet-title').textContent = title; $('sheet-reset').hidden = !reset; $('sheet-done').hidden = !done; $('sheet-body').innerHTML = html;
   const w = $('sheet'); w.hidden = false; w.querySelector('.sheet').scrollTop = 0;
   requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('open')));
 }
@@ -643,11 +653,6 @@ function closeSheet() {
   const w = $('sheet'); if (w.hidden) return;
   w.classList.remove('open'); sheetKind = null; sheetAtt = null; sheetArmed = false;
   setTimeout(() => { if (!w.classList.contains('open')) w.hidden = true; }, 320);
-}
-function pickSheet(value) {
-  if (sheetKind === 'style') filter.style = value || null;
-  else filter = { kind: value ? 'source' : 'all', value: value || null, style: filter.style };
-  saveFilter(); closeSheet(); renderLibrary();
 }
 function visibleLessons() {
   let items = lib.lessons.slice();
@@ -666,18 +671,15 @@ function renderLibrary() {
     $('list').innerHTML = `<div class="empty">${lib.lessons.length ? esc(T.nothingMatches) : `<b>${esc(T.emptyTitle)}</b><br>${esc(T.emptyBody)}`}</div>`;
     return;
   }
-  const showStyle = usedStyles().length > 1;
   let h = '', last = '';
   for (const l of items) {
     const m = monthOf(l.date); if (m !== last) { h += `<div class="month">${esc(m)}</div>`; last = m; }
-    const who = l.source ? `${l.source} · ${typeLabel(l.type)} · ${fmtDate(l.date)}` : `${T.recorded} ${fmtDate(l.date)} · ${T.tapToTag}`;
-    const badges = l.source
-      ? (showStyle ? `<span class="stl">${esc(styleName(l.style))}</span>` : '') + l.tags.slice(0, 3).map(t => `<span class="tag">${esc(tagLabel(t))}</span>`).join('')
-      : `<span class="tag">${esc(T.needsTag)}</span>`;
+    const who = l.source ? `${l.source} · ${styleName(l.style)}` : T.tapToTag;
+    const badges = l.source ? '' : `<span class="tag">${esc(T.needsTag)}</span>`;
     const aud = isAudio(l);
     h += `<button class="card ${l.source ? '' : 'untagged'}" data-id="${esc(l.id)}">
       <div class="thumb ${hue(l.id)}${aud ? ' audio' : ''}">${aud ? icon('audio', 'i aud') : `<img data-thumb="${esc(l.id)}" alt="">`}<div class="play"></div>${l.duration ? `<div class="dur">${fmtDur(l.duration)}</div>` : ''}</div>
-      <div class="meta"><div class="title">${esc(lessonTitle(l).replace(/\s*\n+\s*/g, ' '))}</div><div class="who">${esc(who)}</div><div class="badges">${badges}</div></div></button>`;
+      <div class="meta"><div class="title">${esc(lessonTitle(l).replace(/\s*\n+\s*/g, ' '))}</div><div class="who">${esc(who)}</div><div class="when">${esc(fmtDateFull(l.date))}</div>${badges ? `<div class="badges">${badges}</div>` : ''}</div>${icon('chev', 'i chev')}</button>`;
   }
   $('list').innerHTML = h;
   loadThumbs($('list'));
@@ -699,10 +701,10 @@ async function openDetail(id) {
 function renderDetail() {
   const l = current; if (!l) return;
   const figs = l.figures;
-  const meta = [l.source || T.untagged, l.type ? typeLabel(l.type, true) : null, fmtDateLong(l.date)].filter(Boolean).map(esc).join(' <span class="dim">·</span> ');
+  const meta = [styleName(l.style), l.source || T.untagged, fmtDateLong(l.date)].filter(Boolean).map(esc).join(' <span class="dim">·</span> ');
   $('detail-body').innerHTML = `
     <div class="ttl2">${esc(lessonTitle(l).replace(/\s*\n+\s*/g, ' '))}</div>
-    <div class="meta2"><span>${meta}</span><span class="stl">${esc(styleName(l.style))}</span></div>
+    <div class="meta2"><span>${meta}</span></div>
     ${l.tags.length ? `<div class="tagrow">${l.tags.map(t => `<span class="tag">${esc(tagLabel(t))}</span>`).join('')}</div>` : ''}
     ${l.desc ? `<div class="desc">${esc(l.desc).replace(/\n/g, '<br>')}</div>` : ''}
     <h3>${esc(T.figures)}</h3>
@@ -712,15 +714,13 @@ function renderDetail() {
     <div class="markwrap" id="mark-wrap" hidden><div class="input"><input id="mark-name" placeholder="${esc(T.figureName)}" list="fig-names" autocomplete="off"><button class="mini" id="mark-add" aria-label="${esc(T.aria.save)}">${icon('check')}</button></div><datalist id="fig-names">${allFigureNames().map(n => `<option value="${esc(n)}">`).join('')}</datalist></div>
     ${l.note ? `<h3>${esc(T.notes)}</h3><div class="note">${esc(l.note).replace(/\n/g, '<br>')}</div>` : ''}
     ${renderAttachments(l)}`;
-  document.querySelectorAll('#att-strip img[data-attthumb]').forEach(img => { const a = findAtt(img.dataset.attthumb); if (a) loadAttThumb(a, img); });
+  loadAttThumbs($('detail-body'));
 }
 function onDetailClick(e) {
   if (!current) return;
   const rm = e.target.closest('[data-remove]');
   if (rm) { e.stopPropagation(); const i = +rm.dataset.remove; const f = current.figures[i]; if (!f) return; current.figures.splice(i, 1); current.updatedAt = nowIso(); renderDetail(); saveLibrary().then(() => toast(T.removed(f.name))).catch(err => toast(T.couldNotSave + shortErr(err))); return; }
-  if (e.target.closest('#att-add')) { openAttachSheet(); return; }
-  const tile = e.target.closest('[data-att]');
-  if (tile) { const a = findAtt(tile.dataset.att); if (!a) return; if (a.kind === 'image') openViewer(a); else openAttachActions(a); return; }
+  if (e.target.closest('[data-att]')) { onAttClick(e); return; }
   if (e.target.closest('#mark-row')) { $('mark-wrap').hidden = false; $('mark-name').focus(); if (!video.paused) video.pause(); return; }
   if (e.target.closest('#mark-add')) { submitMark(); return; }
   const row = e.target.closest('[data-fig]');
@@ -886,6 +886,7 @@ function openAdd(id) {
   $('prog').style.display = 'none'; $('prog').querySelector('i').style.width = '0'; $('prog-hint').textContent = '';
   $('delete-row').hidden = !editing; disarmDelete();
   pendingAi = null; $('ai-row').hidden = !editing; setAiHint(T.aiIdle); setAiBusy(false);
+  $('f-att-wrap').hidden = !editing; if (editing) renderFormAtt(); else $('f-att').innerHTML = '';
   show('add');
   document.querySelector('#s-add .scroll').scrollTop = 0;
 }
@@ -902,17 +903,27 @@ function renderStyleSeg() {
 function fillSources(selected) {
   const kind = formType === 'private' ? 'private' : 'school';
   const opts = lib.sources.filter(s => s.kind === kind);
-  const sel = $('f-source');
-  sel.innerHTML = opts.map(s => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('')
-    + `<option value="__new__">${esc(kind === 'private' ? T.newTeacher : T.newSchool)}</option>`;
-  if (selected && opts.some(s => s.name === selected)) sel.value = selected;
-  else if (opts.length) sel.value = opts[0].name;
-  else sel.value = '__new__';
+  if (selected && opts.some(s => s.name === selected)) formSource = selected;
+  else if (opts.length) formSource = opts[0].name;
+  else formSource = '__new__';
   $('f-source-label').textContent = kind === 'private' ? T.teacher : T.school;
   $('f-source-hint').textContent = kind === 'private' ? T.privateHint : '';
-  onSourceChange();
+  renderSourceBtn();
 }
-function onSourceChange() { const isNew = $('f-source').value === '__new__'; $('f-new-wrap').hidden = !isNew; if (!isNew) $('f-new').value = ''; }
+function renderSourceBtn() {
+  const isNew = formSource === '__new__';
+  $('f-source-v').textContent = isNew ? (formType === 'private' ? T.newTeacher : T.newSchool) : formSource;
+  $('f-new-wrap').hidden = !isNew; if (!isNew) $('f-new').value = '';
+}
+// The school or teacher is picked from a bottom sheet, like the filters, instead of a native select.
+function openSourceSheet() {
+  const priv = formType === 'private';
+  const opts = lib.sources.filter(s => s.kind === (priv ? 'private' : 'school'));
+  sheetKind = 'srcpick';
+  const row = (label, value, ic) => `<button class="orow" data-value="${esc(value)}">${ic ? icon(ic, 'i li') : ''}<span class="n">${esc(label)}</span>${formSource === value ? icon('check', 'i ck') : ''}</button>`;
+  showSheet(priv ? T.teacher : T.school, `<div class="orows">${opts.map(s => row(s.name, s.name)).join('')}${row(priv ? T.newTeacher : T.newSchool, '__new__', 'plus')}</div>`);
+}
+function pickFormSource(value) { formSource = value; closeSheet(); renderSourceBtn(); if (value === '__new__') setTimeout(() => $('f-new').focus(), 350); }
 
 function fileChosen(input) {
   const f = input.files && input.files[0]; if (!f) return;
@@ -947,7 +958,7 @@ function fileChosen(input) {
 
 function readForm() {
   const date = $('f-date').value || isoDate(new Date());
-  let source = $('f-source').value, isNew = false;
+  let source = formSource, isNew = false;
   if (source === '__new__') { source = $('f-new').value.trim(); isNew = true; }
   if (!source) source = null;
   let style = formStyle, styleNew = false;
@@ -1131,17 +1142,32 @@ async function runAi() {
   } finally { aiBusy = false; setAiBusy(false); keepAwake(false); }
 }
 // ---------- attachments (photos, files and links on a lesson) ----------
-function findAtt(id) { return current && (current.attachments || []).find(a => a.id === id); }
+// Attachments are added and removed from the edit form and browsed from the lesson page, so the
+// lesson they belong to is whichever of the two screens is showing.
+function attLesson() { return $('s-add').classList.contains('active') ? editing : current; }
+function findAtt(id) { const l = attLesson(); return l && (l.attachments || []).find(a => a.id === id); }
+function refreshAtt(l) { if ($('s-add').classList.contains('active')) { if (editing === l) renderFormAtt(); } else if (current === l) renderDetail(); }
 function linkHost(u) { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return u; } }
 function attTile(a) {
   if (a.kind === 'link') return `<button class="tile link" data-att="${esc(a.id)}">${icon('link')}<span dir="auto">${esc(a.name || linkHost(a.url))}</span></button>`;
   if (a.kind === 'image') return `<button class="tile img" data-att="${esc(a.id)}"><img data-attthumb="${esc(a.id)}" alt=""><div class="cap" dir="auto">${esc(a.name)}</div></button>`;
   return `<button class="tile doc" data-att="${esc(a.id)}">${icon('file')}<span dir="auto">${esc(a.name)}</span></button>`;
 }
-function renderAttachments(l) {
+function renderAttachments(l, editable) {
   const atts = l.attachments || [];
-  return `<h3>${esc(T.attachments)}${atts.length ? `<span class="cnt">${atts.length}</span>` : ''}</h3>
-    <div class="strip" id="att-strip">${atts.map(attTile).join('')}${attBusy ? `<div class="tile busy" id="att-busy">${esc(attBusyText)}</div>` : ''}<button class="tile add" id="att-add" aria-label="${esc(T.aria.attAdd)}" title="${esc(T.aria.attAdd)}">${icon('plus')}</button></div>`;
+  const busy = attBusy && attBusyLesson === l ? `<div class="tile busy" id="att-busy">${esc(attBusyText)}</div>` : '';
+  const tiles = atts.map(attTile).join('') + busy + (editable ? `<button type="button" class="tile add" id="att-add" aria-label="${esc(T.aria.attAdd)}" title="${esc(T.aria.attAdd)}">${icon('plus')}</button>` : '');
+  if (editable) return tiles;
+  if (!atts.length && !busy) return '';
+  return `<h3>${esc(T.attachments)}${atts.length ? `<span class="cnt">${atts.length}</span>` : ''}</h3><div class="strip" id="att-strip">${tiles}</div>`;
+}
+function renderFormAtt() { const l = editing; if (!l) return; const el = $('f-att'); el.innerHTML = renderAttachments(l, true); loadAttThumbs(el); }
+function loadAttThumbs(root) { root.querySelectorAll('img[data-attthumb]').forEach(img => { const a = findAtt(img.dataset.attthumb); if (a) loadAttThumb(a, img); }); }
+function onAttClick(e) {
+  if (e.target.closest('#att-add')) { openAttachSheet(); return; }
+  const tile = e.target.closest('[data-att]'); if (!tile) return;
+  const a = findAtt(tile.dataset.att); if (!a) return;
+  if (a.kind === 'image') openViewer(a); else openAttachActions(a);
 }
 function loadAttThumb(a, img) {
   const key = 'att:' + a.id;
@@ -1158,7 +1184,7 @@ function loadAttThumb(a, img) {
   })();
 }
 function openAttachSheet() {
-  if (!current) return;
+  if (!attLesson()) return;
   if (attBusy) { toast(T.attWait); return; }
   sheetKind = 'attach';
   const row = (act, ic, label, hint) => `<button class="orow" data-act="${act}">${icon(ic, 'i li')}<span class="n">${esc(label)}</span>${hint ? `<span class="hint">${esc(hint)}</span>` : ''}</button>`;
@@ -1175,13 +1201,13 @@ function onAttachPick(act) {
   if (input) input.click();
 }
 function submitLink() {
-  const el = $('att-url'); if (!el || !current) return;
+  const el = $('att-url'), l = attLesson(); if (!el || !l) return;
   let url = (el.value || '').trim(); if (!url) return;
   if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
   try { const u = new URL(url); if (!u.hostname.includes('.')) throw new Error('host'); } catch (e) { toast(T.attBadLink); return; }
   const a = { id: 'link-' + Date.now().toString(36), kind: 'link', name: linkHost(url), url, mime: '', size: null, thumbId: null, createdAt: nowIso() };
-  current.attachments.push(a); current.updatedAt = nowIso();
-  closeSheet(); renderDetail();
+  l.attachments.push(a); l.updatedAt = nowIso();
+  closeSheet(); refreshAtt(l);
   saveLibrary().then(() => toast(T.attAdded)).catch(err => toast(T.couldNotSave + shortErr(err)));
 }
 function openAttachActions(a) {
@@ -1202,7 +1228,7 @@ function onAttachAction(btn, act) {
   }
 }
 async function removeAttachment(a) {
-  const l = current; if (!l) return;
+  const l = attLesson(); if (!l) return;
   closeSheet(); closeViewer();
   try {
     if (a.kind !== 'link') {
@@ -1210,7 +1236,7 @@ async function removeAttachment(a) {
       if (a.thumbId) api(`/files/${a.thumbId}`, { method: 'PATCH', body: { trashed: true } }).catch(() => {});
     }
     l.attachments = l.attachments.filter(x => x.id !== a.id); l.updatedAt = nowIso();
-    if (current === l) renderDetail();
+    refreshAtt(l);
     await saveLibrary(); toast(T.attRemoved);
     idb.del('att:' + a.id);
     if (thumbs['att:' + a.id]) { URL.revokeObjectURL(thumbs['att:' + a.id]); delete thumbs['att:' + a.id]; }
@@ -1233,10 +1259,10 @@ function imageThumb(file, max) {
   });
 }
 async function addAttachmentFile(file, hint) {
-  const l = current; if (!l || !file) return;
+  const l = attLesson(); if (!l || !file) return;
   if (attBusy) { toast(T.attWait); return; }
   const isImg = /^image\//i.test(file.type) || (hint === 'image' && !file.type);
-  attBusy = true; attBusyText = T.attUploading(0); renderDetail(); keepAwake(true);
+  attBusy = true; attBusyLesson = l; attBusyText = T.attUploading(0); refreshAtt(l); keepAwake(true);
   try {
     await ensureRoot();
     const parentId = l.source ? await ensureSourceFolder(l.source, l.type || 'group') : root.id;
@@ -1257,11 +1283,11 @@ async function addAttachmentFile(file, hint) {
   } catch (e) {
     console.error(e);
     if (e.message !== 'signed out') toast(T.attFailed + shortErr(e), 6000);
-  } finally { attBusy = false; keepAwake(false); if (current === l) renderDetail(); }
+  } finally { attBusy = false; attBusyLesson = null; keepAwake(false); refreshAtt(l); }
 }
 // Full-screen viewer for image attachments: swipe or arrow keys between images.
 function openViewer(a) {
-  const l = current; if (!l) return;
+  const l = attLesson(); if (!l) return;
   viewerList = l.attachments.filter(x => x.kind === 'image'); viewerIdx = viewerList.findIndex(x => x.id === a.id);
   if (viewerIdx < 0) return;
   vwArmed = false; $('vw-delete').classList.remove('armed');
@@ -1384,19 +1410,21 @@ function bindEvents() {
   $('btn-edit').addEventListener('click', () => { if (current) openAdd(current.id); });
   $('detail-delete').addEventListener('click', e => deleteFromDetail(e.currentTarget));
   $('btn-add').addEventListener('click', () => openAdd(null));
-  $('btn-cancel').addEventListener('click', () => { if (uploading || aiBusy) { toast(T.waitUpload); return; } const back = editing; resetForm(); if (back && back.source) openDetail(back.id); else show('library'); });
+  $('btn-cancel').addEventListener('click', () => { if (uploading || aiBusy || attBusy) { toast(T.waitUpload); return; } const back = editing; resetForm(); if (back && back.source) openDetail(back.id); else show('library'); });
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => show(t.dataset.go)));
   $('search').addEventListener('input', e => { query = e.target.value; renderLibrary(); });
-  $('flt-style').addEventListener('click', () => openSheet('style'));
-  $('flt-source').addEventListener('click', () => openSheet('source'));
+  $('btn-filter').addEventListener('click', openFilterSheet);
+  $('flt-active').addEventListener('click', e => { const b = e.target.closest('[data-fk]'); if (b) setFilter(b.dataset.fk, null); });
   $('sheet-dim').addEventListener('click', closeSheet);
-  $('sheet-reset').addEventListener('click', () => pickSheet(null));
+  $('sheet-reset').addEventListener('click', () => setFilter(null));
+  $('sheet-done').addEventListener('click', closeSheet);
   $('sheet-body').addEventListener('click', e => {
     if (e.target.closest('#att-url-save')) { submitLink(); return; }
     const b = e.target.closest('.orow'); if (!b) return;
     if (sheetKind === 'attach') onAttachPick(b.dataset.act);
     else if (sheetKind === 'attact') onAttachAction(b, b.dataset.act);
-    else pickSheet(b.dataset.value || null);
+    else if (sheetKind === 'srcpick') pickFormSource(b.dataset.value);
+    else if (sheetKind === 'filter') setFilter(b.dataset.fk, b.dataset.value || null);
   });
   $('sheet-body').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'att-url') { e.preventDefault(); submitLink(); } });
   ['att-camera', 'att-photo', 'att-file'].forEach(id => $(id).addEventListener('change', e => { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (f) addAttachmentFile(f, id === 'att-file' ? null : 'image'); }));
@@ -1461,7 +1489,8 @@ function bindEvents() {
   $('f-file').addEventListener('change', e => fileChosen(e.target));
   $('f-type').addEventListener('click', e => { const b = e.target.closest('button[data-type]'); if (!b) return; formType = b.dataset.type; setTypeUI(); fillSources(lastSource(formType)); });
   $('f-style').addEventListener('click', e => { const b = e.target.closest('button[data-style]'); if (!b) return; formStyle = b.dataset.style; renderStyleSeg(); if (formStyle === '__new__') setTimeout(() => $('f-style-new').focus(), 50); });
-  $('f-source').addEventListener('change', onSourceChange);
+  $('f-source').addEventListener('click', openSourceSheet);
+  $('f-att').addEventListener('click', onAttClick);
   $('f-tags').addEventListener('click', e => { const b = e.target.closest('[data-tag]'); if (b) toggleFormTag(b.dataset.tag); });
   $('f-chapters').addEventListener('click', e => { const b = e.target.closest('[data-remove-chapter]'); if (!b) return; formChapters.splice(+b.dataset.removeChapter, 1); renderFormChapters(); });
   $('btn-save').addEventListener('click', saveLesson);

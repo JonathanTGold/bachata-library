@@ -13,9 +13,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="DanceLab">
-<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.12.0">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.12.0">
-<link rel="stylesheet" href="./styles.css?v=2.12.0">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.13.0">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.13.0">
+<link rel="stylesheet" href="./styles.css?v=2.13.0">
 </head>
 <body>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
@@ -35,8 +35,9 @@
   <symbol id="i-back5" viewBox="0 0 24 24"><path d="M8.25 6.5A7.5 7.5 0 1 1 4.95 10.43"/><path d="M8.25 2.6v3.9h3.85"/></symbol>
   <symbol id="i-fwd5" viewBox="0 0 24 24"><path d="M15.75 6.5A7.5 7.5 0 1 0 19.05 10.43"/><path d="M15.75 2.6v3.9H11.9"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></symbol>
-  <symbol id="i-lib" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M7 3v18M17 3v18M2 12h20M2 7.5h5M2 16.5h5M17 7.5h5M17 16.5h5"/></symbol>
-  <symbol id="i-school" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 6h8M16 6h4M4 12h2M10 12h10M4 18h10M18 18h2"/><circle cx="14" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="18" r="2"/></symbol>
+  <symbol id="i-lessons" viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="15" rx="3"/><path d="M10 9l5 3-5 3z"/></symbol>
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M2 9.5L12 5l10 4.5L12 14 2 9.5z"/><path d="M6 11.4v4.3c0 1.5 2.7 2.8 6 2.8s6-1.3 6-2.8v-4.3M22 9.5v5"/></symbol>
   <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
@@ -57,7 +58,7 @@
   <!-- SIGN IN -->
   <section class="screen" id="s-auth">
     <div class="auth">
-      <img class="logo" src="./icons/icon-192.png?v=2.12.0" alt="">
+      <img class="logo" src="./icons/icon-192.png?v=2.13.0" alt="">
       <h1>DanceLab</h1>
       <p class="sub" data-t="tagline"></p>
       <button class="primary" id="btn-signin" data-t="signin"></button>
@@ -84,8 +85,8 @@
         <button class="ib round" id="btn-settings" data-aria="settings"><svg class="i"><use href="#i-gear"/></svg></button>
       </div>
     </div>
-    <div class="searchwrap"><div class="search"><svg class="i"><use href="#i-search"/></svg><input id="search" type="search" autocomplete="off" aria-label="search"></div></div>
-    <div class="filters"><button class="pillbtn" id="flt-style"></button><button class="pillbtn" id="flt-source"></button></div>
+    <div class="searchwrap"><div class="search"><svg class="i"><use href="#i-search"/></svg><input id="search" type="search" autocomplete="off" aria-label="search" data-ph="search"></div><button class="fbtn" id="btn-filter" data-aria="filter"><svg class="i"><use href="#i-sliders"/></svg></button></div>
+    <div class="actf" id="flt-active" hidden></div>
     <div class="scroll" id="list"></div>
   </section>
 
@@ -149,7 +150,7 @@
           </div></div>
 
         <div class="field"><label id="f-source-label" for="f-source"></label>
-          <div class="input"><select id="f-source"></select></div>
+          <button type="button" class="input pickbtn" id="f-source"><span class="v" id="f-source-v"></span><svg class="i"><use href="#i-down"/></svg></button>
           <div class="input" id="f-new-wrap" hidden><input id="f-new" data-ph="name" autocomplete="off"></div>
           <div class="hint" id="f-source-hint"></div></div>
 
@@ -170,6 +171,9 @@
 
         <div class="field"><label for="f-note" data-t="notesOptional"></label>
           <div class="input"><textarea id="f-note"></textarea></div></div>
+
+        <div class="field" id="f-att-wrap" hidden><label data-t="attachments"></label>
+          <div class="strip" id="f-att"></div></div>
 
         <button class="primary" id="btn-save"></button>
         <div class="progress" id="prog"><i></i></div>
@@ -205,18 +209,18 @@
     <div class="vimg" id="vw-img"><img id="vw-pic" alt=""><div class="vload" id="vw-load" hidden></div></div>
     <div class="vbot"><button class="ib danger" id="vw-delete" data-aria="delete"><svg class="i"><use href="#i-trash"/></svg></button><span class="vn" id="vw-name"></span><button class="ib" id="vw-share" data-aria="share"><svg class="i"><use href="#i-share"/></svg></button></div>
   </div>
-  <div class="sheetwrap" id="sheet" hidden><div class="dim" id="sheet-dim"></div><div class="sheet" role="dialog"><div class="grab"></div><h4><span id="sheet-title"></span><button id="sheet-reset" data-t="reset"></button></h4><div id="sheet-body"></div></div></div>
+  <div class="sheetwrap" id="sheet" hidden><div class="dim" id="sheet-dim"></div><div class="sheet" role="dialog"><div class="grab"></div><h4><button id="sheet-reset" data-t="reset"></button><span id="sheet-title"></span><button id="sheet-done" data-t="done"></button></h4><div id="sheet-body"></div></div></div>
 
   <div class="toast" id="toast" role="status"></div>
 
   <nav class="tabbar" id="tabbar">
-    <button class="tab on" data-go="library"><svg class="i"><use href="#i-lib"/></svg><span data-t="library"></span></button>
+    <button class="tab on" data-go="library"><svg class="i"><use href="#i-lessons"/></svg><span data-t="library"></span></button>
     <button class="fab" id="btn-add" data-aria="add"><svg class="i"><use href="#i-plus"/></svg></button>
-    <button class="tab" data-go="schools"><svg class="i"><use href="#i-school"/></svg><span data-t="schools"></span></button>
+    <button class="tab" data-go="schools"><svg class="i"><use href="#i-cap"/></svg><span data-t="schools"></span></button>
   </nav>
 </div>
-<script src="./config.js?v=2.12.0"></script>
-<script src="./gemini.js?v=2.12.0"></script>
-<script src="./app.js?v=2.12.0"></script>
+<script src="./config.js?v=2.13.0"></script>
+<script src="./gemini.js?v=2.13.0"></script>
+<script src="./app.js?v=2.13.0"></script>
 </body>
 </html>
