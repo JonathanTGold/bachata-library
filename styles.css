@@ -1,8 +1,9 @@
 /* DanceLab · Apple Human Interface style: system type, one tint, dark glass. Cards, inputs and
- * sheet rows are translucent panes over a solid background.
+ * sheet rows are translucent panes; a yellow glow rises from the lower part of the screen (the top stays plain).
  * Dark by default, light via html[data-theme=light]. */
 :root{
   --bg:#000;--grp:rgba(255,255,255,.09);--grp2:rgba(255,255,255,.09);--grp3:rgba(255,255,255,.14);--rim:rgba(255,255,255,.13);--sheet:rgba(24,24,27,.86);--r:12px;--r2:999px;--r-lg:14px;
+  --ambient:linear-gradient(#000 0,#000 6%,transparent 22%),radial-gradient(125% 85% at 100% 30%,rgba(255,214,10,.16),transparent 75%),radial-gradient(100% 65% at 0% 100%,rgba(255,214,10,.1),transparent 72%);
   --label:#fff;--label2:rgba(235,235,245,.6);--label3:rgba(235,235,245,.3);
   --sep:rgba(84,84,88,.6);--fill:rgba(120,120,128,.24);--fill2:rgba(120,120,128,.32);
   --tint:#ffd60a;--tint-fill:#ffd60a;--tint-soft:rgba(255,214,10,.16);--on-tint:#1a1400;
@@ -12,6 +13,7 @@
 }
 html[data-theme=light]{
   --bg:#f2f2f7;--grp:rgba(255,255,255,.66);--grp2:rgba(255,255,255,.66);--grp3:rgba(0,0,0,.06);--rim:rgba(255,255,255,.95);--sheet:rgba(242,242,247,.9);
+  --ambient:linear-gradient(#f2f2f7 0,#f2f2f7 6%,transparent 22%),radial-gradient(125% 85% at 100% 30%,rgba(255,204,0,.22),transparent 75%),radial-gradient(100% 65% at 0% 100%,rgba(255,204,0,.13),transparent 72%);
   --label:#000;--label2:rgba(60,60,67,.6);--label3:rgba(60,60,67,.3);
   --sep:rgba(60,60,67,.29);--fill:rgba(118,118,128,.12);--fill2:rgba(118,118,128,.2);
   --tint:#b58a00;--tint-fill:#ffcc00;--tint-soft:rgba(255,204,0,.2);--on-tint:#1a1400;
@@ -26,7 +28,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 input,select,textarea{font:inherit;font-size:17px;color:var(--label)}
 a{color:var(--tint)}
 svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;display:block;flex:none}
-.app{position:absolute;inset:0;max-width:560px;margin:0 auto;background:var(--bg);overflow:hidden}
+.app{position:absolute;inset:0;max-width:560px;margin:0 auto;background:var(--ambient),var(--bg);overflow:hidden}
 .screen{position:absolute;inset:0;display:none;flex-direction:column}
 .screen.active{display:flex}
 
