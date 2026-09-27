@@ -89,7 +89,8 @@ function buildPrompt(lang, tags, mode) {
     if (audio) return 'נתחו את הקלטת השמע הזאת של שיעור ריקוד (קול בלבד, בלי תמונה: המורה מסביר או מסכם, לפעמים על רקע מוזיקה). ענו בעברית.\n' +
       'החזירו: כותרת קצרה (עד 12 מילים) שמונה את הפיגורות או הנושאים שנלמדו; תיאור מלא ומסודר של כל מה שנאמר בשיעור, לפי סדר הדברים, מחולק לנושאים עם כותרת משנה קצרה לכל נושא: ' +
       'ההסברים, התיקונים, הטיפים להובלה ולמובלים, התרגילים והכללים, במילים של המורה. לא תקציר קצר: כל נקודה שנאמרה נכנסת. ' +
-      'בלי פרשנות, בלי מושגים או מילים שלא נאמרו, ובלי להשלים ידע מבחוץ; 3 עד 8 פרקים כלליים, ' +
+      'בלי פרשנות, בלי מושגים או מילים שלא נאמרו, ובלי להשלים ידע מבחוץ. ' +
+      'פורמט התיאור: טקסט רגיל בלבד, בלי סימני Markdown (בלי #, בלי כוכביות, בלי מקפים בתחילת שורה): לכל נושא שורת כותרת משנה קצרה, מתחתיה הפסקה שלו, ושורה ריקה בין נושא לנושא; 3 עד 8 פרקים כלליים, ' +
       'לכל אחד זמן התחלה בפורמט MM:SS וכותרת נושא קצרה; ותגיות.\n' +
       'הכותרת מתארת את תוכן השיעור עצמו, למשל „מוזיקליות: ספירות, אקסנטים וכלי הנגינה”, בלי קידומות כמו „סיכום שיעור” או „שיעור ריקוד”.\n' +
       'מונחי ריקוד: מורים בישראל אומרים את שמות הפיגורות באנגלית במבטא ישראלי. השתמשו אך ורק באיות הבא כשמונח מהרשימה נשמע בהקלטה, ' +
@@ -100,7 +101,8 @@ function buildPrompt(lang, tags, mode) {
     return 'נתחו את סרטון סיכום שיעור הריקוד הזה. ענו בעברית.\n' +
       'החזירו: כותרת קצרה (עד 12 מילים) שמונה את הפיגורות או הנושאים שנלמדו; תיאור מלא ומסודר של כל מה שנאמר בשיעור, לפי סדר הדברים, מחולק לנושאים עם כותרת משנה קצרה לכל נושא: ' +
       'ההסברים, התיקונים, הטיפים להובלה ולמובלים, התרגילים והכללים, במילים של המורה. לא תקציר קצר: כל נקודה שנאמרה נכנסת. ' +
-      'בלי פרשנות, בלי מושגים או מילים שלא נאמרו, ובלי להשלים ידע מבחוץ; 3 עד 8 פרקים כלליים, ' +
+      'בלי פרשנות, בלי מושגים או מילים שלא נאמרו, ובלי להשלים ידע מבחוץ. ' +
+      'פורמט התיאור: טקסט רגיל בלבד, בלי סימני Markdown (בלי #, בלי כוכביות, בלי מקפים בתחילת שורה): לכל נושא שורת כותרת משנה קצרה, מתחתיה הפסקה שלו, ושורה ריקה בין נושא לנושא; 3 עד 8 פרקים כלליים, ' +
       'לכל אחד זמן התחלה בפורמט MM:SS וכותרת נושא קצרה; ותגיות.\n' +
       'הכותרת מתארת את תוכן השיעור עצמו, למשל „האמרלוק, שדו רגיל ושדו נגדי”, בלי קידומות כמו „סיכום שיעור” או „שיעור ריקוד”.\n' +
       'מונחי ריקוד: מורים בישראל אומרים את שמות הפיגורות באנגלית במבטא ישראלי. השתמשו אך ורק באיות הבא כשמונח מהרשימה נשמע בסרטון, ' +
@@ -113,7 +115,8 @@ function buildPrompt(lang, tags, mode) {
   if (audio) return 'Analyze this audio recording of a dance lesson (sound only, no picture: the instructor explaining or recapping, sometimes over music). Answer in English.\n' +
     'Return: a short title (max 12 words) naming the figures or topics taught; a full, ordered write-up of everything said in the lesson, split into topics with a short subheading each: ' +
     'the explanations, corrections, leading and following tips, exercises and rules, in the instructor\'s own words. Not a short summary: every point made goes in. ' +
-    'No interpretation, no terms or words that were not said, no outside knowledge; ' +
+    'No interpretation, no terms or words that were not said, no outside knowledge. ' +
+    'Description format: plain text only, no Markdown (no #, no asterisks, no leading dashes): for each topic a short subheading line, its paragraph below it, and a blank line between topics; ' +
     '3 to 8 broad chapters, each with a start time in MM:SS and a short topic title; and tags.\n' +
     'The title names the content itself, for example "Musicality: counts, accents and instruments", with no prefix such as "Lesson summary" or "Dance lesson".\n' +
     'Dance vocabulary: use exactly these spellings whenever one of these terms is heard, even with an accent, and never invent another transcription: ' + lex + '.\n' +
@@ -123,7 +126,8 @@ function buildPrompt(lang, tags, mode) {
   return 'Analyze this dance lesson recap video. Answer in English.\n' +
     'Return: a short title (max 12 words) naming the figures or topics taught; a full, ordered write-up of everything said in the lesson, split into topics with a short subheading each: ' +
     'the explanations, corrections, leading and following tips, exercises and rules, in the instructor\'s own words. Not a short summary: every point made goes in. ' +
-    'No interpretation, no terms or words that were not said, no outside knowledge; ' +
+    'No interpretation, no terms or words that were not said, no outside knowledge. ' +
+    'Description format: plain text only, no Markdown (no #, no asterisks, no leading dashes): for each topic a short subheading line, its paragraph below it, and a blank line between topics; ' +
     '3 to 8 broad chapters, each with a start time in MM:SS and a short topic title; and tags.\n' +
     'The title names the content itself, for example "Hammerlock, shadow and counter shadow", with no prefix such as "Lesson summary" or "Dance lesson".\n' +
     'Dance vocabulary: use exactly these spellings whenever one of these terms is heard, even with an accent, and never invent another transcription: ' + lex + '.\n' +
@@ -285,6 +289,12 @@ function normalizeTerms(text) {
   return out;
 }
 
+// Models still slip in Markdown now and then; the app stores plain text.
+function plainText(text) {
+  return String(text == null ? '' : text).replace(/\r/g, '').split('\n')
+    .map(l => l.replace(/^\s*#{1,6}\s*/, '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/^\s*[-*]\s+/, '• ').trimEnd())
+    .join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
 function parseTime(s) {
   const parts = String(s || '').trim().split(':').map(x => parseInt(x, 10));
   if (!parts.length || parts.some(isNaN)) return null;
@@ -307,7 +317,7 @@ async function generate(fileUri, mime, key, model, lang, tags, mode) {
   const allowed = new Set((tags || []).map(t => t.key));
   return {
     title: normalizeTerms(cleanTitle(data.title)),
-    desc: normalizeTerms(String(data.description || '').trim()),
+    desc: normalizeTerms(plainText(data.description)),
     tags: [...new Set((Array.isArray(data.tags) ? data.tags : []).map(String).filter(t => allowed.has(t)))],
     chapters: (Array.isArray(data.chapters) ? data.chapters : [])
       .map(c => ({ name: normalizeTerms(String(c.title || '').trim()), t: parseTime(c.start) }))

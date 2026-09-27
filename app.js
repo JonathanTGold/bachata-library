@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.15.2';
+const APP_VERSION = '2.15.3';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -164,6 +164,21 @@ const shortErr = e => String((e && e.message) || e).slice(0, 160);
 const fmtSize = n => n >= 1048576 ? (n / 1048576).toFixed(n >= 100 * 1048576 ? 0 : 1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
 const hue = id => ['', 't2', 't3'][String(id || '').split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 3];
 const icon = (name, cls = 'i') => `<svg class="${cls}"><use href="#i-${name}"/></svg>`;
+// Recaps are stored as plain text: a short subheading line, its paragraph, a blank line between
+// topics. Markdown marks that a model may still emit (#, **, list dashes) are dropped on the way in.
+function stripMd(text) {
+  return String(text == null ? '' : text).replace(/\r/g, '').split('\n')
+    .map(l => l.replace(/^\s*#{1,6}\s*/, '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/^\s*[-*]\s+/, '• ').trimEnd())
+    .join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+// Lesson page: each block is a paragraph; a short first line without end punctuation is its heading.
+function formatDesc(text) {
+  return stripMd(text).split(/\n\s*\n/).filter(b => b.trim()).map(b => {
+    const lines = b.split('\n').map(l => l.trim()).filter(Boolean);
+    const head = lines.length > 1 && lines[0].length <= 70 && !/[.!?,;]$/.test(lines[0]) ? lines.shift().replace(/:$/, '') : '';
+    return `<p>${head ? `<b>${esc(head)}</b>` : ''}${lines.map(esc).join('<br>')}</p>`;
+  }).join('');
+}
 const styleName = s => (s && T.styles[s]) || s || '';
 const tagLabel = k => (T.tags && T.tags[k]) || k;
 const typeLabel = (t, long) => t === 'private' ? (long ? T.privateLesson : T.private) : (long ? T.groupLesson : T.group);
@@ -189,7 +204,7 @@ function normalize(d) {
     return {
       id: String(l.id), thumbId: l.thumbId || null, name: l.name || '', date: l.date || '', source: l.source || null,
       type: l.type === 'private' ? 'private' : (l.type === 'group' ? 'group' : null),
-      style: (l.style && String(l.style).trim()) || DEFAULT_STYLE, title, desc: (l.desc == null ? '' : String(l.desc)).trim(), figures,
+      style: (l.style && String(l.style).trim()) || DEFAULT_STYLE, title, desc: stripMd(l.desc), figures,
       tags: [...new Set((Array.isArray(l.tags) ? l.tags : []).map(t => TAG_ALIASES[String(t)] || String(t)).filter(t => TAG_KEYS.includes(t)))],
       note: l.note || '', duration: l.duration == null ? null : +l.duration, size: l.size == null ? null : +l.size,
       mimeType: l.mimeType || '', createdAt: l.createdAt || null, updatedAt: l.updatedAt || null,
@@ -705,7 +720,7 @@ function renderDetail() {
     <div class="ttl2">${esc(lessonTitle(l).replace(/\s*\n+\s*/g, ' '))}</div>
     <div class="meta2"><span>${meta}</span></div>
     ${l.tags.length ? `<div class="tagrow">${l.tags.map(t => `<span class="tag">${esc(tagLabel(t))}</span>`).join('')}</div>` : ''}
-    ${l.desc ? `<div class="desc">${esc(l.desc).replace(/\n/g, '<br>')}</div>` : ''}
+    ${l.desc ? `<div class="desc">${formatDesc(l.desc)}</div>` : ''}
     <h3>${esc(T.figures)}</h3>
     ${figs.length ? '' : `<div class="chapters-empty">${esc(T.noChapters)}</div>`}
     ${figs.map((f, i) => `<div class="fig" data-fig="${i}" role="button"><span class="fname">${esc(f.name)}</span><span class="tm">${f.t != null ? fmtDur(f.t) : '·'}</span><button class="x ib" data-remove="${i}" aria-label="${esc(T.aria.remove)}">${icon('close')}</button></div>`).join('')}

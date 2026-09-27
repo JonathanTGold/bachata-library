@@ -155,6 +155,9 @@ h1{font-size:34px;font-weight:700;margin:0;letter-spacing:.37px;line-height:41px
 .tagpick{display:flex;gap:8px;flex-wrap:wrap}
 .tagpick .chip{font-size:14px;padding:6px 12px}
 .desc{font-size:17px;line-height:1.45;margin-top:12px;letter-spacing:-.4px;word-break:break-word}
+.desc p{margin:0 0 12px}
+.desc p:last-child{margin-bottom:0}
+.desc b{display:block;font-weight:600;margin-bottom:2px}
 h3{font-size:13px;font-weight:400;color:var(--label2);margin:22px 16px 6px}
 .chapters-empty{font-size:15px;color:var(--label2);line-height:1.45;background:var(--grp);border-radius:var(--r) var(--r) 0 0;padding:12px 14px}
 .fig{display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:17px;width:100%;text-align:start;color:var(--label);background:var(--grp);position:relative;cursor:pointer;letter-spacing:-.4px}
