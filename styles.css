@@ -37,6 +37,8 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stro
 .top.row,.brand{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 h1{font-size:34px;font-weight:700;margin:0;letter-spacing:.37px;line-height:41px;word-break:break-word}
 .top.row h1{font-size:28px;line-height:34px;letter-spacing:.36px}
+.top.row.compact{justify-content:flex-end}
+.top.row.compact .ib.round{margin-top:0}
 .sub{font-size:15px;color:var(--label2);margin-top:0;line-height:1.35}
 .ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;position:relative;flex:none;color:var(--tint)}
 .ib.round{background:var(--fill);color:var(--label2);width:36px;height:36px;margin-top:3px}

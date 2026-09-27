@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.15.1';
+const APP_VERSION = '2.15.2';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -868,8 +868,6 @@ function openAdd(id) {
     ? `${editAudio ? icon('audio', 'i aud') : ''}<b>${esc(editing.name)}</b><span>${editing.duration ? fmtDur(editing.duration) + ' · ' : ''}${editAudio ? esc(T.audioLesson) + ' · ' : ''}${esc(T.alreadyInDrive)}</span>`
     : '';
   if (editing && !editAudio && thumbs[editing.id]) { const img = document.createElement('img'); img.src = thumbs[editing.id]; img.alt = ''; pick.prepend(img); }
-  $('add-title').textContent = editing ? (editing.source ? T.editLesson : T.tagLesson) : T.addLesson;
-  $('add-sub').textContent = editing ? T.savedToIndex : T.pickTagDone;
   $('f-date').value = editing && editing.date ? editing.date : isoDate(new Date());
   formType = (editing && editing.type) || lastType() || 'group';
   formStyle = (editing && editing.style) || lastStyle();
