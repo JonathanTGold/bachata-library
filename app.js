@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.13.3';
+const APP_VERSION = '2.14.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -583,7 +583,7 @@ function lessonTitle(l) {
 function show(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 's-' + name));
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.go === name));
-  $('tabbar').style.display = (name === 'library' || name === 'schools') ? '' : 'none';
+  $('tabbar').style.display = (name === 'library' || name === 'schools' || name === 'settings') ? '' : 'none';
   if (name !== 'library') closeSheet();
   if (name !== 'detail') closeViewer();
   if (name !== 'detail' && video && !video.paused) video.pause();
@@ -665,7 +665,6 @@ function visibleLessons() {
 }
 function renderLibrary() {
   renderFilters();
-  $('lib-sub').textContent = lib.lessons.length ? T.recapsN(lib.lessons.length) : T.noRecaps;
   const items = visibleLessons();
   if (!items.length) {
     $('list').innerHTML = `<div class="empty">${lib.lessons.length ? esc(T.nothingMatches) : `<b>${esc(T.emptyTitle)}</b><br>${esc(T.emptyBody)}`}</div>`;
@@ -1404,8 +1403,6 @@ function renderSettings() {
 function bindEvents() {
   $('btn-signin').addEventListener('click', () => startAuth({}));
   $('btn-save-client').addEventListener('click', () => saveClientId($('setup-client').value));
-  $('btn-settings').addEventListener('click', () => show('settings'));
-  $('btn-settings-back').addEventListener('click', () => show('library'));
   $('btn-back').addEventListener('click', () => show('library'));
   $('btn-edit').addEventListener('click', () => { if (current) openAdd(current.id); });
   $('detail-delete').addEventListener('click', e => deleteFromDetail(e.currentTarget));

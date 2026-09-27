@@ -13,9 +13,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="DanceLab">
-<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.13.3">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.13.3">
-<link rel="stylesheet" href="./styles.css?v=2.13.3">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.14.0">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.14.0">
+<link rel="stylesheet" href="./styles.css?v=2.14.0">
 </head>
 <body>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
@@ -58,7 +58,7 @@
   <!-- SIGN IN -->
   <section class="screen" id="s-auth">
     <div class="auth">
-      <img class="logo" src="./icons/icon-192.png?v=2.13.3" alt="">
+      <img class="logo" src="./icons/icon-192.png?v=2.14.0" alt="">
       <h1>DanceLab</h1>
       <p class="sub" data-t="tagline"></p>
       <button class="primary" id="btn-signin" data-t="signin"></button>
@@ -79,13 +79,7 @@
 
   <!-- LIBRARY -->
   <section class="screen" id="s-library">
-    <div class="top">
-      <div class="brand">
-        <div><h1 data-t="library"></h1><div class="sub" id="lib-sub"></div></div>
-        <button class="ib round" id="btn-settings" data-aria="settings"><svg class="i"><use href="#i-gear"/></svg></button>
-      </div>
-    </div>
-    <div class="searchwrap"><div class="search"><svg class="i"><use href="#i-search"/></svg><input id="search" type="search" autocomplete="off" aria-label="search" data-ph="search"></div><button class="fbtn" id="btn-filter" data-aria="filter"><svg class="i"><use href="#i-sliders"/></svg></button></div>
+    <div class="searchwrap"><button class="fbtn" id="btn-add" data-aria="add"><svg class="i"><use href="#i-plus"/></svg></button><div class="search"><svg class="i"><use href="#i-search"/></svg><input id="search" type="search" autocomplete="off" aria-label="search" data-ph="search"></div><button class="fbtn" id="btn-filter" data-aria="filter"><svg class="i"><use href="#i-sliders"/></svg></button></div>
     <div class="actf" id="flt-active" hidden></div>
     <div class="scroll" id="list"></div>
   </section>
@@ -194,11 +188,8 @@
 
   <!-- SETTINGS -->
   <section class="screen" id="s-settings">
-    <div class="top row">
-      <div><h1 data-t="settings"></h1><div class="sub" id="set-sub"></div></div>
-      <button class="ib round" id="btn-settings-back" data-aria="close"><svg class="i"><use href="#i-close"/></svg></button>
-    </div>
-    <div class="scroll plain" id="settings-body"></div>
+    <div class="top"><h1 data-t="settings"></h1><div class="sub" id="set-sub"></div></div>
+    <div class="scroll" id="settings-body"></div>
   </section>
 
   <input type="file" id="att-camera" class="vh" accept="image/*" capture="environment" tabindex="-1">
@@ -215,12 +206,12 @@
 
   <nav class="tabbar" id="tabbar">
     <button class="tab on" data-go="library"><svg class="i"><use href="#i-lessons"/></svg><span data-t="library"></span></button>
-    <button class="fab" id="btn-add" data-aria="add"><svg class="i"><use href="#i-plus"/></svg></button>
     <button class="tab" data-go="schools"><svg class="i"><use href="#i-cap"/></svg><span data-t="schools"></span></button>
+    <button class="tab" data-go="settings"><svg class="i"><use href="#i-gear"/></svg><span data-t="settings"></span></button>
   </nav>
 </div>
-<script src="./config.js?v=2.13.3"></script>
-<script src="./gemini.js?v=2.13.3"></script>
-<script src="./app.js?v=2.13.3"></script>
+<script src="./config.js?v=2.14.0"></script>
+<script src="./gemini.js?v=2.14.0"></script>
+<script src="./app.js?v=2.14.0"></script>
 </body>
 </html>
