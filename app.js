@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.15.3';
+const APP_VERSION = '2.15.4';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -1155,13 +1155,15 @@ async function runAi() {
 }
 // The Gemini key: asked for in a sheet the first time the auto-fill is tapped, with a paste button
 // so the round trip to AI Studio is one tap each way. The same steps sit collapsed in Settings.
+// Key formats change; only reject what cannot be a key at all (spaces, too short).
+const looksLikeKey = v => /^[A-Za-z0-9_\-.]{20,}$/.test(String(v || '').trim());
 function keyStepsHtml() {
   return `<details class="steps"><summary><span>${esc(T.keyHow)}</span>${icon('down')}</summary><ol>${T.keySteps.map(x => `<li>${esc(x)}</li>`).join('')}</ol><p>${esc(T.keyNote)}</p></details>`;
 }
 function openKeySheet() {
   sheetKind = 'key';
   showSheet(T.keyTitle, `<div class="orows"><a class="orow" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">${icon('open', 'i li')}<span class="n">${esc(T.keyGet)}</span></a></div>
-    <div class="input linkrow"><input id="key-in" placeholder="AIza…" dir="ltr" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"><button class="mini" id="key-paste" aria-label="${esc(T.aria.paste)}">${icon('paste')}</button><button class="mini" id="key-save" aria-label="${esc(T.aria.save)}">${icon('check')}</button></div>
+    <div class="input linkrow"><input id="key-in" placeholder="API key" dir="ltr" enterkeyhint="done" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"><button class="mini" id="key-paste" aria-label="${esc(T.aria.paste)}">${icon('paste')}</button><button class="mini" id="key-save" aria-label="${esc(T.aria.save)}">${icon('check')}</button></div>
     ${keyStepsHtml()}`);
 }
 async function pasteKey() {
@@ -1172,7 +1174,7 @@ async function pasteKey() {
 function saveKeyFromSheet() {
   const el = $('key-in'); if (!el) return;
   const key = el.value.trim();
-  if (!/^AIza[0-9A-Za-z_-]{20,}$/.test(key)) { toast(T.badGeminiKey); return; }
+  if (!looksLikeKey(key)) { toast(T.badGeminiKey); return; }
   lib.settings.geminiKey = key; closeSheet();
   saveLibrary().then(() => toast(T.keySaved)).catch(err => toast(T.couldNotSave + shortErr(err)));
   if ($('s-add').classList.contains('active')) setTimeout(runAi, 350);
@@ -1363,7 +1365,7 @@ async function shareViewerImage() {
 function saveGeminiSettings() {
   const key = ($('set-gemini-key').value || '').trim();
   const model = ($('set-gemini-model').value || '').trim();
-  if (key && !/^AIza[0-9A-Za-z_-]{20,}$/.test(key)) { toast(T.badGeminiKey); return; }
+  if (key && !looksLikeKey(key)) { toast(T.badGeminiKey); return; }
   lib.settings.geminiKey = key; lib.settings.geminiModel = model;
   saveLibrary().then(() => toast(T.keySaved)).catch(err => toast(T.couldNotSave + shortErr(err)));
 }
@@ -1463,6 +1465,8 @@ function bindEvents() {
     else if (sheetKind === 'srcpick') pickFormSource(b.dataset.value);
     else if (sheetKind === 'filter') setFilter(b.dataset.fk, b.dataset.value || null);
   });
+  // A key pasted straight into the field saves by itself; no need to find the tick.
+  $('sheet-body').addEventListener('input', e => { if (e.target.id === 'key-in' && e.inputType === 'insertFromPaste' && looksLikeKey(e.target.value)) setTimeout(saveKeyFromSheet, 150); });
   $('sheet-body').addEventListener('keydown', e => { if (e.key !== 'Enter') return; if (e.target.id === 'att-url') { e.preventDefault(); submitLink(); } else if (e.target.id === 'key-in') { e.preventDefault(); saveKeyFromSheet(); } });
   ['att-camera', 'att-photo', 'att-file'].forEach(id => $(id).addEventListener('change', e => { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (f) addAttachmentFile(f, id === 'att-file' ? null : 'image'); }));
   $('vw-close').addEventListener('click', closeViewer);
