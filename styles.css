@@ -217,10 +217,15 @@ h3+.fig,#f-chapters .fig:first-child{border-radius:var(--r) var(--r) 0 0}
 .seg button.on{background:var(--seg-on);box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04)}
 .pick{position:relative;margin-top:14px;height:120px;border-radius:var(--r);display:grid;place-items:center;color:var(--label2);font-size:15px;background:var(--grp);cursor:pointer;text-align:center;padding:0 20px;overflow:hidden}
 .pick.locked{cursor:default}
-.pick img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.35}
-.pick .txt{position:relative;display:flex;flex-direction:column;gap:2px;align-items:center;word-break:break-all}
+.pick img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pick .txt{position:relative;z-index:1;display:flex;flex-direction:column;gap:2px;align-items:center;word-break:break-all}
 .pick b{color:var(--tint);font-size:17px;font-weight:600}
 .pick.picked b{color:var(--label)}
+/* with a poster the frame shows at full strength and the caption sits on a dark scrim along the bottom */
+.pick:has(img){align-content:end;justify-items:start;text-align:start;padding:0 14px 10px;color:rgba(255,255,255,.8)}
+.pick:has(img):after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 30%,rgba(0,0,0,.74))}
+.pick:has(img) .txt{align-items:flex-start}
+.pick.picked:has(img) b{color:#fff}
 .vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
 .primary{margin:22px 0 0;background:var(--tint-fill);color:var(--on-tint);border-radius:var(--r);padding:14px;font-size:17px;font-weight:600;width:100%}
 .primary:disabled{opacity:.55}
