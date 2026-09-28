@@ -120,12 +120,12 @@ html[data-theme=light] .topbar{background:rgba(242,242,247,.72)}
 .menu button{padding:9px 14px;border-radius:8px;text-align:left;font-size:15px;font-weight:500;color:#fff;font-variant-numeric:tabular-nums}
 .menu button.on{background:#ffd60a;color:#1a1400}
 #s-detail.hidectl .topctl,#s-detail.hidectl .center,#s-detail.hidectl .pctl{opacity:0;pointer-events:none}
-.player{position:relative;background:#000;padding-top:var(--sat);flex:none;direction:ltr}
+.player{position:relative;background:#000;padding-top:var(--sat);flex:none;direction:ltr;overflow:hidden}
 .player:before{content:"";position:absolute;left:0;right:0;top:0;height:calc(var(--sat) + 80px);background:linear-gradient(rgba(0,0,0,.55),transparent);pointer-events:none;z-index:1}
-.player video{display:block;width:100%;height:min(48vh,470px);object-fit:contain;background:#000;transition:height .3s ease,transform .2s}
+.player video{display:block;width:100%;height:min(48vh,470px);object-fit:contain;background:#000;transition:height .3s ease,opacity .2s,transform .2s}
 /* notes mode (Spotify style): the video folds away and a slim strip with the title and play/pause
    pins at the top, still playing; tapping the strip brings the player back */
-#s-detail.notes .player video{height:0}
+#s-detail.notes .player video{height:0;opacity:0}   /* iOS keeps painting a playing video outside a zero box unless it is clipped and faded */
 #s-detail.notes .center,#s-detail.notes .topctl,#s-detail.notes .pctl{opacity:0;pointer-events:none}
 #s-detail.notes .player:before,#s-detail.notes .audioart{display:none}
 .mstrip{display:flex;align-items:center;gap:10px;width:100%;min-height:58px;padding-block:6px;padding-inline:52px 14px;background:#000;color:#fff;text-align:start;position:relative;flex:none;border-bottom:.5px solid rgba(255,255,255,.12);opacity:0;transition:opacity .25s ease}
