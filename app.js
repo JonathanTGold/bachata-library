@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.15.4';
+const APP_VERSION = '2.15.5';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -39,7 +39,7 @@ const STR = {
   he: {
     dir: 'rtl', locale: 'he-IL',
     library: 'השיעורים שלי', schools: 'בתי ספר', settings: 'הגדרות', addLesson: 'שיעור חדש', editLesson: 'עריכת שיעור', tagLesson: 'תיוג הסיכום',
-    tagline: 'סיכומי השיעורים שלך, מסודרים לפי בית ספר, ישירות מה‑Google Drive שלך. שום דבר לא נשמר במקום אחר.',
+    tagline: 'סיכומי השיעורים שלך, מסודרים לפי בית ספר, ישירות מה‑Google Drive שלך.',
     signin: 'התחברות עם Google', signinHint: 'האפליקציה מבקשת גישה רק לקבצים שהיא עצמה יוצרת ב‑Drive שלך.',
     setupTitle: 'הגדרה חד‑פעמית', setupBody: 'לעותק הזה של האפליקציה אין עדיין מזהה לקוח של Google. יוצרים אחד ב‑Google Cloud Console ומדביקים למטה.',
     setupStep1: 'יוצרים פרויקט ומפעילים את Google Drive API.', setupStep2: 'ב‑Google Auth Platform מגדירים מיתוג, בוחרים קהל External, מוסיפים את ההרשאה drive.file ומפרסמים.', setupStep3: 'יוצרים לקוח OAuth מסוג Web application עם:', origin: 'מקור JavaScript מורשה', redirect: 'כתובת הפניה מורשית',
@@ -78,7 +78,7 @@ const STR = {
   en: {
     dir: 'ltr', locale: 'en-GB',
     library: 'My lessons', schools: 'Schools', settings: 'Settings', addLesson: 'New lesson', editLesson: 'Edit lesson', tagLesson: 'Tag this recap',
-    tagline: 'Your lesson recaps, organized by school, streamed from your own Google Drive. Nothing is stored anywhere else.',
+    tagline: 'Your lesson recaps, organized by school, streamed from your own Google Drive.',
     signin: 'Sign in with Google', signinHint: 'Asks only for access to files this app creates in your Drive.',
     setupTitle: 'One-time setup', setupBody: 'This copy of the app has no Google client ID yet. Create one in the Google Cloud console, then paste it below.',
     setupStep1: 'Create a project and enable the Google Drive API.', setupStep2: 'Under Google Auth Platform set up branding, choose audience External, add the drive.file scope, and publish.', setupStep3: 'Create an OAuth client of type Web application with:', origin: 'Authorized JavaScript origin', redirect: 'Authorized redirect URI',

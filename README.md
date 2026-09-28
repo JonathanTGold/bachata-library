@@ -4,7 +4,7 @@ DanceLab is a lightweight progressive web app (PWA) to organize, browse, and wat
 Everything lives in **your own Google Drive**. The app is only the front end. There is no backend
 and no server that ever sees your videos.
 
-**Live app:** https://jonathantgold.github.io/bachata-library/
+**Live app:** https://dancelab.pages.dev/ (also served at https://jonathantgold.github.io/bachata-library/)
 **UI mockup (fake data):** https://jonathantgold.github.io/bachata-library/mockup/
 
 ## What it does
@@ -75,9 +75,9 @@ origins you register.
    **Data access**: add the scope `https://www.googleapis.com/auth/drive.file`. It is non-sensitive,
    so no verification review is required.
 4. **Clients > Create client**, type **Web application**:
-   - Authorized JavaScript origins: `https://jonathantgold.github.io`
+   - Authorized JavaScript origins: `https://dancelab.pages.dev` and `https://jonathantgold.github.io`
      (add `http://localhost:8787` for local development)
-   - Authorized redirect URIs: `https://jonathantgold.github.io/bachata-library/`
+   - Authorized redirect URIs: `https://dancelab.pages.dev/` and `https://jonathantgold.github.io/bachata-library/`
      (add `http://localhost:8787/` for local development)
 5. Copy the client ID into `config.js`, or paste it into the app's setup screen.
 
@@ -92,7 +92,7 @@ Then open http://localhost:8787/ . Sign-in only works if that origin is register
 ## Gemini key security
 
 Create the key in Google Cloud for the same project and restrict it to the Generative Language API and to the
-website `https://jonathantgold.github.io/*`. The app sends it only in a request header to Google, never in a URL,
+websites `https://dancelab.pages.dev/*` and `https://jonathantgold.github.io/*`. The app sends it only in a request header to Google, never in a URL,
 and never ships it in the code.
 
 ## Repository layout
