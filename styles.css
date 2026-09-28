@@ -1,5 +1,7 @@
 /* DanceLab · Apple Human Interface style: system type, one tint, dark glass. Cards, inputs and
  * sheet rows are translucent panes; a yellow glow rises from the lower part of the screen (the top stays plain).
+ * Light: a deeper system gray so the near-white panes keep contrast where the glow fades; the glow cores are
+ * opaque so they stay as bright as before.
  * Dark by default, light via html[data-theme=light]. */
 :root{
   --bg:#000;--grp:rgba(255,255,255,.09);--grp2:rgba(255,255,255,.09);--grp3:rgba(255,255,255,.14);--rim:rgba(255,255,255,.13);--sheet:rgba(24,24,27,.86);--r:12px;--r2:999px;--r-lg:14px;
@@ -12,8 +14,8 @@
   --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif
 }
 html[data-theme=light]{
-  --bg:#f2f2f7;--grp:rgba(255,255,255,.66);--grp2:rgba(255,255,255,.66);--grp3:rgba(0,0,0,.06);--rim:rgba(255,255,255,.95);--sheet:rgba(242,242,247,.9);
-  --ambient:linear-gradient(#f2f2f7 0,#f2f2f7 6%,transparent 22%),radial-gradient(125% 85% at 100% 30%,rgba(255,204,0,.12),transparent 75%),radial-gradient(100% 65% at 0% 100%,rgba(255,204,0,.07),transparent 72%);
+  --bg:#e9e9ee;--grp:rgba(255,255,255,.94);--grp2:rgba(255,255,255,.94);--grp3:rgba(0,0,0,.06);--rim:rgba(255,255,255,.95);--sheet:rgba(233,233,238,.9);
+  --ambient:linear-gradient(#e9e9ee 0,#e9e9ee 6%,transparent 22%),radial-gradient(125% 85% at 100% 30%,#f5eac1,transparent 75%),radial-gradient(100% 65% at 0% 100%,#f4edd7,transparent 72%);
   --label:#000;--label2:rgba(60,60,67,.6);--label3:rgba(60,60,67,.3);
   --sep:rgba(60,60,67,.29);--fill:rgba(118,118,128,.12);--fill2:rgba(118,118,128,.2);
   --tint:#b58a00;--tint-fill:#ffcc00;--tint-soft:rgba(255,204,0,.2);--on-tint:#1a1400;
@@ -50,7 +52,7 @@ h1{font-size:34px;font-weight:700;margin:0;letter-spacing:.37px;line-height:41px
 /* the control bar is a glass strip over the list: it follows the scroll pixel by pixel (Instagram
    style) and snaps fully open or fully away when the gesture ends; the list is padded underneath */
 .topbar{position:absolute;top:0;inset-inline:0;z-index:5;background:rgba(0,0,0,.62);backdrop-filter:saturate(160%) blur(22px);-webkit-backdrop-filter:saturate(160%) blur(22px);will-change:transform}
-html[data-theme=light] .topbar{background:rgba(242,242,247,.72)}
+html[data-theme=light] .topbar{background:rgba(233,233,238,.72)}
 #btn-add .i{stroke-width:2.3}
 .search{flex:1;min-width:0;display:flex;gap:6px;align-items:center;background:var(--grp);border-radius:var(--r-lg);padding:7px 10px;color:var(--label2);min-height:40px}
 .search .i{width:18px;height:18px;stroke-width:2.2}
@@ -199,7 +201,7 @@ h3+.fig,#f-chapters .fig:first-child{border-radius:var(--r) var(--r) 0 0}
 .field{margin-top:14px}
 .field>label,.lbl{display:block;font-size:13px;color:var(--label2);margin:0 16px 7px}
 .input{background:var(--grp);border-radius:var(--r);padding:0 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:44px}
-.input+.input{margin-top:8px}
+.input+.input,.seg+.input{margin-top:8px}
 .input select,.input input,.input textarea{border:0;outline:0;background:transparent;flex:1;min-width:0;-webkit-appearance:none;appearance:none;padding:11px 0;margin:0;color:var(--label)}
 .pickbtn{width:100%;cursor:pointer;text-align:start;padding:11px 14px;color:var(--label)}
 .pickbtn .v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

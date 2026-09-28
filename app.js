@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.17.1';
+const APP_VERSION = '2.17.2';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -277,7 +277,7 @@ function resolvedTheme() { return theme === 'auto' ? (lightMq && lightMq.matches
 function applyTheme() {
   const t = resolvedTheme();
   document.documentElement.dataset.theme = t;
-  const tc = document.querySelector('meta[name=theme-color]'); if (tc) tc.content = t === 'light' ? '#f2f2f7' : '#000000';
+  const tc = document.querySelector('meta[name=theme-color]'); if (tc) tc.content = t === 'light' ? '#e9e9ee' : '#000000';
   const cs = document.querySelector('meta[name=color-scheme]'); if (cs) cs.content = t;
 }
 function setTheme(v) { theme = THEMES.includes(v) ? v : 'dark'; localStorage.setItem(LS.theme, theme); applyTheme(); renderSettings(); }
