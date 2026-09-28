@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.17.2';
+const APP_VERSION = '2.17.3';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -20,7 +20,7 @@ const INDEX_NAME = 'library.json';
 const THUMBS_NAME = '.thumbnails';
 const FOLDER_MIME = 'application/vnd.google-apps.folder';
 const LS = { token: 'bl_token', lib: 'bl_library', clientId: 'bl_client_id', hint: 'bl_login_hint', root: 'bl_root', lang: 'bl_lang', theme: 'bl_theme', filter: 'bl_filter' };
-const THEMES = ['dark', 'light', 'auto'];
+const THEMES = ['light', 'dark', 'auto'];   // light is the default
 const SS = { state: 'bl_oauth_state', silent: 'bl_silent_tried', needConsent: 'bl_need_consent' };
 const SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5];
 const SKIP = 5;
@@ -117,7 +117,7 @@ const STR = {
 };
 let lang = localStorage.getItem(LS.lang) || 'he';
 let T = STR[lang] || STR.he;
-let theme = THEMES.includes(localStorage.getItem(LS.theme)) ? localStorage.getItem(LS.theme) : 'dark';
+let theme = THEMES.includes(localStorage.getItem(LS.theme)) ? localStorage.getItem(LS.theme) : 'light';
 
 // ---------- state ----------
 let token = null;            // { access_token, expires_at }
@@ -280,7 +280,7 @@ function applyTheme() {
   const tc = document.querySelector('meta[name=theme-color]'); if (tc) tc.content = t === 'light' ? '#e9e9ee' : '#000000';
   const cs = document.querySelector('meta[name=color-scheme]'); if (cs) cs.content = t;
 }
-function setTheme(v) { theme = THEMES.includes(v) ? v : 'dark'; localStorage.setItem(LS.theme, theme); applyTheme(); renderSettings(); }
+function setTheme(v) { theme = THEMES.includes(v) ? v : 'light'; localStorage.setItem(LS.theme, theme); applyTheme(); renderSettings(); }
 
 // ---------- auth (OAuth 2.0 implicit flow via redirect; works inside iOS home-screen apps) ----------
 function clientId() { return (localStorage.getItem(LS.clientId) || CFG.GOOGLE_CLIENT_ID || '').trim(); }

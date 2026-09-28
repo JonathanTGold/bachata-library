@@ -2,7 +2,7 @@
  * sheet rows are translucent panes; a yellow glow rises from the lower part of the screen (the top stays plain).
  * Light: a deeper system gray so the near-white panes keep contrast where the glow fades; the glow cores are
  * opaque so they stay as bright as before.
- * Dark by default, light via html[data-theme=light]. */
+ * Base tokens are the dark theme; the light theme (the app default) applies via html[data-theme=light]. */
 :root{
   --bg:#000;--grp:rgba(255,255,255,.09);--grp2:rgba(255,255,255,.09);--grp3:rgba(255,255,255,.14);--rim:rgba(255,255,255,.13);--sheet:rgba(24,24,27,.86);--r:12px;--r2:999px;--r-lg:14px;
   --ambient:linear-gradient(#000 0,#000 6%,transparent 22%),radial-gradient(125% 85% at 100% 30%,rgba(255,214,10,.085),transparent 75%),radial-gradient(100% 65% at 0% 100%,rgba(255,214,10,.055),transparent 72%);

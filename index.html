@@ -6,16 +6,16 @@
 <title>DanceLab</title>
 <meta name="description" content="Organize, browse, and watch your dance lesson recap videos, stored in your own Google Drive.">
 <link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#000000">
-<meta name="color-scheme" content="dark">
-<script>try{var t=localStorage.getItem('bl_theme');if(t==='light'||(t==='auto'&&matchMedia('(prefers-color-scheme: light)').matches)){document.documentElement.dataset.theme='light';document.querySelector('meta[name=theme-color]').content='#e9e9ee';document.querySelector('meta[name=color-scheme]').content='light'}}catch(e){}</script>
+<meta name="theme-color" content="#e9e9ee">
+<meta name="color-scheme" content="light">
+<script>document.documentElement.dataset.theme='light';try{var t=localStorage.getItem('bl_theme');if(t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.dataset.theme='dark';document.querySelector('meta[name=theme-color]').content='#000000';document.querySelector('meta[name=color-scheme]').content='dark'}}catch(e){}</script>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="DanceLab">
-<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.17.2">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.17.2">
-<link rel="stylesheet" href="./styles.css?v=2.17.2">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.17.3">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.17.3">
+<link rel="stylesheet" href="./styles.css?v=2.17.3">
 </head>
 <body>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
@@ -60,7 +60,7 @@
   <!-- SIGN IN -->
   <section class="screen" id="s-auth">
     <div class="auth">
-      <img class="logo" src="./icons/icon-192.png?v=2.17.2" alt="">
+      <img class="logo" src="./icons/icon-192.png?v=2.17.3" alt="">
       <h1>DanceLab</h1>
       <p class="sub" data-t="tagline"></p>
       <button class="primary" id="btn-signin" data-t="signin"></button>
@@ -213,8 +213,8 @@
     <button class="tab" data-go="settings"><svg class="i"><use href="#i-gear"/></svg><span data-t="settings"></span></button>
   </nav>
 </div>
-<script src="./config.js?v=2.17.2"></script>
-<script src="./gemini.js?v=2.17.2"></script>
-<script src="./app.js?v=2.17.2"></script>
+<script src="./config.js?v=2.17.3"></script>
+<script src="./gemini.js?v=2.17.3"></script>
+<script src="./app.js?v=2.17.3"></script>
 </body>
 </html>
