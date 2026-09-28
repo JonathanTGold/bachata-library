@@ -47,6 +47,10 @@ h1{font-size:34px;font-weight:700;margin:0;letter-spacing:.37px;line-height:41px
 .ib.danger.armed,.ib.armed{background:var(--red)!important;color:#fff!important}
 .searchwrap{padding:12px 16px 10px;flex:none;display:flex;gap:8px;align-items:center}
 #s-library .searchwrap{padding-top:max(14px,calc(var(--sat) + 8px))}
+/* the control bar is a glass strip over the list: it follows the scroll pixel by pixel (Instagram
+   style) and snaps fully open or fully away when the gesture ends; the list is padded underneath */
+.topbar{position:absolute;top:0;inset-inline:0;z-index:5;background:rgba(0,0,0,.62);backdrop-filter:saturate(160%) blur(22px);-webkit-backdrop-filter:saturate(160%) blur(22px);will-change:transform}
+html[data-theme=light] .topbar{background:rgba(242,242,247,.72)}
 #btn-add .i{stroke-width:2.3}
 .search{flex:1;min-width:0;display:flex;gap:6px;align-items:center;background:var(--grp);border-radius:var(--r-lg);padding:7px 10px;color:var(--label2);min-height:40px}
 .search .i{width:18px;height:18px;stroke-width:2.2}

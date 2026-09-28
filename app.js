@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.15.6';
+const APP_VERSION = '2.16.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -678,8 +678,33 @@ function visibleLessons() {
   if (q) items = items.filter(l => [l.title, l.desc, l.note, ...l.figures.map(f => f.name), ...l.tags.map(tagLabel), ...(l.attachments || []).map(a => a.name)].filter(Boolean).some(v => String(v).toLowerCase().includes(q)));
   return items;
 }
+// Home screen bar (add, search, filter): a glass strip over the list that follows the scroll from
+// the first pixel, up with the content and back down with it, and snaps fully open or fully away
+// once the gesture settles. The list is padded underneath it by its measured height.
+let barH = 0, barOff = 0, barLastY = 0, barUp = 0, barSnap = null;
+function setBarOffset(v, animate) {
+  const bar = $('topbar');
+  barOff = Math.max(0, Math.min(barH, v));
+  bar.style.transition = animate ? 'transform .22s cubic-bezier(.2,.8,.2,1)' : 'none';
+  bar.style.transform = `translateY(${-barOff}px)`;
+}
+function layoutBar() {
+  const h = $('topbar').offsetHeight; if (!h) return;   // library screen not showing
+  barH = h; $('list').style.paddingTop = h + 'px';
+  setBarOffset(0, false); barLastY = Math.max(0, $('list').scrollTop); barUp = 0;
+}
+function onListScroll() {
+  const list = $('list'), y = Math.max(0, list.scrollTop), dy = y - barLastY; barLastY = y;
+  if (document.activeElement === $('search')) { setBarOffset(0, false); return; }
+  barUp = dy < 0 ? barUp - dy : 0;
+  setBarOffset(Math.min(barOff + dy, y), false);   // never hide more than has been scrolled
+  clearTimeout(barSnap);
+  // When the gesture settles: a deliberate scroll back (10px or more) reopens the bar, otherwise it
+  // lands on whichever side is nearer; near the top of the list it is always open.
+  barSnap = setTimeout(() => setBarOffset((barUp >= 10 || y <= barH || barOff <= barH / 2) ? 0 : barH, true), 110);
+}
 function renderLibrary() {
-  renderFilters();
+  renderFilters(); layoutBar();
   const items = visibleLessons();
   if (!items.length) {
     $('list').innerHTML = `<div class="empty">${lib.lessons.length ? esc(T.nothingMatches) : `<b>${esc(T.emptyTitle)}</b><br>${esc(T.emptyBody)}`}</div>`;
@@ -1449,6 +1474,8 @@ function bindEvents() {
   $('btn-cancel').addEventListener('click', () => { if (uploading || aiBusy || attBusy) { toast(T.waitUpload); return; } const back = editing; resetForm(); if (back && back.source) openDetail(back.id); else show('library'); });
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => show(t.dataset.go)));
   $('search').addEventListener('input', e => { query = e.target.value; renderLibrary(); });
+  $('list').addEventListener('scroll', onListScroll, { passive: true });
+  window.addEventListener('resize', layoutBar);
   $('btn-filter').addEventListener('click', openFilterSheet);
   $('flt-active').addEventListener('click', e => { const b = e.target.closest('[data-fk]'); if (b) setFilter(b.dataset.fk, null); });
   $('sheet-dim').addEventListener('click', closeSheet);
