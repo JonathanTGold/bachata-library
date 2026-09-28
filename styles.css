@@ -122,7 +122,20 @@ html[data-theme=light] .topbar{background:rgba(242,242,247,.72)}
 #s-detail.hidectl .topctl,#s-detail.hidectl .center,#s-detail.hidectl .pctl{opacity:0;pointer-events:none}
 .player{position:relative;background:#000;padding-top:var(--sat);flex:none;direction:ltr}
 .player:before{content:"";position:absolute;left:0;right:0;top:0;height:calc(var(--sat) + 80px);background:linear-gradient(rgba(0,0,0,.55),transparent);pointer-events:none;z-index:1}
-.player video{display:block;width:100%;height:min(48vh,470px);object-fit:contain;background:#000;transition:transform .2s}
+.player video{display:block;width:100%;height:min(48vh,470px);object-fit:contain;background:#000;transition:height .3s ease,transform .2s}
+/* notes mode (Spotify style): the video folds away and a slim strip with the title and play/pause
+   pins at the top, still playing; tapping the strip brings the player back */
+#s-detail.notes .player video{height:0}
+#s-detail.notes .center,#s-detail.notes .topctl,#s-detail.notes .pctl{opacity:0;pointer-events:none}
+#s-detail.notes .player:before,#s-detail.notes .audioart{display:none}
+.mstrip{display:flex;align-items:center;gap:10px;width:100%;min-height:58px;padding-block:6px;padding-inline:52px 14px;background:#000;color:#fff;text-align:start;position:relative;flex:none;border-bottom:.5px solid rgba(255,255,255,.12);opacity:0;transition:opacity .25s ease}
+.mstrip.in{opacity:1}
+.mstrip .mt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.mstrip b{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.2px}
+.mstrip .ms{font-size:13px;color:rgba(235,235,245,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mstrip .msplay{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.16);display:grid;place-items:center;flex:none;color:#fff}
+.mstrip .msplay .i{width:18px;height:18px}
+.mstrip .msbar{position:absolute;left:0;bottom:-.5px;height:2px;background:#ffd60a;width:0}
 .player video.mirror{transform:scaleX(-1)}
 .center{position:absolute;left:50%;top:calc(50% + var(--sat)/2);transform:translate(-50%,-50%);display:flex;align-items:center;gap:30px;transition:opacity .25s;z-index:2}
 .bigplay{width:66px;height:66px;border-radius:50%;background:rgba(255,255,255,.22);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;display:grid;place-items:center}
@@ -144,7 +157,9 @@ html[data-theme=light] .topbar{background:rgba(242,242,247,.72)}
 /* ---- lesson page ---- */
 .actrow{display:flex;gap:2px;padding:6px 0 0;margin:0 -6px}
 .actrow .ib{color:var(--tint)}
+.actrow .i{stroke-width:1.6}
 .actrow #detail-delete{color:var(--red)}
+.actrow #btn-notes{margin-inline-start:auto}
 .ib.aibtn{color:var(--tint)}
 .ib.aibtn.busy{opacity:.5;pointer-events:none;animation:pulse 1.2s ease-in-out infinite}
 @keyframes pulse{50%{opacity:1}}

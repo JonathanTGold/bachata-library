@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.16.1';
+const APP_VERSION = '2.17.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -73,7 +73,7 @@ const STR = {
     tagsLabel: 'תגיות',
     tags: { basics: 'בסיסים', elements: 'אלמנטים', combos: 'קומבינציות', bodymove: 'תנועתיות', technique: 'טכניקה', choreo: 'כוריאוגרפיה', footwork: 'עבודת רגליים', musicality: 'מוזיקליות', styling: 'סטיילינג' },
     tagHints: { basics: 'צעדי בסיס, טאפים וגיווני בסיס', elements: 'פיגורות ואלמנטים בזוג כמו האמרלוק, סומבררו, שדו, כריכה, קרוס בודי, סיבובים', combos: 'קומבינציות ורצפים של כמה אלמנטים', bodymove: 'גלי גוף, בודי רול, קמברה, איזולציות של אגן וחזה, תנועות ראש, סנסואל', technique: 'יציבה, מסגרת, העברת משקל, הובלה ומעקב, חיבור, תרגילים', choreo: 'כוריאוגרפיה או רצף להופעה', footwork: 'עבודת רגליים, סינקופות, סגנון דומיניקני, שיינס', musicality: 'מוזיקליות, קצב, ספירות, אינטרו, מבנה השיר', styling: 'סטיילינג ידיים, שיער וגוף למובילים ולמובלות' },
-    aria: { filter: 'סינון', paste: 'הדבקה', attAdd: 'הוספת תמונה, קובץ או קישור לשיעור', share: 'שיתוף', ai: 'ניתוח אוטומטי עם Gemini', back: 'חזרה', settings: 'הגדרות', add: 'שיעור חדש', close: 'סגירה', edit: 'עריכה', drive: 'פתיחה ב‑Drive', remove: 'הסרה', addFigure: 'סימון פרק בזמן הנוכחי', mirror: 'מראה', repeat: 'חזרה על קטע', fullscreen: 'מסך מלא', pip: 'תמונה בתוך תמונה', play: 'נגן', pause: 'השהיה', back5: 'אחורה 5 שניות', fwd5: 'קדימה 5 שניות', speed: 'מהירות', delete: 'מחיקה', signout: 'התנתקות', rescan: 'סריקה', save: 'שמירה' }
+    aria: { filter: 'סינון', paste: 'הדבקה', notes: 'הסיכום במסך מלא', attAdd: 'הוספת תמונה, קובץ או קישור לשיעור', share: 'שיתוף', ai: 'ניתוח אוטומטי עם Gemini', back: 'חזרה', settings: 'הגדרות', add: 'שיעור חדש', close: 'סגירה', edit: 'עריכה', drive: 'פתיחה ב‑Drive', remove: 'הסרה', addFigure: 'סימון פרק בזמן הנוכחי', mirror: 'מראה', repeat: 'חזרה על קטע', fullscreen: 'מסך מלא', pip: 'תמונה בתוך תמונה', play: 'נגן', pause: 'השהיה', back5: 'אחורה 5 שניות', fwd5: 'קדימה 5 שניות', speed: 'מהירות', delete: 'מחיקה', signout: 'התנתקות', rescan: 'סריקה', save: 'שמירה' }
   },
   en: {
     dir: 'ltr', locale: 'en-GB',
@@ -112,7 +112,7 @@ const STR = {
     tagsLabel: 'Tags',
     tags: { basics: 'Basics', elements: 'Elements', combos: 'Combinations', bodymove: 'Body movement', technique: 'Technique', choreo: 'Choreography', footwork: 'Footwork', musicality: 'Musicality', styling: 'Styling' },
     tagHints: { basics: 'basic steps, taps and basic variations', elements: 'partner figures such as hammerlock, sombrero, shadow, wrap, cross body lead, turns', combos: 'combinations and sequences of several elements', bodymove: 'body waves, body rolls, cambré, hip and chest isolations, head movement, sensual style', technique: 'posture, frame, weight transfer, leading and following, connection, drills', choreo: 'a choreography or performance routine', footwork: 'footwork, syncopations, Dominican style, shines', musicality: 'musicality, rhythm, counting, intros, song structure', styling: 'arm, hair and body styling for leads and follows' },
-    aria: { filter: 'Filters', paste: 'Paste', attAdd: 'Add a photo, file or link to the lesson', share: 'Share', ai: 'Auto-fill with Gemini', back: 'Back', settings: 'Settings', add: 'New lesson', close: 'Close', edit: 'Edit', drive: 'Open in Drive', remove: 'Remove', addFigure: 'Mark a chapter at the current time', mirror: 'Mirror', repeat: 'Repeat a section', fullscreen: 'Fullscreen', pip: 'Picture in picture', play: 'Play', pause: 'Pause', back5: 'Back 5 seconds', fwd5: 'Forward 5 seconds', speed: 'Speed', delete: 'Delete', signout: 'Sign out', rescan: 'Rescan', save: 'Save' }
+    aria: { filter: 'Filters', paste: 'Paste', notes: 'Notes full screen', attAdd: 'Add a photo, file or link to the lesson', share: 'Share', ai: 'Auto-fill with Gemini', back: 'Back', settings: 'Settings', add: 'New lesson', close: 'Close', edit: 'Edit', drive: 'Open in Drive', remove: 'Remove', addFigure: 'Mark a chapter at the current time', mirror: 'Mirror', repeat: 'Repeat a section', fullscreen: 'Fullscreen', pip: 'Picture in picture', play: 'Play', pause: 'Pause', back5: 'Back 5 seconds', fwd5: 'Forward 5 seconds', speed: 'Speed', delete: 'Delete', signout: 'Sign out', rescan: 'Rescan', save: 'Save' }
   }
 };
 let lang = localStorage.getItem(LS.lang) || 'he';
@@ -734,8 +734,22 @@ async function openDetail(id) {
   const dd = $('detail-delete'); dd.dataset.armed = ''; dd.classList.remove('armed'); dd.disabled = false;
   $('s-detail').classList.toggle('audio', isAudio(l));
   show('detail'); renderDetail();
-  $('detail-scroll').scrollTop = 0;
+  $('detail-scroll').scrollTop = 0; setNotesMode(false); $('ministrip').hidden = true; fillStrip(l);
   loadMedia(l);
+}
+// Notes mode: a button under the player folds the video away (it keeps playing) and a slim strip
+// with the title, play/pause and progress pins at the top, so the notes get the whole screen.
+// Tapping the strip brings the player back.
+let stripTimer = null;
+function setNotesMode(on) {
+  const d = $('s-detail'), strip = $('ministrip'); clearTimeout(stripTimer);
+  d.classList.toggle('notes', on);
+  if (on) { strip.hidden = false; setTimeout(() => strip.classList.add('in'), 20); }
+  else { strip.classList.remove('in'); stripTimer = setTimeout(() => { if (!d.classList.contains('notes')) strip.hidden = true; }, 260); }
+}
+function fillStrip(l) {
+  $('ms-title').textContent = lessonTitle(l).replace(/\s*\n+\s*/g, ' ');
+  $('ms-sub').textContent = [styleName(l.style), l.source || T.untagged].join(' · ');
 }
 function renderDetail() {
   const l = current; if (!l) return;
@@ -748,7 +762,7 @@ function renderDetail() {
     ${l.desc ? `<div class="desc">${formatDesc(l.desc)}</div>` : ''}
     <h3>${esc(T.figures)}</h3>
     ${figs.length ? '' : `<div class="chapters-empty">${esc(T.noChapters)}</div>`}
-    ${figs.map((f, i) => `<div class="fig" data-fig="${i}" role="button"><span class="fname">${esc(f.name)}</span><span class="tm">${f.t != null ? fmtDur(f.t) : '·'}</span><button class="x ib" data-remove="${i}" aria-label="${esc(T.aria.remove)}">${icon('close')}</button></div>`).join('')}
+    ${figs.map((f, i) => `<div class="fig" data-fig="${i}" role="button"><span class="fname">${esc(f.name)}</span><span class="tm">${f.t != null ? fmtDur(f.t) : '·'}</span></div>`).join('')}
     <button class="fig add" id="mark-row" aria-label="${esc(T.aria.addFigure)}" title="${esc(T.aria.addFigure)}">${icon('plus')}</button>
     <div class="markwrap" id="mark-wrap" hidden><div class="input"><input id="mark-name" placeholder="${esc(T.figureName)}" list="fig-names" autocomplete="off"><button class="mini" id="mark-add" aria-label="${esc(T.aria.save)}">${icon('check')}</button></div><datalist id="fig-names">${allFigureNames().map(n => `<option value="${esc(n)}">`).join('')}</datalist></div>
     ${l.note ? `<h3>${esc(T.notes)}</h3><div class="note">${esc(l.note).replace(/\n/g, '<br>')}</div>` : ''}
@@ -757,8 +771,6 @@ function renderDetail() {
 }
 function onDetailClick(e) {
   if (!current) return;
-  const rm = e.target.closest('[data-remove]');
-  if (rm) { e.stopPropagation(); const i = +rm.dataset.remove; const f = current.figures[i]; if (!f) return; current.figures.splice(i, 1); current.updatedAt = nowIso(); renderDetail(); saveLibrary().then(() => toast(T.removed(f.name))).catch(err => toast(T.couldNotSave + shortErr(err))); return; }
   if (e.target.closest('[data-att]')) { onAttClick(e); return; }
   if (e.target.closest('#mark-row')) { $('mark-wrap').hidden = false; $('mark-name').focus(); if (!video.paused) video.pause(); return; }
   if (e.target.closest('#mark-add')) { submitMark(); return; }
@@ -835,7 +847,7 @@ function setRate(r) {
 }
 function toggleSpeedMenu(force) { const m = $('speed-menu'); m.hidden = force === undefined ? !m.hidden : !force; }
 function skip(sec) { if (!video.duration) return; video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + sec)); updateTime(); }
-function setPlayIcon(playing) { $('playicon').innerHTML = `<use href="#i-${playing ? 'pause' : 'play'}"/>`; $('bigplay').setAttribute('aria-label', playing ? T.aria.pause : T.aria.play); }
+function setPlayIcon(playing) { $('playicon').innerHTML = $('ms-icon').innerHTML = `<use href="#i-${playing ? 'pause' : 'play'}"/>`; $('bigplay').setAttribute('aria-label', playing ? T.aria.pause : T.aria.play); }
 let fadeTimer;
 function showControls() { $('s-detail').classList.remove('hidectl'); clearTimeout(fadeTimer); if (!video.paused && !(current && isAudio(current))) fadeTimer = setTimeout(() => { if (!video.paused && $('speed-menu').hidden) $('s-detail').classList.add('hidectl'); }, 4000); }
 function controlsHidden() { return $('s-detail').classList.contains('hidectl'); }
@@ -843,7 +855,7 @@ function hideControls() { clearTimeout(fadeTimer); $('s-detail').classList.add('
 function pct(t) { return video.duration ? (t / video.duration * 100) + '%' : '0%'; }
 function updateTime() {
   const d = isFinite(video.duration) ? video.duration : 0;
-  $('fill').style.width = $('knob').style.left = pct(video.currentTime || 0);
+  $('fill').style.width = $('knob').style.left = $('ms-bar').style.width = pct(video.currentTime || 0);
   $('time').textContent = `${fmtDur(video.currentTime || 0)} / ${fmtDur(d)}`;
   if (loopA !== null) $('mkA').style.left = pct(loopA);
   if (loopB !== null) { $('mkB').style.left = pct(loopB); $('ab').style.left = pct(loopA); $('ab').style.width = (d ? (loopB - loopA) / d * 100 : 0) + '%'; }
@@ -1549,6 +1561,8 @@ function bindEvents() {
   $('btn-fs').addEventListener('click', enterFullscreen);
   $('btn-pip').addEventListener('click', togglePip);
   if (!pipSupported()) $('btn-pip').style.display = 'none';
+  $('btn-notes').addEventListener('click', () => setNotesMode(true));
+  $('ministrip').addEventListener('click', e => { if (e.target.closest('#ms-play')) { if (video.paused) video.play().catch(() => {}); else video.pause(); return; } setNotesMode(false); });
   $('detail-body').addEventListener('click', onDetailClick);
   $('detail-body').addEventListener('keydown', e => { if (e.target.id === 'mark-name' && e.key === 'Enter') { e.preventDefault(); submitMark(); } });
 
