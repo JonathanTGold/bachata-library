@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.15.5';
+const APP_VERSION = '2.15.6';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -1425,8 +1425,7 @@ function renderSettings() {
     <div class="input" style="margin-top:8px"><input id="set-gemini-model" value="${esc(lib.settings.geminiModel)}" placeholder="${esc(window.GeminiClient ? window.GeminiClient.DEFAULT_MODEL : 'gemini-2.5-flash')}" dir="ltr" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"></div>
     <div class="hint">${esc(T.geminiModelHint)}</div>
     ${keyStepsHtml()}
-    <div class="month">${esc(T.help)}</div>
-    <div class="help">${T.helpItems.map(([ic, t, d]) => `<div>${icon(ic)}<span><b>${esc(t)}</b>${esc(d)}</span></div>`).join('')}</div>
+    <details class="steps helpbox"><summary><span>${esc(T.help)}</span>${icon('down')}</summary><div class="help">${T.helpItems.map(([ic, t, d]) => `<div>${icon(ic)}<span><b>${esc(t)}</b>${esc(d)}</span></div>`).join('')}</div></details>
     <div class="month">${esc(T.language)}</div>
     <div class="seg" id="lang-seg"><button type="button" class="${lang === 'he' ? 'on' : ''}" data-lang="he">עברית</button><button type="button" class="${lang === 'en' ? 'on' : ''}" data-lang="en">English</button></div>
     <div class="month">${esc(T.appearance)}</div>
