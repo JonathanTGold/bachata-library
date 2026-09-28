@@ -15,7 +15,7 @@
 }
 html[data-theme=light]{
   --bg:#e9e9ee;--grp:rgba(255,255,255,.94);--grp2:rgba(255,255,255,.94);--grp3:rgba(0,0,0,.06);--rim:rgba(255,255,255,.95);--sheet:rgba(233,233,238,.9);
-  --ambient:linear-gradient(#e9e9ee 0,#e9e9ee 6%,transparent 22%),radial-gradient(125% 85% at 100% 30%,#f5eac1,transparent 75%),radial-gradient(100% 65% at 0% 100%,#f4edd7,transparent 72%);
+  --ambient:linear-gradient(#e9e9ee 0,#e9e9ee 6%,transparent 22%),radial-gradient(125% 85% at 100% 30%,#f4ecd0,transparent 75%),radial-gradient(100% 65% at 0% 100%,#f3eede,transparent 72%);
   --label:#000;--label2:rgba(60,60,67,.6);--label3:rgba(60,60,67,.3);
   --sep:rgba(60,60,67,.29);--fill:rgba(118,118,128,.12);--fill2:rgba(118,118,128,.2);
   --tint:#b58a00;--tint-fill:#ffcc00;--tint-soft:rgba(255,204,0,.2);--on-tint:#1a1400;
