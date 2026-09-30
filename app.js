@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.19.5';
+const APP_VERSION = '2.20.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -65,7 +65,7 @@ const STR = {
     couldNotReach: 'אין גישה ל‑Google Drive. ', couldNotLoadVideo: 'לא ניתן לטעון את הסרטון. ', couldNotPlay: 'לא ניתן לנגן את הסרטון. ייתכן שהפורמט לא נתמך בדפדפן הזה.', loadingVideo: 'טוען סרטון…', loadingPct: p => `טוען סרטון… ${p}%`, buffering: 'טוען…',
     marked: (n, t) => `„${n}” סומן ב‑${t}.`, removed: n => `„${n}” הוסר.`, couldNotSave: 'לא ניתן לשמור. ', typeFigure: 'צריך להקליד שם לפרק.',
     schoolsSub: 'מורים פרטיים מופיעים לצד בתי הספר. לחיצה מסננת את הרשימה.', noSchools: 'אין עדיין בתי ספר.', noTeachers: 'אין עדיין מורים פרטיים.', privateTeacher: 'מורה פרטי', groupClasses: 'שיעורים קבוצתיים', addSource: 'הוספה', schoolsAuto: 'בתי ספר ומורים נוספים אוטומטית גם כשמתייגים סיכום.', alreadyListed: 'כבר ברשימה.', added: n => `${n} נוסף.`, removedSource: n => `${n} הוסר.`, moveFirst: 'קודם מעבירים או מוחקים את הסיכומים שלו.', last: 'אחרון',
-    signedInAs: e => `מחובר בתור ${e}`, signedIn: 'מחובר', aiSection: 'ניתוח AI', keepTitle: 'מטמון', keepSub: (n, s) => n ? `${n} שיעורים · ${s}` : 'ריק', mediaCleared: 'המטמון נוקה.', storage: 'אחסון', storageBody: 'הכול נשמר בתיקייה בשם Bachata Library ב‑Google Drive שלך: תת‑תיקייה לכל בית ספר או מורה, הסרטונים, וקובץ אינדקס קטן.', openDrive: 'פתיחת התיקייה ב‑Drive', maintenance: 'תחזוקה', rescan: 'סריקת Drive ותיקון האינדקס', rescanHint: 'מוסיף סיכומים שהועלו ממכשיר אחר או חסרים ברשימה, ומסיר רשומות שהקבצים שלהן נמחקו.', scanning: 'סורק…', rescanDone: (a, r) => `הסתיים. ${a} נוספו, ${r} הוסרו.`, rescanFailed: 'הסריקה נכשלה. ',
+    signedInAs: e => `מחובר בתור ${e}`, signedIn: 'מחובר', aiSection: 'ניתוח AI', level: 'רמה', lessonNo: 'מספר שיעור', lessonN: n => `שיעור ${n}`, levelN: n => `רמה ${n}`, levelPh: 'מתקדמים / 2', lessonNoPh: '7', keepTitle: 'מטמון', keepSub: (n, s) => n ? `${n} שיעורים · ${s}` : 'ריק', mediaCleared: 'המטמון נוקה.', storage: 'אחסון', storageBody: 'הכול נשמר בתיקייה בשם Bachata Library ב‑Google Drive שלך: תת‑תיקייה לכל בית ספר או מורה, הסרטונים, וקובץ אינדקס קטן.', openDrive: 'פתיחת התיקייה ב‑Drive', maintenance: 'תחזוקה', rescan: 'סריקת Drive ותיקון האינדקס', rescanHint: 'מוסיף סיכומים שהועלו ממכשיר אחר או חסרים ברשימה, ומסיר רשומות שהקבצים שלהן נמחקו.', scanning: 'סורק…', rescanDone: (a, r) => `הסתיים. ${a} נוספו, ${r} הוסרו.`, rescanFailed: 'הסריקה נכשלה. ',
     account: 'חשבון', signOut: 'התנתקות', signOutHint: 'מתנתק במכשיר הזה בלבד. שום דבר ב‑Drive לא נמחק.', language: 'שפה', appearance: 'מראה', themeDark: 'כהה', themeLight: 'בהיר', themeAuto: 'אוטומטי', advanced: 'מתקדם', clientId: 'מזהה לקוח Google OAuth', clientHint: 'נדרש רק אם מריצים עותק עצמאי של האפליקציה.', badClient: 'זה לא נראה כמו מזהה לקוח של Google.', clientSaved: 'המזהה נשמר.', addClientFirst: 'קודם מוסיפים מזהה לקוח.',
     signInAgain: 'צריך להתחבר שוב.', signinCheckFailed: 'בדיקת ההתחברות נכשלה. נסו שוב.', driveNotGranted: 'לא ניתנה גישה ל‑Drive. התחברו שוב והשאירו את תיבת Google Drive מסומנת.',
     recapsN: n => n === 1 ? 'סיכום אחד' : `${n} סיכומים`, schoolsN: n => n === 1 ? 'בית ספר אחד' : `${n} בתי ספר`, teachersN: n => n === 1 ? 'מורה פרטי אחד' : `${n} מורים פרטיים`,
@@ -104,7 +104,7 @@ const STR = {
     couldNotReach: 'Could not reach Google Drive. ', couldNotLoadVideo: 'Could not load this video. ', couldNotPlay: 'Could not play this video. It may use a format this browser cannot decode.', loadingVideo: 'Loading video…', loadingPct: p => `Loading video… ${p}%`, buffering: 'Buffering…',
     marked: (n, t) => `“${n}” marked at ${t}.`, removed: n => `Removed “${n}”.`, couldNotSave: 'Could not save. ', typeFigure: 'Type the figure name.',
     schoolsSub: 'Private teachers listed alongside. Tap one to filter.', noSchools: 'No schools yet.', noTeachers: 'No private teachers yet.', privateTeacher: 'Private teacher', groupClasses: 'Group classes', addSource: 'Add', schoolsAuto: 'Schools and teachers also appear automatically when you tag a recap.', alreadyListed: 'Already in the list.', added: n => `Added ${n}.`, removedSource: n => `Removed ${n}.`, moveFirst: 'Move or delete its recaps first.', last: 'last',
-    signedInAs: e => `Signed in as ${e}`, signedIn: 'Signed in', aiSection: 'AI analysis', keepTitle: 'Cache', keepSub: (n, s) => n ? `${n} lessons · ${s}` : 'Empty', mediaCleared: 'Cache cleared.', storage: 'Storage', storageBody: 'Everything lives in a folder called Bachata Library in your Google Drive: one subfolder per school or teacher, the videos, and a small index file.', openDrive: 'Open the folder in Drive', maintenance: 'Maintenance', rescan: 'Rescan Drive and repair the index', rescanHint: 'Adds recaps uploaded from another device or missing from this list, and removes entries whose files were deleted.', scanning: 'Scanning…', rescanDone: (a, r) => `Done. ${a} added, ${r} removed.`, rescanFailed: 'Rescan failed. ',
+    signedInAs: e => `Signed in as ${e}`, signedIn: 'Signed in', aiSection: 'AI analysis', level: 'Level', lessonNo: 'Lesson number', lessonN: n => `Lesson ${n}`, levelN: n => `Level ${n}`, levelPh: 'Advanced / 2', lessonNoPh: '7', keepTitle: 'Cache', keepSub: (n, s) => n ? `${n} lessons · ${s}` : 'Empty', mediaCleared: 'Cache cleared.', storage: 'Storage', storageBody: 'Everything lives in a folder called Bachata Library in your Google Drive: one subfolder per school or teacher, the videos, and a small index file.', openDrive: 'Open the folder in Drive', maintenance: 'Maintenance', rescan: 'Rescan Drive and repair the index', rescanHint: 'Adds recaps uploaded from another device or missing from this list, and removes entries whose files were deleted.', scanning: 'Scanning…', rescanDone: (a, r) => `Done. ${a} added, ${r} removed.`, rescanFailed: 'Rescan failed. ',
     account: 'Account', signOut: 'Sign out', signOutHint: 'Signs out on this device only. Nothing in Drive is touched.', language: 'Language', appearance: 'Appearance', themeDark: 'Dark', themeLight: 'Light', themeAuto: 'Automatic', advanced: 'Advanced', clientId: 'Google OAuth client ID', clientHint: 'Only needed if you run your own copy of this app.', badClient: 'That does not look like a Google client ID.', clientSaved: 'Client ID saved.', addClientFirst: 'Add the Google client ID first.',
     signInAgain: 'Please sign in again.', signinCheckFailed: 'Sign-in check failed. Please try again.', driveNotGranted: 'Drive access was not granted. Sign in again and keep the Google Drive box ticked.',
     recapsN: n => `${n} recap${n === 1 ? '' : 's'}`, schoolsN: n => `${n} school${n === 1 ? '' : 's'}`, teachersN: n => `${n} private teacher${n === 1 ? '' : 's'}`,
@@ -158,6 +158,9 @@ const fmtDate = iso => { const d = dateOf(iso); return d ? d.toLocaleDateString(
 const fmtDateFull = iso => { const d = dateOf(iso); return d ? d.toLocaleDateString(T.locale, { day: 'numeric', month: 'long', year: 'numeric' }) : (iso || ''); };
 const fmtDateLong = iso => { const d = dateOf(iso); return d ? d.toLocaleDateString(T.locale, { weekday: 'long', day: 'numeric', month: 'long' }) : (iso || ''); };
 const monthOf = iso => { const d = dateOf(iso); return d ? d.toLocaleDateString(T.locale, { month: 'long', year: 'numeric' }) : '—'; };
+// level is free text, the lesson number a positive integer; both optional
+const lessonNumber = v => { const n = parseInt(v, 10); return Number.isInteger(n) && n > 0 ? n : null; };
+function levelTag(l) { const lv = /^\d+$/.test(l.level || '') ? T.levelN(l.level) : l.level; return [lv, l.lessonNo ? T.lessonN(l.lessonNo) : ''].filter(Boolean).join(' · '); }
 const fmtDur = s => (s == null || !isFinite(s)) ? '' : `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 const isoDate = d => { const x = new Date(d.getTime() - d.getTimezoneOffset() * 60000); return x.toISOString().slice(0, 10); };
 const shortErr = e => String((e && e.message) || e).slice(0, 160);
@@ -205,6 +208,7 @@ function normalize(d) {
       id: String(l.id), thumbId: l.thumbId || null, name: l.name || '', date: l.date || '', source: l.source || null,
       type: l.type === 'private' ? 'private' : (l.type === 'group' ? 'group' : null),
       style: (l.style && String(l.style).trim()) || DEFAULT_STYLE, title, desc: stripMd(l.desc), figures,
+      level: String(l.level || '').trim().slice(0, 40), lessonNo: lessonNumber(l.lessonNo),
       tags: [...new Set((Array.isArray(l.tags) ? l.tags : []).map(t => TAG_ALIASES[String(t)] || String(t)).filter(t => TAG_KEYS.includes(t)))],
       note: l.note || '', duration: l.duration == null ? null : +l.duration, size: l.size == null ? null : +l.size,
       mimeType: l.mimeType || '', createdAt: l.createdAt || null, updatedAt: l.updatedAt || null,
@@ -675,7 +679,7 @@ function visibleLessons() {
   if (filter.kind === 'untagged') items = items.filter(l => !l.source);
   if (filter.kind === 'source') items = items.filter(l => l.source === filter.value);
   const q = query.trim().toLowerCase();
-  if (q) items = items.filter(l => [l.title, l.desc, l.note, ...l.figures.map(f => f.name), ...l.tags.map(tagLabel), ...(l.attachments || []).map(a => a.name)].filter(Boolean).some(v => String(v).toLowerCase().includes(q)));
+  if (q) items = items.filter(l => [l.title, l.desc, l.note, l.level, ...l.figures.map(f => f.name), ...l.tags.map(tagLabel), ...(l.attachments || []).map(a => a.name)].filter(Boolean).some(v => String(v).toLowerCase().includes(q)));
   return items;
 }
 // Home screen bar (add, search, filter): a glass strip over the list that follows the scroll from
@@ -713,7 +717,7 @@ function renderLibrary() {
   let h = '', last = '';
   for (const l of items) {
     const m = monthOf(l.date); if (m !== last) { h += `<div class="month">${esc(m)}</div>`; last = m; }
-    const who = l.source ? `${l.source} · ${styleName(l.style)}` : T.tapToTag;
+    const who = l.source ? [styleName(l.style), l.source, levelTag(l)].filter(Boolean).join(' · ') : T.tapToTag;
     const badges = l.source ? '' : `<span class="tag">${esc(T.needsTag)}</span>`;
     const aud = isAudio(l);
     h += `<button class="card ${l.source ? '' : 'untagged'}" data-id="${esc(l.id)}">
@@ -754,7 +758,7 @@ function fillStrip(l) {
 function renderDetail() {
   const l = current; if (!l) return;
   const figs = l.figures;
-  const meta = [styleName(l.style), l.source || T.untagged, fmtDateLong(l.date)].filter(Boolean).map(esc).join(' <span class="dim">·</span> ');
+  const meta = [styleName(l.style), l.source || T.untagged, levelTag(l), fmtDateLong(l.date)].filter(Boolean).map(esc).join(' <span class="dim">·</span> ');
   $('detail-body').innerHTML = `
     <div class="ttl2">${esc(lessonTitle(l).replace(/\s*\n+\s*/g, ' '))}</div>
     <div class="meta2"><span>${meta}</span></div>
@@ -942,6 +946,7 @@ function openAdd(id) {
     : '';
   if (editing && !editAudio && thumbs[editing.id]) { const img = document.createElement('img'); img.src = thumbs[editing.id]; img.alt = ''; pick.prepend(img); }
   $('f-date').value = editing && editing.date ? editing.date : isoDate(new Date());
+  $('f-level').value = editing ? editing.level || '' : ''; $('f-lessonno').value = editing && editing.lessonNo ? String(editing.lessonNo) : '';
   formType = (editing && editing.type) || lastType() || 'group';
   formStyle = (editing && editing.style) || lastStyle();
   setTypeUI(); renderStyleSeg();
@@ -1033,7 +1038,7 @@ function readForm() {
   if (!source) source = null;
   let style = formStyle, styleNew = false;
   if (style === '__new__' || !allStyles().includes(style)) { style = $('f-style-new').value.trim(); styleNew = true; }
-  return { date, source, isNew, style, styleNew, title: $('f-title').value.trim(), desc: $('f-desc').value.trim(), note: $('f-note').value.trim() };
+  return { date, source, isNew, style, styleNew, title: $('f-title').value.trim(), desc: $('f-desc').value.trim(), note: $('f-note').value.trim(), level: $('f-level').value.trim().slice(0, 40), lessonNo: lessonNumber($('f-lessonno').value) };
 }
 function setProgress(frac) {
   const p = $('prog'); p.style.display = 'block'; p.querySelector('i').style.width = Math.round(frac * 100) + '%';
@@ -1054,7 +1059,7 @@ async function saveLesson() {
     if (editing) {
       // Move or rename the file in Drive first; only touch the local record once that succeeded.
       const l = editing;
-      const next = { date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, note: form.note };
+      const next = { date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, note: form.note, level: form.level, lessonNo: form.lessonNo };
       next.figures = cleanChapters(); next.tags = formTags.slice();
       const moved = l.source !== next.source || l.date !== next.date;
       if (moved) next.name = await moveLesson(Object.assign({}, l, next));
@@ -1069,7 +1074,7 @@ async function saveLesson() {
       const parentId = form.source ? await ensureSourceFolder(form.source, formType) : root.id;
       const name = `${form.date} ${form.source || 'Untagged'}.${extOf(f.name)}`;
       const file = await resumableUpload(f, { name, parentId, mime, appProperties: { bachata: 'lesson', date: form.date, type: type || '', style: form.style }, onProgress: setProgress });
-      const l = { id: file.id, thumbId: null, name: file.name || name, date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, figures: cleanChapters(), tags: formTags.slice(), note: form.note, attachments: [],
+      const l = { id: file.id, thumbId: null, name: file.name || name, date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, figures: cleanChapters(), tags: formTags.slice(), level: form.level, lessonNo: form.lessonNo, note: form.note, attachments: [],
         duration: pending.duration != null ? Math.round(pending.duration) : (file.videoMediaMetadata && file.videoMediaMetadata.durationMillis ? Math.round(file.videoMediaMetadata.durationMillis / 1000) : null),
         size: +file.size || f.size, mimeType: file.mimeType || mime, createdAt: nowIso(), updatedAt: nowIso() };
       if (pending.poster) {
@@ -1205,6 +1210,8 @@ async function runAi() {
     if (res.desc) $('f-desc').value = res.desc;
     if (res.chapters.length) { formChapters = editing ? mergeChapters(formChapters, res.chapters) : res.chapters.map(c => ({ name: c.name, t: c.t })); renderFormChapters(); }
     if (res.tags && res.tags.length) { formTags = TAG_KEYS.filter(k => formTags.includes(k) || res.tags.includes(k)); renderFormTags(); }
+    if (res.level && !$('f-level').value.trim()) $('f-level').value = /^\d+$/.test(res.level) ? T.levelN(res.level) : res.level;   // a bare number becomes "רמה 3"
+    if (res.lessonNo && !$('f-lessonno').value) $('f-lessonno').value = String(res.lessonNo);
     pendingAi = res;
     setAiHint(T.aiIdle); toast(T.aiDone, 4000);
   } catch (e) {

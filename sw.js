@@ -11,7 +11,7 @@
  * reached the least recently played lesson goes first.
  *
  * Never touches other Google API requests. */
-const VERSION = 'bl-v47';
+const VERSION = 'bl-v48';
 const MEDIA_CACHE = 'bl-media-1';                   // outlives app updates (not tied to VERSION)
 const PART = 4 * 1024 * 1024;                       // bytes per cached part
 const CAP = +new URL(self.location.href).searchParams.get('cap') || 2 * 1024 * 1024 * 1024;   // bytes kept on the device (?cap= is a test hook)

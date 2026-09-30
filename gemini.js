@@ -97,7 +97,7 @@ function buildPrompt(lang, tags, mode) {
       'גם אם ההגייה לא ברורה, ואל תמציאו תעתיק אחר: ' + lex + '.\n' +
       'זו הקלטת קול בלבד: זהו את הנושאים לפי מה שנאמר, לפי הספירות, הקצב והמוזיקה שנשמעים. אם המורה מתייחס למוזיקה, ציינו מה נאמר על הספירה, על האקסנטים ועל כלי הנגינה. ' +
       'מונח מהרשימה נכתב רק באיות העברי שלו, בלי האנגלית ובלי סוגריים. מונח שלא ברשימה: כתבו אותו כפי שהמורה אומר אותו, ואם הוא באנגלית הוסיפו את המקור באנגלית בסוגריים בפעם הראשונה בלבד.\n' +
-      'אל תמציאו תוכן שלא נשמע בהקלטה.' + tagsText(tags, 'he');
+      'אל תמציאו תוכן שלא נשמע בהקלטה.' + tagsText(tags, 'he') + levelText('he');
     return 'נתחו את סרטון סיכום שיעור הריקוד הזה. ענו בעברית.\n' +
       'החזירו: כותרת קצרה (עד 12 מילים) שמונה את הפיגורות או הנושאים שנלמדו; תיאור מלא ומסודר של כל מה שנאמר בשיעור, לפי סדר הדברים, מחולק לנושאים עם כותרת משנה קצרה לכל נושא: ' +
       'ההסברים, התיקונים, הטיפים להובלה ולמובלים, התרגילים והכללים, במילים של המורה. לא תקציר קצר: כל נקודה שנאמרה נכנסת. ' +
@@ -110,7 +110,7 @@ function buildPrompt(lang, tags, mode) {
       (track ? 'זה פסקול השיעור בלבד (השמע של הסרטון, בלי תמונה): זהו את הפיגורות והנושאים לפי מה שהמורה אומר, לפי הספירות ולפי המוזיקה. '
         : 'הסתמכו גם על מה שרואים בסרטון כדי לזהות את הפיגורה (למשל יד מאחורי הגב = האמרלוק; המוביל מאחורי המובלת = שדו). ') +
       'מונח מהרשימה נכתב רק באיות העברי שלו, בלי האנגלית ובלי סוגריים. מונח שלא ברשימה: כתבו אותו כפי שהמורה אומר אותו, ואם הוא באנגלית הוסיפו את המקור באנגלית בסוגריים בפעם הראשונה בלבד.\n' +
-      (track ? 'אל תמציאו תוכן שלא נשמע בהקלטה.' : 'אל תמציאו תוכן שלא מופיע בסרטון.') + tagsText(tags, 'he');
+      (track ? 'אל תמציאו תוכן שלא נשמע בהקלטה.' : 'אל תמציאו תוכן שלא מופיע בסרטון.') + tagsText(tags, 'he') + levelText('he');
   }
   if (audio) return 'Analyze this audio recording of a dance lesson (sound only, no picture: the instructor explaining or recapping, sometimes over music). Answer in English.\n' +
     'Return: a short title (max 12 words) naming the figures or topics taught; a full, ordered write-up of everything said in the lesson, split into topics with a short subheading each: ' +
@@ -122,7 +122,7 @@ function buildPrompt(lang, tags, mode) {
     'Dance vocabulary: use exactly these spellings whenever one of these terms is heard, even with an accent, and never invent another transcription: ' + lex + '.\n' +
     'This is sound only: identify the topics from what is said and from the counts, rhythm and music that can be heard. When the instructor talks about the music, note what is said about the count, the accents and the instruments. ' +
     'A listed term is written in its listed English form only, without extra brackets. A term not in the list: write it as the instructor says it.\n' +
-    'Do not invent content that is not in the recording.' + tagsText(tags, 'en');
+    'Do not invent content that is not in the recording.' + tagsText(tags, 'en') + levelText('en');
   return 'Analyze this dance lesson recap video. Answer in English.\n' +
     'Return: a short title (max 12 words) naming the figures or topics taught; a full, ordered write-up of everything said in the lesson, split into topics with a short subheading each: ' +
     'the explanations, corrections, leading and following tips, exercises and rules, in the instructor\'s own words. Not a short summary: every point made goes in. ' +
@@ -134,7 +134,13 @@ function buildPrompt(lang, tags, mode) {
     (track ? 'This is only the soundtrack of the lesson video (no picture): identify the figures and topics from what the instructor says, the counts and the music. '
       : 'Use what is visible in the video to confirm the figure (an arm folded behind the back = hammerlock; the lead behind the follow = shadow position). ') +
     'A listed term is written in its listed English form only, without extra brackets. A term not in the list: write it as the instructor says it.\n' +
-    (track ? 'Do not invent content that is not in the recording.' : 'Do not invent content that is not in the video.') + tagsText(tags, 'en');
+    (track ? 'Do not invent content that is not in the recording.' : 'Do not invent content that is not in the video.') + tagsText(tags, 'en') + levelText('en');
+}
+
+function levelText(lang) {
+  return lang === 'he'
+    ? '\nרמה ומספר שיעור: אם המורה אומר במפורש את רמת השיעור (למשל מתחילים, בינוניים, מתקדמים או מספר רמה) או את מספר השיעור בקורס, החזירו אותם בשדות level ו‑lessonNumber. רמה מספרית נכתבת במילים, למשל „רמה 3” ולא „3”. אם זה לא נאמר, השאירו level ריק ו‑lessonNumber 0. אל תנחשו.'
+    : '\nLevel and lesson number: if the instructor explicitly states the level of the class (for example beginners, intermediate, advanced, or a level number) or the number of this lesson in the course, return them in level and lessonNumber. A numeric level is written out, for example "Level 3" rather than "3". If not stated, leave level empty and lessonNumber 0. Do not guess.';
 }
 
 function buildSchema(tags) {
@@ -143,6 +149,8 @@ function buildSchema(tags) {
     properties: {
       title: { type: 'STRING', description: 'Short lesson title, at most 12 words, naming the figures or topics' },
       description: { type: 'STRING', description: 'Full, ordered write-up of everything said in the lesson, split into topics with short subheadings, in the instructor\'s words' },
+      level: { type: 'STRING', description: 'The level of the class, only if the instructor states it (for example beginners, intermediate, advanced, or "Level 3" for a numbered level); otherwise an empty string' },
+      lessonNumber: { type: 'INTEGER', description: 'The number of this lesson in the course, only if the instructor states it; otherwise 0' },
       chapters: {
         type: 'ARRAY',
         items: {
@@ -317,6 +325,8 @@ async function generate(fileUri, mime, key, model, lang, tags, mode) {
   const allowed = new Set((tags || []).map(t => t.key));
   return {
     title: normalizeTerms(cleanTitle(data.title)),
+    level: String(data.level || '').trim().slice(0, 40),
+    lessonNo: (n => Number.isInteger(n) && n > 0 ? n : null)(parseInt(data.lessonNumber, 10)),
     desc: normalizeTerms(plainText(data.description)),
     tags: [...new Set((Array.isArray(data.tags) ? data.tags : []).map(String).filter(t => allowed.has(t)))],
     chapters: (Array.isArray(data.chapters) ? data.chapters : [])

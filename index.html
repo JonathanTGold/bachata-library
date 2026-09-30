@@ -13,9 +13,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="DanceLab">
-<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.19.5">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.19.5">
-<link rel="stylesheet" href="./styles.css?v=2.19.5">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=2.20.0">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=2.20.0">
+<link rel="stylesheet" href="./styles.css?v=2.20.0">
 </head>
 <body>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
@@ -60,7 +60,7 @@
   <!-- SIGN IN -->
   <section class="screen" id="s-auth">
     <div class="auth">
-      <img class="logo" src="./icons/icon-192.png?v=2.19.5" alt="">
+      <img class="logo" src="./icons/icon-192.png?v=2.20.0" alt="">
       <h1>DanceLab</h1>
       <p class="sub" data-t="tagline"></p>
       <button class="primary" id="btn-signin" data-t="signin"></button>
@@ -151,6 +151,11 @@
         <div class="field"><label for="f-date" data-t="date"></label>
           <div class="input"><input type="date" id="f-date"></div></div>
 
+        <div class="field two">
+          <div><label class="lbl" for="f-level" data-t="level"></label><div class="input"><input id="f-level" data-ph="levelPh" autocomplete="off" maxlength="40"></div></div>
+          <div><label class="lbl" for="f-lessonno" data-t="lessonNo"></label><div class="input"><input id="f-lessonno" type="number" inputmode="numeric" min="1" step="1" data-ph="lessonNoPh" autocomplete="off"></div></div>
+        </div>
+
         <div class="field"><label for="f-title" data-t="title"></label>
           <div class="input"><input id="f-title" autocomplete="off"></div></div>
 
@@ -210,8 +215,8 @@
     <button class="tab" data-go="settings"><svg class="i"><use href="#i-gear"/></svg><span data-t="settings"></span></button>
   </nav>
 </div>
-<script src="./config.js?v=2.19.5"></script>
-<script src="./gemini.js?v=2.19.5"></script>
-<script src="./app.js?v=2.19.5"></script>
+<script src="./config.js?v=2.20.0"></script>
+<script src="./gemini.js?v=2.20.0"></script>
+<script src="./app.js?v=2.20.0"></script>
 </body>
 </html>

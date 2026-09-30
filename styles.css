@@ -199,6 +199,7 @@ h3+.fig,#f-chapters .fig:first-child{border-radius:var(--r) var(--r) 0 0}
 /* ---- forms ---- */
 .form{padding:0}
 .field{margin-top:14px}
+.field.two{display:flex;gap:8px}.field.two>div{flex:1;min-width:0}
 .field>label,.lbl{display:block;font-size:13px;color:var(--label2);margin:0 16px 7px}
 .input{background:var(--grp);border-radius:var(--r);padding:0 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:44px}
 .input+.input,.seg+.input{margin-top:8px}
