@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.18.1';
+const APP_VERSION = '2.19.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -19,7 +19,7 @@ const ROOT_NAME = 'Bachata Library';
 const INDEX_NAME = 'library.json';
 const THUMBS_NAME = '.thumbnails';
 const FOLDER_MIME = 'application/vnd.google-apps.folder';
-const LS = { token: 'bl_token', lib: 'bl_library', clientId: 'bl_client_id', hint: 'bl_login_hint', root: 'bl_root', lang: 'bl_lang', theme: 'bl_theme', filter: 'bl_filter' };
+const LS = { token: 'bl_token', lib: 'bl_library', clientId: 'bl_client_id', hint: 'bl_login_hint', root: 'bl_root', lang: 'bl_lang', theme: 'bl_theme', filter: 'bl_filter', keep: 'bl_keep' };
 const THEMES = ['light', 'dark', 'auto'];   // light is the default
 const SS = { state: 'bl_oauth_state', silent: 'bl_silent_tried', needConsent: 'bl_need_consent' };
 const SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5];
@@ -65,7 +65,7 @@ const STR = {
     couldNotReach: 'אין גישה ל‑Google Drive. ', couldNotLoadVideo: 'לא ניתן לטעון את הסרטון. ', couldNotPlay: 'לא ניתן לנגן את הסרטון. ייתכן שהפורמט לא נתמך בדפדפן הזה.', loadingVideo: 'טוען סרטון…', loadingPct: p => `טוען סרטון… ${p}%`, buffering: 'טוען…',
     marked: (n, t) => `„${n}” סומן ב‑${t}.`, removed: n => `„${n}” הוסר.`, couldNotSave: 'לא ניתן לשמור. ', typeFigure: 'צריך להקליד שם לפרק.',
     schoolsSub: 'מורים פרטיים מופיעים לצד בתי הספר. לחיצה מסננת את הרשימה.', noSchools: 'אין עדיין בתי ספר.', noTeachers: 'אין עדיין מורים פרטיים.', privateTeacher: 'מורה פרטי', groupClasses: 'שיעורים קבוצתיים', addSource: 'הוספה', schoolsAuto: 'בתי ספר ומורים נוספים אוטומטית גם כשמתייגים סיכום.', alreadyListed: 'כבר ברשימה.', added: n => `${n} נוסף.`, removedSource: n => `${n} הוסר.`, moveFirst: 'קודם מעבירים או מוחקים את הסיכומים שלו.', last: 'אחרון',
-    signedInAs: e => `מחובר בתור ${e}`, signedIn: 'מחובר', storage: 'אחסון', storageBody: 'הכול נשמר בתיקייה בשם Bachata Library ב‑Google Drive שלך: תת‑תיקייה לכל בית ספר או מורה, הסרטונים, וקובץ אינדקס קטן.', openDrive: 'פתיחת התיקייה ב‑Drive', maintenance: 'תחזוקה', rescan: 'סריקת Drive ותיקון האינדקס', rescanHint: 'מוסיף סיכומים שהועלו ממכשיר אחר או חסרים ברשימה, ומסיר רשומות שהקבצים שלהן נמחקו.', scanning: 'סורק…', rescanDone: (a, r) => `הסתיים. ${a} נוספו, ${r} הוסרו.`, rescanFailed: 'הסריקה נכשלה. ',
+    signedInAs: e => `מחובר בתור ${e}`, signedIn: 'מחובר', keepTitle: 'שיעורים במכשיר', keepSub: (n, s) => n ? `${n} שיעורים · ${s}` : 'ריק', on: 'מופעל', off: 'כבוי', mediaCleared: 'השיעורים השמורים במכשיר נמחקו.', storage: 'אחסון', storageBody: 'הכול נשמר בתיקייה בשם Bachata Library ב‑Google Drive שלך: תת‑תיקייה לכל בית ספר או מורה, הסרטונים, וקובץ אינדקס קטן.', openDrive: 'פתיחת התיקייה ב‑Drive', maintenance: 'תחזוקה', rescan: 'סריקת Drive ותיקון האינדקס', rescanHint: 'מוסיף סיכומים שהועלו ממכשיר אחר או חסרים ברשימה, ומסיר רשומות שהקבצים שלהן נמחקו.', scanning: 'סורק…', rescanDone: (a, r) => `הסתיים. ${a} נוספו, ${r} הוסרו.`, rescanFailed: 'הסריקה נכשלה. ',
     account: 'חשבון', signOut: 'התנתקות', signOutHint: 'מתנתק במכשיר הזה בלבד. שום דבר ב‑Drive לא נמחק.', language: 'שפה', appearance: 'מראה', themeDark: 'כהה', themeLight: 'בהיר', themeAuto: 'אוטומטי', advanced: 'מתקדם', clientId: 'מזהה לקוח Google OAuth', clientHint: 'נדרש רק אם מריצים עותק עצמאי של האפליקציה.', badClient: 'זה לא נראה כמו מזהה לקוח של Google.', clientSaved: 'המזהה נשמר.', addClientFirst: 'קודם מוסיפים מזהה לקוח.',
     signInAgain: 'צריך להתחבר שוב.', signinCheckFailed: 'בדיקת ההתחברות נכשלה. נסו שוב.', driveNotGranted: 'לא ניתנה גישה ל‑Drive. התחברו שוב והשאירו את תיבת Google Drive מסומנת.',
     recapsN: n => n === 1 ? 'סיכום אחד' : `${n} סיכומים`, schoolsN: n => n === 1 ? 'בית ספר אחד' : `${n} בתי ספר`, teachersN: n => n === 1 ? 'מורה פרטי אחד' : `${n} מורים פרטיים`,
@@ -73,7 +73,7 @@ const STR = {
     tagsLabel: 'תגיות',
     tags: { basics: 'בסיסים', elements: 'אלמנטים', combos: 'קומבינציות', bodymove: 'תנועתיות', isolations: 'איזולציות', technique: 'טכניקה', choreo: 'כוריאוגרפיה', footwork: 'עבודת רגליים', musicality: 'מוזיקליות', styling: 'סטיילינג' },
     tagHints: { basics: 'צעדי בסיס, טאפים וגיווני בסיס', elements: 'פיגורות ואלמנטים בזוג כמו האמרלוק, סומבררו, שדו, כריכה, קרוס בודי, סיבובים', combos: 'קומבינציות ורצפים של כמה אלמנטים', bodymove: 'גלי גוף, בודי רול, קמברה, תנועות ראש, סנסואל', isolations: 'איזולציות של ראש, כתפיים, חזה ואגן', technique: 'יציבה, מסגרת, העברת משקל, הובלה ומעקב, חיבור, תרגילים', choreo: 'כוריאוגרפיה או רצף להופעה', footwork: 'עבודת רגליים, סינקופות, סגנון דומיניקני, שיינס', musicality: 'מוזיקליות, קצב, ספירות, אינטרו, מבנה השיר', styling: 'סטיילינג ידיים, שיער וגוף למובילים ולמובלות' },
-    aria: { filter: 'סינון', paste: 'הדבקה', notes: 'הסיכום במסך מלא', attAdd: 'הוספת תמונה, קובץ או קישור לשיעור', share: 'שיתוף', ai: 'ניתוח אוטומטי עם Gemini', back: 'חזרה', settings: 'הגדרות', add: 'שיעור חדש', close: 'סגירה', edit: 'עריכה', drive: 'פתיחה ב‑Drive', remove: 'הסרה', addFigure: 'סימון פרק בזמן הנוכחי', mirror: 'מראה', repeat: 'חזרה על קטע', fullscreen: 'מסך מלא', pip: 'תמונה בתוך תמונה', play: 'נגן', pause: 'השהיה', back5: 'אחורה 5 שניות', fwd5: 'קדימה 5 שניות', speed: 'מהירות', delete: 'מחיקה', signout: 'התנתקות', rescan: 'סריקה', save: 'שמירה' }
+    aria: { clearMedia: 'מחיקת השיעורים השמורים במכשיר', filter: 'סינון', paste: 'הדבקה', notes: 'הסיכום במסך מלא', attAdd: 'הוספת תמונה, קובץ או קישור לשיעור', share: 'שיתוף', ai: 'ניתוח אוטומטי עם Gemini', back: 'חזרה', settings: 'הגדרות', add: 'שיעור חדש', close: 'סגירה', edit: 'עריכה', drive: 'פתיחה ב‑Drive', remove: 'הסרה', addFigure: 'סימון פרק בזמן הנוכחי', mirror: 'מראה', repeat: 'חזרה על קטע', fullscreen: 'מסך מלא', pip: 'תמונה בתוך תמונה', play: 'נגן', pause: 'השהיה', back5: 'אחורה 5 שניות', fwd5: 'קדימה 5 שניות', speed: 'מהירות', delete: 'מחיקה', signout: 'התנתקות', rescan: 'סריקה', save: 'שמירה' }
   },
   en: {
     dir: 'ltr', locale: 'en-GB',
@@ -104,7 +104,7 @@ const STR = {
     couldNotReach: 'Could not reach Google Drive. ', couldNotLoadVideo: 'Could not load this video. ', couldNotPlay: 'Could not play this video. It may use a format this browser cannot decode.', loadingVideo: 'Loading video…', loadingPct: p => `Loading video… ${p}%`, buffering: 'Buffering…',
     marked: (n, t) => `“${n}” marked at ${t}.`, removed: n => `Removed “${n}”.`, couldNotSave: 'Could not save. ', typeFigure: 'Type the figure name.',
     schoolsSub: 'Private teachers listed alongside. Tap one to filter.', noSchools: 'No schools yet.', noTeachers: 'No private teachers yet.', privateTeacher: 'Private teacher', groupClasses: 'Group classes', addSource: 'Add', schoolsAuto: 'Schools and teachers also appear automatically when you tag a recap.', alreadyListed: 'Already in the list.', added: n => `Added ${n}.`, removedSource: n => `Removed ${n}.`, moveFirst: 'Move or delete its recaps first.', last: 'last',
-    signedInAs: e => `Signed in as ${e}`, signedIn: 'Signed in', storage: 'Storage', storageBody: 'Everything lives in a folder called Bachata Library in your Google Drive: one subfolder per school or teacher, the videos, and a small index file.', openDrive: 'Open the folder in Drive', maintenance: 'Maintenance', rescan: 'Rescan Drive and repair the index', rescanHint: 'Adds recaps uploaded from another device or missing from this list, and removes entries whose files were deleted.', scanning: 'Scanning…', rescanDone: (a, r) => `Done. ${a} added, ${r} removed.`, rescanFailed: 'Rescan failed. ',
+    signedInAs: e => `Signed in as ${e}`, signedIn: 'Signed in', keepTitle: 'Lessons on this device', keepSub: (n, s) => n ? `${n} lessons · ${s}` : 'Empty', on: 'On', off: 'Off', mediaCleared: 'Lessons kept on this device deleted.', storage: 'Storage', storageBody: 'Everything lives in a folder called Bachata Library in your Google Drive: one subfolder per school or teacher, the videos, and a small index file.', openDrive: 'Open the folder in Drive', maintenance: 'Maintenance', rescan: 'Rescan Drive and repair the index', rescanHint: 'Adds recaps uploaded from another device or missing from this list, and removes entries whose files were deleted.', scanning: 'Scanning…', rescanDone: (a, r) => `Done. ${a} added, ${r} removed.`, rescanFailed: 'Rescan failed. ',
     account: 'Account', signOut: 'Sign out', signOutHint: 'Signs out on this device only. Nothing in Drive is touched.', language: 'Language', appearance: 'Appearance', themeDark: 'Dark', themeLight: 'Light', themeAuto: 'Automatic', advanced: 'Advanced', clientId: 'Google OAuth client ID', clientHint: 'Only needed if you run your own copy of this app.', badClient: 'That does not look like a Google client ID.', clientSaved: 'Client ID saved.', addClientFirst: 'Add the Google client ID first.',
     signInAgain: 'Please sign in again.', signinCheckFailed: 'Sign-in check failed. Please try again.', driveNotGranted: 'Drive access was not granted. Sign in again and keep the Google Drive box ticked.',
     recapsN: n => `${n} recap${n === 1 ? '' : 's'}`, schoolsN: n => `${n} school${n === 1 ? '' : 's'}`, teachersN: n => `${n} private teacher${n === 1 ? '' : 's'}`,
@@ -112,7 +112,7 @@ const STR = {
     tagsLabel: 'Tags',
     tags: { basics: 'Basics', elements: 'Elements', combos: 'Combinations', bodymove: 'Body movement', isolations: 'Isolations', technique: 'Technique', choreo: 'Choreography', footwork: 'Footwork', musicality: 'Musicality', styling: 'Styling' },
     tagHints: { basics: 'basic steps, taps and basic variations', elements: 'partner figures such as hammerlock, sombrero, shadow, wrap, cross body lead, turns', combos: 'combinations and sequences of several elements', bodymove: 'body waves, body rolls, cambré, head movement, sensual style', isolations: 'isolations of the head, shoulders, chest and hips', technique: 'posture, frame, weight transfer, leading and following, connection, drills', choreo: 'a choreography or performance routine', footwork: 'footwork, syncopations, Dominican style, shines', musicality: 'musicality, rhythm, counting, intros, song structure', styling: 'arm, hair and body styling for leads and follows' },
-    aria: { filter: 'Filters', paste: 'Paste', notes: 'Notes full screen', attAdd: 'Add a photo, file or link to the lesson', share: 'Share', ai: 'Auto-fill with Gemini', back: 'Back', settings: 'Settings', add: 'New lesson', close: 'Close', edit: 'Edit', drive: 'Open in Drive', remove: 'Remove', addFigure: 'Mark a chapter at the current time', mirror: 'Mirror', repeat: 'Repeat a section', fullscreen: 'Fullscreen', pip: 'Picture in picture', play: 'Play', pause: 'Pause', back5: 'Back 5 seconds', fwd5: 'Forward 5 seconds', speed: 'Speed', delete: 'Delete', signout: 'Sign out', rescan: 'Rescan', save: 'Save' }
+    aria: { clearMedia: 'Delete the lessons kept on this device', filter: 'Filters', paste: 'Paste', notes: 'Notes full screen', attAdd: 'Add a photo, file or link to the lesson', share: 'Share', ai: 'Auto-fill with Gemini', back: 'Back', settings: 'Settings', add: 'New lesson', close: 'Close', edit: 'Edit', drive: 'Open in Drive', remove: 'Remove', addFigure: 'Mark a chapter at the current time', mirror: 'Mirror', repeat: 'Repeat a section', fullscreen: 'Fullscreen', pip: 'Picture in picture', play: 'Play', pause: 'Pause', back5: 'Back 5 seconds', fwd5: 'Forward 5 seconds', speed: 'Speed', delete: 'Delete', signout: 'Sign out', rescan: 'Rescan', save: 'Save' }
   }
 };
 let lang = localStorage.getItem(LS.lang) || 'he';
@@ -161,7 +161,7 @@ const monthOf = iso => { const d = dateOf(iso); return d ? d.toLocaleDateString(
 const fmtDur = s => (s == null || !isFinite(s)) ? '' : `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 const isoDate = d => { const x = new Date(d.getTime() - d.getTimezoneOffset() * 60000); return x.toISOString().slice(0, 10); };
 const shortErr = e => String((e && e.message) || e).slice(0, 160);
-const fmtSize = n => n >= 1048576 ? (n / 1048576).toFixed(n >= 100 * 1048576 ? 0 : 1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
+const fmtSize = n => n >= 1073741824 ? (n / 1073741824).toFixed(1) + ' GB' : n >= 1048576 ? (n / 1048576).toFixed(n >= 100 * 1048576 ? 0 : 1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
 const hue = id => ['', 't2', 't3'][String(id || '').split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 3];
 const icon = (name, cls = 'i') => `<svg class="${cls}"><use href="#i-${name}"/></svg>`;
 // Recaps are stored as plain text: a short subheading line, its paragraph, a blank line between
@@ -605,7 +605,7 @@ function show(name) {
   if (name === 'auth') renderAuth();
   if (name === 'library') renderLibrary();
   if (name === 'schools') renderSchools();
-  if (name === 'settings') { renderSettings(); $('settings-body').scrollTop = 0; }
+  if (name === 'settings') { renderSettings(); fillKeepSub(); $('settings-body').scrollTop = 0; }
 }
 function render() {
   const active = document.querySelector('.screen.active'); const id = active ? active.id : '';
@@ -807,6 +807,7 @@ async function loadMedia(l) {
   if (viaWorker) {
     const u = new URL('./media', location.href);
     u.searchParams.set('id', l.id); u.searchParams.set('t', at); if (l.size) u.searchParams.set('size', String(l.size));
+    if (l.mimeType) u.searchParams.set('mime', l.mimeType); u.searchParams.set('keep', keepMedia() ? '1' : '0');
     video.src = u.toString(); video.load();
   } else {
     loadViaBlob(l, at);
@@ -840,6 +841,26 @@ async function loadViaBlob(l, at) {
   }
 }
 function setVideoLoading(msg) { const el = $('vload'); el.textContent = msg; el.hidden = !msg; }
+// ---------- lessons kept on the device (the service worker's media cache) ----------
+const MEDIA_CACHE = 'bl-media-1', MEDIA_PART = 4 * 1024 * 1024;
+function keepMedia() { return localStorage.getItem(LS.keep) !== '0'; }
+function setKeep(on) { localStorage.setItem(LS.keep, on ? '1' : '0'); renderSettings(); }
+function swPost(msg) { const c = navigator.serviceWorker && navigator.serviceWorker.controller; if (c) { try { c.postMessage(msg); } catch (e) { /* ignore */ } } }
+async function mediaStats() {
+  try {
+    if (!('caches' in window)) return { n: 0, bytes: 0 };
+    const c = await caches.open(MEDIA_CACHE); const r = await c.match(new URL('./media-index', location.href).href);
+    if (!r) return { n: 0, bytes: 0 };
+    const files = Object.values((await r.json()).files || {});
+    return { n: files.length, bytes: files.reduce((s, f) => s + Math.min(f.size, f.parts.filter(Boolean).length * MEDIA_PART), 0) };
+  } catch (e) { return { n: 0, bytes: 0 }; }
+}
+function fillKeepSub() { mediaStats().then(s => { const el = $('keep-sub'); if (el) el.textContent = T.keepSub(s.n, fmtSize(s.bytes)); }); }
+async function clearMedia() {
+  swPost({ type: 'clear' });
+  try { if ('caches' in window) await caches.delete(MEDIA_CACHE); } catch (e) { /* ignore */ }
+  toast(T.mediaCleared); fillKeepSub();
+}
 function setRate(r) {
   video.playbackRate = r;
   $('btn-speed').textContent = (r === 1 ? '1' : String(r)) + '×';
@@ -1055,6 +1076,7 @@ async function saveLesson() {
         try { const t = await uploadBlob(root.thumbsId, `${file.id}.jpg`, pending.poster, { bachata: 'thumb', lesson: file.id }); l.thumbId = t.id; thumbs[l.id] = URL.createObjectURL(pending.poster); idb.put(l.id, pending.poster); }
         catch (e) { console.warn('thumbnail upload failed', e); }
       }
+      if (keepMedia()) swPost({ type: 'store', id: l.id, blob: f, mime: l.mimeType });
       lib.lessons.unshift(l);
       await saveLibrary();
       toast(form.source ? T.uploaded : T.uploadedUntagged);
@@ -1087,6 +1109,7 @@ async function performDelete(l) {
   if (l.thumbId) api(`/files/${l.thumbId}`, { method: 'PATCH', body: { trashed: true } }).catch(() => {});
   (l.attachments || []).forEach(a => { if (a.kind === 'link') return; api(`/files/${a.id}`, { method: 'PATCH', body: { trashed: true } }).catch(() => {}); if (a.thumbId) api(`/files/${a.thumbId}`, { method: 'PATCH', body: { trashed: true } }).catch(() => {}); });
   lib.lessons = lib.lessons.filter(x => x.id !== l.id);
+  swPost({ type: 'evict', id: l.id });
   await saveLibrary(); idb.del(l.id); delete thumbs[l.id];
 }
 let detailDeleteTimer;
@@ -1456,6 +1479,8 @@ function renderSettings() {
   $('settings-body').innerHTML = `
     <div class="month">${esc(T.storage)}</div>
     <div class="srow"><div><div class="lbl2">${esc(T.openDrive)}</div><div class="sm">${esc(T.storageBody)}</div></div>${root ? `<a class="ib" href="https://drive.google.com/drive/folders/${encodeURIComponent(root.id)}" target="_blank" rel="noopener" aria-label="${esc(T.aria.drive)}">${icon('open')}</a>` : ''}</div>
+    <div class="srow" style="margin-top:8px"><div><div class="lbl2">${esc(T.keepTitle)}</div><div class="sm" id="keep-sub">…</div></div><button class="ib danger" id="btn-clear-media" aria-label="${esc(T.aria.clearMedia)}">${icon('trash')}</button></div>
+    <div class="seg" id="keep-seg" style="margin-top:8px"><button type="button" class="${keepMedia() ? 'on' : ''}" data-keep="1">${esc(T.on)}</button><button type="button" class="${keepMedia() ? '' : 'on'}" data-keep="0">${esc(T.off)}</button></div>
     <div class="month">${esc(T.maintenance)}</div>
     <div class="srow"><div><div class="lbl2">${esc(T.rescan)}</div><div class="sm">${esc(T.rescanHint)}</div></div><button class="ib" id="btn-rescan" aria-label="${esc(T.aria.rescan)}">${icon('refresh')}</button></div>
     <div class="month">Gemini</div>
@@ -1586,9 +1611,10 @@ function bindEvents() {
   $('schools').addEventListener('keydown', e => { if (e.target.id === 'src-name' && e.key === 'Enter') { e.preventDefault(); addSource(); } });
   $('settings-body').addEventListener('click', e => {
     const btn = e.target.closest('button'); const id = btn ? btn.id : '';
-    if (id === 'btn-rescan') rescan(btn); else if (id === 'btn-signout') signOut(); else if (id === 'btn-save-client2') saveClientId($('set-client').value); else if (id === 'btn-save-gemini') saveGeminiSettings();
+    if (id === 'btn-rescan') rescan(btn); else if (id === 'btn-signout') signOut(); else if (id === 'btn-save-client2') saveClientId($('set-client').value); else if (id === 'btn-save-gemini') saveGeminiSettings(); else if (id === 'btn-clear-media') clearMedia();
     const lb = e.target.closest('#lang-seg button'); if (lb) setLanguage(lb.dataset.lang);
     const tb = e.target.closest('#theme-seg button'); if (tb) setTheme(tb.dataset.theme);
+    const kb = e.target.closest('#keep-seg button'); if (kb) { setKeep(kb.dataset.keep === '1'); fillKeepSub(); }
   });
   if (lightMq) { const onChange = () => { if (theme === 'auto') applyTheme(); }; if (lightMq.addEventListener) lightMq.addEventListener('change', onChange); else if (lightMq.addListener) lightMq.addListener(onChange); }
 

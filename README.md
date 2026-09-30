@@ -9,6 +9,7 @@ and no server that ever sees your videos.
 
 ## What it does
 
+- Lessons you play are kept on the device by the service worker (4 MB parts in Cache Storage, up to 2 GB, least recently played evicted first), so every seek after the first play is served from disk and the lesson works offline; a lesson uploaded from the device is kept at upload time. Settings shows the usage with a clear button and an on/off switch.
 - Hebrew, right-to-left interface by default, with English available in Settings. Apple-style design (system typeface, grouped lists, one yellow tint), light by default with dark and automatic modes, icon-only actions.
 - Each lesson carries a dance style (Bachata, Salsa, or your own). A style switch appears at the top once more than one style is in use.
 - **Auto-fill** sends only the recording's audio track to Gemini: the AAC track is pulled out of the MOV/MP4 container in the browser without decoding (a tenth of the tokens, a fraction of the upload), and the whole video is sent only when the container is unusual. The description it returns is a full, sectioned recap in the teacher's words. The Gemini key is asked for in a sheet with a paste button the first time; the steps sit collapsed in Settings.
