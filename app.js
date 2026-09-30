@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.19.2';
+const APP_VERSION = '2.19.3';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -605,7 +605,7 @@ function show(name) {
   if (name === 'auth') renderAuth();
   if (name === 'library') renderLibrary();
   if (name === 'schools') renderSchools();
-  if (name === 'settings') { renderSettings(); fillKeepSub(); $('settings-body').scrollTop = 0; }
+  if (name === 'settings') { renderSettings(); $('settings-body').scrollTop = 0; }
 }
 function render() {
   const active = document.querySelector('.screen.active'); const id = active ? active.id : '';
@@ -1499,6 +1499,7 @@ function renderSettings() {
     <div class="input"><input id="set-client" value="${esc(clientId())}" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="…apps.googleusercontent.com" dir="ltr"><button class="mini" id="btn-save-client2" aria-label="${esc(T.aria.save)}">${icon('check')}</button></div>
     <div class="hint">${esc(T.clientId)} · ${esc(T.clientHint)}</div>
     <div class="hint" style="margin-top:18px;text-align:center">DanceLab ${APP_VERSION}</div>`;
+  fillKeepSub();   // the usage line is async; every render (including the sync re-render) must fill it
 }
 
 // ---------- events and boot ----------
@@ -1613,7 +1614,7 @@ function bindEvents() {
     if (id === 'btn-rescan') rescan(btn); else if (id === 'btn-signout') signOut(); else if (id === 'btn-save-client2') saveClientId($('set-client').value); else if (id === 'btn-save-gemini') saveGeminiSettings(); else if (id === 'btn-clear-media') clearMedia();
     const lb = e.target.closest('#lang-seg button'); if (lb) setLanguage(lb.dataset.lang);
     const tb = e.target.closest('#theme-seg button'); if (tb) setTheme(tb.dataset.theme);
-    if (id === 'keep-sw') { setKeep(!keepMedia()); fillKeepSub(); }
+    if (id === 'keep-sw') setKeep(!keepMedia());
   });
   if (lightMq) { const onChange = () => { if (theme === 'auto') applyTheme(); }; if (lightMq.addEventListener) lightMq.addEventListener('change', onChange); else if (lightMq.addListener) lightMq.addListener(onChange); }
 
