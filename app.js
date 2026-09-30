@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.17.6';
+const APP_VERSION = '2.18.0';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -30,9 +30,9 @@ const BASE_STYLES = ['bachata', 'salsa'];
 const DEFAULT_STYLE = 'bachata';
 // General classification of what a lesson works on. Fixed list: shown as chips, editable by hand,
 // and the auto-fill picks one or more of these keys.
-const TAG_KEYS = ['basics', 'elements', 'combos', 'bodymove', 'technique', 'choreo', 'footwork', 'musicality', 'styling'];
+const TAG_KEYS = ['basics', 'elements', 'combos', 'bodymove', 'isolations', 'technique', 'choreo', 'footwork', 'musicality', 'styling'];
 // Tags from earlier versions fold into the closest current one when the index is loaded.
-const TAG_ALIASES = { turns: 'elements', tricks: 'elements', isolations: 'bodymove', sensual: 'bodymove', leadfollow: 'technique', drills: 'technique' };
+const TAG_ALIASES = { turns: 'elements', tricks: 'elements', sensual: 'bodymove', leadfollow: 'technique', drills: 'technique' };
 
 // ---------- strings ----------
 const STR = {
@@ -71,8 +71,8 @@ const STR = {
     recapsN: n => n === 1 ? 'סיכום אחד' : `${n} סיכומים`, schoolsN: n => n === 1 ? 'בית ספר אחד' : `${n} בתי ספר`, teachersN: n => n === 1 ? 'מורה פרטי אחד' : `${n} מורים פרטיים`,
     styles: { bachata: 'באצ׳טה', salsa: 'סלסה', kizomba: 'קיזומבה', zouk: 'זוק' },
     tagsLabel: 'תגיות',
-    tags: { basics: 'בסיסים', elements: 'אלמנטים', combos: 'קומבינציות', bodymove: 'תנועתיות', technique: 'טכניקה', choreo: 'כוריאוגרפיה', footwork: 'עבודת רגליים', musicality: 'מוזיקליות', styling: 'סטיילינג' },
-    tagHints: { basics: 'צעדי בסיס, טאפים וגיווני בסיס', elements: 'פיגורות ואלמנטים בזוג כמו האמרלוק, סומבררו, שדו, כריכה, קרוס בודי, סיבובים', combos: 'קומבינציות ורצפים של כמה אלמנטים', bodymove: 'גלי גוף, בודי רול, קמברה, איזולציות של אגן וחזה, תנועות ראש, סנסואל', technique: 'יציבה, מסגרת, העברת משקל, הובלה ומעקב, חיבור, תרגילים', choreo: 'כוריאוגרפיה או רצף להופעה', footwork: 'עבודת רגליים, סינקופות, סגנון דומיניקני, שיינס', musicality: 'מוזיקליות, קצב, ספירות, אינטרו, מבנה השיר', styling: 'סטיילינג ידיים, שיער וגוף למובילים ולמובלות' },
+    tags: { basics: 'בסיסים', elements: 'אלמנטים', combos: 'קומבינציות', bodymove: 'תנועתיות', isolations: 'איזולציות', technique: 'טכניקה', choreo: 'כוריאוגרפיה', footwork: 'עבודת רגליים', musicality: 'מוזיקליות', styling: 'סטיילינג' },
+    tagHints: { basics: 'צעדי בסיס, טאפים וגיווני בסיס', elements: 'פיגורות ואלמנטים בזוג כמו האמרלוק, סומבררו, שדו, כריכה, קרוס בודי, סיבובים', combos: 'קומבינציות ורצפים של כמה אלמנטים', bodymove: 'גלי גוף, בודי רול, קמברה, תנועות ראש, סנסואל', isolations: 'איזולציות של ראש, כתפיים, חזה ואגן', technique: 'יציבה, מסגרת, העברת משקל, הובלה ומעקב, חיבור, תרגילים', choreo: 'כוריאוגרפיה או רצף להופעה', footwork: 'עבודת רגליים, סינקופות, סגנון דומיניקני, שיינס', musicality: 'מוזיקליות, קצב, ספירות, אינטרו, מבנה השיר', styling: 'סטיילינג ידיים, שיער וגוף למובילים ולמובלות' },
     aria: { filter: 'סינון', paste: 'הדבקה', notes: 'הסיכום במסך מלא', attAdd: 'הוספת תמונה, קובץ או קישור לשיעור', share: 'שיתוף', ai: 'ניתוח אוטומטי עם Gemini', back: 'חזרה', settings: 'הגדרות', add: 'שיעור חדש', close: 'סגירה', edit: 'עריכה', drive: 'פתיחה ב‑Drive', remove: 'הסרה', addFigure: 'סימון פרק בזמן הנוכחי', mirror: 'מראה', repeat: 'חזרה על קטע', fullscreen: 'מסך מלא', pip: 'תמונה בתוך תמונה', play: 'נגן', pause: 'השהיה', back5: 'אחורה 5 שניות', fwd5: 'קדימה 5 שניות', speed: 'מהירות', delete: 'מחיקה', signout: 'התנתקות', rescan: 'סריקה', save: 'שמירה' }
   },
   en: {
@@ -110,8 +110,8 @@ const STR = {
     recapsN: n => `${n} recap${n === 1 ? '' : 's'}`, schoolsN: n => `${n} school${n === 1 ? '' : 's'}`, teachersN: n => `${n} private teacher${n === 1 ? '' : 's'}`,
     styles: { bachata: 'Bachata', salsa: 'Salsa', kizomba: 'Kizomba', zouk: 'Zouk' },
     tagsLabel: 'Tags',
-    tags: { basics: 'Basics', elements: 'Elements', combos: 'Combinations', bodymove: 'Body movement', technique: 'Technique', choreo: 'Choreography', footwork: 'Footwork', musicality: 'Musicality', styling: 'Styling' },
-    tagHints: { basics: 'basic steps, taps and basic variations', elements: 'partner figures such as hammerlock, sombrero, shadow, wrap, cross body lead, turns', combos: 'combinations and sequences of several elements', bodymove: 'body waves, body rolls, cambré, hip and chest isolations, head movement, sensual style', technique: 'posture, frame, weight transfer, leading and following, connection, drills', choreo: 'a choreography or performance routine', footwork: 'footwork, syncopations, Dominican style, shines', musicality: 'musicality, rhythm, counting, intros, song structure', styling: 'arm, hair and body styling for leads and follows' },
+    tags: { basics: 'Basics', elements: 'Elements', combos: 'Combinations', bodymove: 'Body movement', isolations: 'Isolations', technique: 'Technique', choreo: 'Choreography', footwork: 'Footwork', musicality: 'Musicality', styling: 'Styling' },
+    tagHints: { basics: 'basic steps, taps and basic variations', elements: 'partner figures such as hammerlock, sombrero, shadow, wrap, cross body lead, turns', combos: 'combinations and sequences of several elements', bodymove: 'body waves, body rolls, cambré, head movement, sensual style', isolations: 'isolations of the head, shoulders, chest and hips', technique: 'posture, frame, weight transfer, leading and following, connection, drills', choreo: 'a choreography or performance routine', footwork: 'footwork, syncopations, Dominican style, shines', musicality: 'musicality, rhythm, counting, intros, song structure', styling: 'arm, hair and body styling for leads and follows' },
     aria: { filter: 'Filters', paste: 'Paste', notes: 'Notes full screen', attAdd: 'Add a photo, file or link to the lesson', share: 'Share', ai: 'Auto-fill with Gemini', back: 'Back', settings: 'Settings', add: 'New lesson', close: 'Close', edit: 'Edit', drive: 'Open in Drive', remove: 'Remove', addFigure: 'Mark a chapter at the current time', mirror: 'Mirror', repeat: 'Repeat a section', fullscreen: 'Fullscreen', pip: 'Picture in picture', play: 'Play', pause: 'Pause', back5: 'Back 5 seconds', fwd5: 'Forward 5 seconds', speed: 'Speed', delete: 'Delete', signout: 'Sign out', rescan: 'Rescan', save: 'Save' }
   }
 };
@@ -1034,7 +1034,7 @@ async function saveLesson() {
       // Move or rename the file in Drive first; only touch the local record once that succeeded.
       const l = editing;
       const next = { date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, note: form.note };
-      next.figures = formChapters.map(c => ({ name: c.name, t: c.t })); next.tags = formTags.slice();
+      next.figures = cleanChapters(); next.tags = formTags.slice();
       const moved = l.source !== next.source || l.date !== next.date;
       if (moved) next.name = await moveLesson(Object.assign({}, l, next));
       if (form.source) ensureSource(form.source, formType);
@@ -1048,7 +1048,7 @@ async function saveLesson() {
       const parentId = form.source ? await ensureSourceFolder(form.source, formType) : root.id;
       const name = `${form.date} ${form.source || 'Untagged'}.${extOf(f.name)}`;
       const file = await resumableUpload(f, { name, parentId, mime, appProperties: { bachata: 'lesson', date: form.date, type: type || '', style: form.style }, onProgress: setProgress });
-      const l = { id: file.id, thumbId: null, name: file.name || name, date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, figures: formChapters.map(c => ({ name: c.name, t: c.t })), tags: formTags.slice(), note: form.note, attachments: [],
+      const l = { id: file.id, thumbId: null, name: file.name || name, date: form.date, source: form.source, type, style: form.style, title: form.title, desc: form.desc, figures: cleanChapters(), tags: formTags.slice(), note: form.note, attachments: [],
         duration: pending.duration != null ? Math.round(pending.duration) : (file.videoMediaMetadata && file.videoMediaMetadata.durationMillis ? Math.round(file.videoMediaMetadata.durationMillis / 1000) : null),
         size: +file.size || f.size, mimeType: file.mimeType || mime, createdAt: nowIso(), updatedAt: nowIso() };
       if (pending.poster) {
@@ -1122,10 +1122,11 @@ async function deleteLesson() {
 
 // ---------- Gemini auto-fill ----------
 function setAiHint(msg) { $('ai-hint').textContent = msg || ''; }
+function cleanChapters() { return formChapters.map(c => ({ name: String(c.name || '').trim(), t: c.t })).filter(c => c.name); }
 function renderFormChapters() {
   const wrap = $('f-chapters-wrap');
   wrap.hidden = !formChapters.length;
-  $('f-chapters').innerHTML = formChapters.map((c, i) => `<div class="fig"><span class="fname">${esc(c.name)}</span><span class="tm">${c.t != null ? fmtDur(c.t) : '·'}</span><button type="button" class="x ib" data-remove-chapter="${i}" aria-label="${esc(T.aria.remove)}">${icon('close')}</button></div>`).join('');
+  $('f-chapters').innerHTML = formChapters.map((c, i) => `<div class="fig"><input class="fname" value="${esc(c.name)}" data-chap="${i}" placeholder="${esc(T.figureName)}" autocomplete="off"><span class="tm">${c.t != null ? fmtDur(c.t) : '·'}</span><button type="button" class="x ib" data-remove-chapter="${i}" aria-label="${esc(T.aria.remove)}">${icon('close')}</button></div>`).join('');
 }
 function renderFormTags() {
   $('f-tags').innerHTML = TAG_KEYS.map(k => `<button type="button" class="chip ${formTags.includes(k) ? 'on' : ''}" data-tag="${k}">${esc(tagLabel(k))}</button>`).join('');
@@ -1574,6 +1575,8 @@ function bindEvents() {
   $('f-att').addEventListener('click', onAttClick);
   $('f-tags').addEventListener('click', e => { const b = e.target.closest('[data-tag]'); if (b) toggleFormTag(b.dataset.tag); });
   $('f-chapters').addEventListener('click', e => { const b = e.target.closest('[data-remove-chapter]'); if (!b) return; formChapters.splice(+b.dataset.removeChapter, 1); renderFormChapters(); });
+  // titles are edited in place; the model follows every keystroke and empty names are dropped on save
+  $('f-chapters').addEventListener('input', e => { const inp = e.target.closest('input[data-chap]'); if (!inp) return; const c = formChapters[+inp.dataset.chap]; if (c) c.name = inp.value; });
   $('btn-save').addEventListener('click', saveLesson);
   $('btn-ai').addEventListener('click', runAi);
   $('btn-delete').addEventListener('click', deleteLesson);

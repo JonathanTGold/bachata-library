@@ -187,6 +187,7 @@ h3+.fig,#f-chapters .fig:first-child{border-radius:var(--r) var(--r) 0 0}
 .fig.add,#f-chapters .fig:last-child{border-radius:0 0 var(--r) var(--r)}
 #f-chapters .fig:only-child{border-radius:var(--r)}
 .fig .fname{flex:1;min-width:0;word-break:break-word}
+.fig input.fname{border:0;outline:0;background:transparent;-webkit-appearance:none;appearance:none;font:inherit;color:inherit;letter-spacing:inherit;padding:0;margin:0}
 .fig .tm{font-variant-numeric:tabular-nums;color:var(--tint);font-weight:500;direction:ltr;font-size:15px;flex:none}
 .fig .x{width:28px;height:28px;color:var(--label3);flex:none;margin-inline-end:-6px}
 .fig .x .i{width:18px;height:18px}
