@@ -7,14 +7,14 @@
  * worker turns each request into an authenticated Drive request. Files are kept on the device in
  * 4 MB parts (Cache Storage): a part is stored the first time it passes through, the rest of the
  * file is fetched ahead while the lesson is open, and lessons uploaded from this device are stored
- * at upload time. Every later seek is served from disk. The most recent 2 GB stay; when the cap is
+ * at upload time. Every later seek is served from disk. The most recent 8 GB stay; when the cap is
  * reached the least recently played lesson goes first.
  *
  * Never touches other Google API requests. */
-const VERSION = 'bl-v48';
+const VERSION = 'bl-v49';
 const MEDIA_CACHE = 'bl-media-1';                   // outlives app updates (not tied to VERSION)
 const PART = 4 * 1024 * 1024;                       // bytes per cached part
-const CAP = +new URL(self.location.href).searchParams.get('cap') || 2 * 1024 * 1024 * 1024;   // bytes kept on the device (?cap= is a test hook)
+const CAP = +new URL(self.location.href).searchParams.get('cap') || 8 * 1024 * 1024 * 1024;   // bytes kept on the device (?cap= is a test hook)
 const SCOPE = self.registration.scope;
 const MEDIA_PATH = new URL('./media', SCOPE).pathname;
 const PART_PATH = new URL('./media-part', SCOPE).pathname;   // cache keys only, never fetched
