@@ -7,7 +7,7 @@
 'use strict';
 
 const CFG = window.BACHATA_CONFIG || {};
-const APP_VERSION = '2.19.1';
+const APP_VERSION = '2.19.2';
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -65,7 +65,7 @@ const STR = {
     couldNotReach: 'אין גישה ל‑Google Drive. ', couldNotLoadVideo: 'לא ניתן לטעון את הסרטון. ', couldNotPlay: 'לא ניתן לנגן את הסרטון. ייתכן שהפורמט לא נתמך בדפדפן הזה.', loadingVideo: 'טוען סרטון…', loadingPct: p => `טוען סרטון… ${p}%`, buffering: 'טוען…',
     marked: (n, t) => `„${n}” סומן ב‑${t}.`, removed: n => `„${n}” הוסר.`, couldNotSave: 'לא ניתן לשמור. ', typeFigure: 'צריך להקליד שם לפרק.',
     schoolsSub: 'מורים פרטיים מופיעים לצד בתי הספר. לחיצה מסננת את הרשימה.', noSchools: 'אין עדיין בתי ספר.', noTeachers: 'אין עדיין מורים פרטיים.', privateTeacher: 'מורה פרטי', groupClasses: 'שיעורים קבוצתיים', addSource: 'הוספה', schoolsAuto: 'בתי ספר ומורים נוספים אוטומטית גם כשמתייגים סיכום.', alreadyListed: 'כבר ברשימה.', added: n => `${n} נוסף.`, removedSource: n => `${n} הוסר.`, moveFirst: 'קודם מעבירים או מוחקים את הסיכומים שלו.', last: 'אחרון',
-    signedInAs: e => `מחובר בתור ${e}`, signedIn: 'מחובר', keepTitle: 'מטמון', keepSub: (n, s) => n ? `${n} שיעורים · ${s}` : 'ריק', on: 'מופעל', off: 'כבוי', mediaCleared: 'המטמון נוקה.', storage: 'אחסון', storageBody: 'הכול נשמר בתיקייה בשם Bachata Library ב‑Google Drive שלך: תת‑תיקייה לכל בית ספר או מורה, הסרטונים, וקובץ אינדקס קטן.', openDrive: 'פתיחת התיקייה ב‑Drive', maintenance: 'תחזוקה', rescan: 'סריקת Drive ותיקון האינדקס', rescanHint: 'מוסיף סיכומים שהועלו ממכשיר אחר או חסרים ברשימה, ומסיר רשומות שהקבצים שלהן נמחקו.', scanning: 'סורק…', rescanDone: (a, r) => `הסתיים. ${a} נוספו, ${r} הוסרו.`, rescanFailed: 'הסריקה נכשלה. ',
+    signedInAs: e => `מחובר בתור ${e}`, signedIn: 'מחובר', keepTitle: 'מטמון', keepSub: (n, s) => n ? `${n} שיעורים · ${s}` : 'ריק', mediaCleared: 'המטמון נוקה.', storage: 'אחסון', storageBody: 'הכול נשמר בתיקייה בשם Bachata Library ב‑Google Drive שלך: תת‑תיקייה לכל בית ספר או מורה, הסרטונים, וקובץ אינדקס קטן.', openDrive: 'פתיחת התיקייה ב‑Drive', maintenance: 'תחזוקה', rescan: 'סריקת Drive ותיקון האינדקס', rescanHint: 'מוסיף סיכומים שהועלו ממכשיר אחר או חסרים ברשימה, ומסיר רשומות שהקבצים שלהן נמחקו.', scanning: 'סורק…', rescanDone: (a, r) => `הסתיים. ${a} נוספו, ${r} הוסרו.`, rescanFailed: 'הסריקה נכשלה. ',
     account: 'חשבון', signOut: 'התנתקות', signOutHint: 'מתנתק במכשיר הזה בלבד. שום דבר ב‑Drive לא נמחק.', language: 'שפה', appearance: 'מראה', themeDark: 'כהה', themeLight: 'בהיר', themeAuto: 'אוטומטי', advanced: 'מתקדם', clientId: 'מזהה לקוח Google OAuth', clientHint: 'נדרש רק אם מריצים עותק עצמאי של האפליקציה.', badClient: 'זה לא נראה כמו מזהה לקוח של Google.', clientSaved: 'המזהה נשמר.', addClientFirst: 'קודם מוסיפים מזהה לקוח.',
     signInAgain: 'צריך להתחבר שוב.', signinCheckFailed: 'בדיקת ההתחברות נכשלה. נסו שוב.', driveNotGranted: 'לא ניתנה גישה ל‑Drive. התחברו שוב והשאירו את תיבת Google Drive מסומנת.',
     recapsN: n => n === 1 ? 'סיכום אחד' : `${n} סיכומים`, schoolsN: n => n === 1 ? 'בית ספר אחד' : `${n} בתי ספר`, teachersN: n => n === 1 ? 'מורה פרטי אחד' : `${n} מורים פרטיים`,
@@ -104,7 +104,7 @@ const STR = {
     couldNotReach: 'Could not reach Google Drive. ', couldNotLoadVideo: 'Could not load this video. ', couldNotPlay: 'Could not play this video. It may use a format this browser cannot decode.', loadingVideo: 'Loading video…', loadingPct: p => `Loading video… ${p}%`, buffering: 'Buffering…',
     marked: (n, t) => `“${n}” marked at ${t}.`, removed: n => `Removed “${n}”.`, couldNotSave: 'Could not save. ', typeFigure: 'Type the figure name.',
     schoolsSub: 'Private teachers listed alongside. Tap one to filter.', noSchools: 'No schools yet.', noTeachers: 'No private teachers yet.', privateTeacher: 'Private teacher', groupClasses: 'Group classes', addSource: 'Add', schoolsAuto: 'Schools and teachers also appear automatically when you tag a recap.', alreadyListed: 'Already in the list.', added: n => `Added ${n}.`, removedSource: n => `Removed ${n}.`, moveFirst: 'Move or delete its recaps first.', last: 'last',
-    signedInAs: e => `Signed in as ${e}`, signedIn: 'Signed in', keepTitle: 'Cache', keepSub: (n, s) => n ? `${n} lessons · ${s}` : 'Empty', on: 'On', off: 'Off', mediaCleared: 'Cache cleared.', storage: 'Storage', storageBody: 'Everything lives in a folder called Bachata Library in your Google Drive: one subfolder per school or teacher, the videos, and a small index file.', openDrive: 'Open the folder in Drive', maintenance: 'Maintenance', rescan: 'Rescan Drive and repair the index', rescanHint: 'Adds recaps uploaded from another device or missing from this list, and removes entries whose files were deleted.', scanning: 'Scanning…', rescanDone: (a, r) => `Done. ${a} added, ${r} removed.`, rescanFailed: 'Rescan failed. ',
+    signedInAs: e => `Signed in as ${e}`, signedIn: 'Signed in', keepTitle: 'Cache', keepSub: (n, s) => n ? `${n} lessons · ${s}` : 'Empty', mediaCleared: 'Cache cleared.', storage: 'Storage', storageBody: 'Everything lives in a folder called Bachata Library in your Google Drive: one subfolder per school or teacher, the videos, and a small index file.', openDrive: 'Open the folder in Drive', maintenance: 'Maintenance', rescan: 'Rescan Drive and repair the index', rescanHint: 'Adds recaps uploaded from another device or missing from this list, and removes entries whose files were deleted.', scanning: 'Scanning…', rescanDone: (a, r) => `Done. ${a} added, ${r} removed.`, rescanFailed: 'Rescan failed. ',
     account: 'Account', signOut: 'Sign out', signOutHint: 'Signs out on this device only. Nothing in Drive is touched.', language: 'Language', appearance: 'Appearance', themeDark: 'Dark', themeLight: 'Light', themeAuto: 'Automatic', advanced: 'Advanced', clientId: 'Google OAuth client ID', clientHint: 'Only needed if you run your own copy of this app.', badClient: 'That does not look like a Google client ID.', clientSaved: 'Client ID saved.', addClientFirst: 'Add the Google client ID first.',
     signInAgain: 'Please sign in again.', signinCheckFailed: 'Sign-in check failed. Please try again.', driveNotGranted: 'Drive access was not granted. Sign in again and keep the Google Drive box ticked.',
     recapsN: n => `${n} recap${n === 1 ? '' : 's'}`, schoolsN: n => `${n} school${n === 1 ? '' : 's'}`, teachersN: n => `${n} private teacher${n === 1 ? '' : 's'}`,
@@ -1479,8 +1479,7 @@ function renderSettings() {
   $('settings-body').innerHTML = `
     <div class="month">${esc(T.storage)}</div>
     <div class="srow"><div><div class="lbl2">${esc(T.openDrive)}</div><div class="sm">${esc(T.storageBody)}</div></div>${root ? `<a class="ib" href="https://drive.google.com/drive/folders/${encodeURIComponent(root.id)}" target="_blank" rel="noopener" aria-label="${esc(T.aria.drive)}">${icon('open')}</a>` : ''}</div>
-    <div class="srow" style="margin-top:8px"><div><div class="lbl2">${esc(T.keepTitle)}</div><div class="sm" id="keep-sub">…</div></div><button class="ib danger" id="btn-clear-media" aria-label="${esc(T.aria.clearMedia)}">${icon('trash')}</button></div>
-    <div class="seg" id="keep-seg" style="margin-top:8px"><button type="button" class="${keepMedia() ? 'on' : ''}" data-keep="1">${esc(T.on)}</button><button type="button" class="${keepMedia() ? '' : 'on'}" data-keep="0">${esc(T.off)}</button></div>
+    <div class="srow" style="margin-top:8px"><div><div class="lbl2">${esc(T.keepTitle)}</div><div class="sm" id="keep-sub">…</div></div><div class="ctls"><button class="ib danger" id="btn-clear-media" aria-label="${esc(T.aria.clearMedia)}">${icon('trash')}</button><button type="button" class="sw ${keepMedia() ? 'on' : ''}" id="keep-sw" role="switch" aria-checked="${keepMedia()}" aria-label="${esc(T.keepTitle)}"></button></div></div>
     <div class="month">${esc(T.maintenance)}</div>
     <div class="srow"><div><div class="lbl2">${esc(T.rescan)}</div><div class="sm">${esc(T.rescanHint)}</div></div><button class="ib" id="btn-rescan" aria-label="${esc(T.aria.rescan)}">${icon('refresh')}</button></div>
     <div class="month">Gemini</div>
@@ -1614,7 +1613,7 @@ function bindEvents() {
     if (id === 'btn-rescan') rescan(btn); else if (id === 'btn-signout') signOut(); else if (id === 'btn-save-client2') saveClientId($('set-client').value); else if (id === 'btn-save-gemini') saveGeminiSettings(); else if (id === 'btn-clear-media') clearMedia();
     const lb = e.target.closest('#lang-seg button'); if (lb) setLanguage(lb.dataset.lang);
     const tb = e.target.closest('#theme-seg button'); if (tb) setTheme(tb.dataset.theme);
-    const kb = e.target.closest('#keep-seg button'); if (kb) { setKeep(kb.dataset.keep === '1'); fillKeepSub(); }
+    if (id === 'keep-sw') { setKeep(!keepMedia()); fillKeepSub(); }
   });
   if (lightMq) { const onChange = () => { if (theme === 'auto') applyTheme(); }; if (lightMq.addEventListener) lightMq.addEventListener('change', onChange); else if (lightMq.addListener) lightMq.addListener(onChange); }
 

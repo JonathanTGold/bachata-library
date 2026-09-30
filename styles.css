@@ -243,6 +243,13 @@ h3+.fig,#f-chapters .fig:first-child{border-radius:var(--r) var(--r) 0 0}
 .trow .ib{background:transparent;color:var(--label3);width:32px;height:32px}
 .srow{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--grp);border-radius:var(--r);padding:10px 14px;min-height:44px;position:relative}
 .srow .lbl2{font-size:17px;letter-spacing:-.4px}
+.srow .ctls{display:flex;align-items:center;gap:6px;flex:none}
+/* iOS-style switch */
+.sw{width:51px;height:31px;border-radius:999px;background:var(--fill2);position:relative;flex:none;padding:0;transition:background .2s}
+.sw:after{content:"";position:absolute;top:2px;inset-inline-start:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.06);transition:transform .2s}
+.sw.on{background:var(--tint-fill)}
+.sw.on:after{transform:translateX(20px)}
+[dir=rtl] .sw.on:after{transform:translateX(-20px)}
 .srow .sm{font-size:13px;color:var(--label2);margin-top:2px;overflow-wrap:break-word;line-height:1.4}
 .srow .ib{color:var(--tint);width:32px;height:32px}
 .srow:has(+.input){border-radius:var(--r) var(--r) 0 0}
